@@ -1,6 +1,6 @@
 struct Ingredient {
   byte ID;
-  String Action;                                               //If given, prompt the message and wait for user confirmation first
+  String Action;                                                //If given, prompt the message and wait for user confirmation first
   byte ml;
 };
 struct Drink {
@@ -57,7 +57,7 @@ bool AddDispencer(Dispenser Dis) {
 bool RemoveDispencer(byte IngredientID) {
   for (byte i = 0; i < Dispensers_Amount; i++) {
     if (Dispensers[i].IngredientID == IngredientID) {
-      if (i != 0) {                                          //If this is the first one (needs to be ocupied)
+      if (i != 0) {                                             //If this is the first one (needs to be ocupied)
         Dispensers[i].Type = UNSPECIFIED;
       } else {
         for (byte j = 1; j < Dispensers_Amount; j++) {
@@ -121,14 +121,14 @@ byte GetDispenserID(byte IngredientID) {
   //  Serial.println("GetDispenserID " + String(IngredientID) + "(" + IngredientIDtoString(IngredientID) + ")");
   if (IngredientID == 0) return 0;
   for (byte i = 0; i <= Ingredient_Amount; i++) {
-    if (Dispensers[i].IngredientID == IngredientID) {       //If the drink is found and avalible
+    if (Dispensers[i].IngredientID == IngredientID) {           //If the drink is found and avalible
       return i;
     }
   }
   return 0;
 }
 void MyYield() {
-  WiFiManager.RunServer();                                    //Do WIFI server stuff if needed
+  WiFiManager.RunServer();                                      //Do WIFI server stuff if needed
   //FastLED.delay(1);
   yield();
 }

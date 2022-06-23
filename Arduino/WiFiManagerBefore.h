@@ -36,16 +36,15 @@
 
 #define WiFiManager_DoRequest                                   //Adds a simple way to do stable URL request (with optional json)
 #define WiFiManager_Restart                                     //Adds a simple handle "/restart" to restart the ESP
-																
+
 #define WiFiManagerUser_VariableNames_Defined                   //Define that we want to use the custom user variables (Dont forget to setup WiFiManager_VariableNames and WiFiManager_Settings)
-const String WiFiManager_VariableNames[] = {"SSID", "Password", "name", "MotorMAXSpeed", "MotorMAXAccel", "BedSize_X", "BedSize_Y", "BedSize_Z", "Manual_X", "Manual_Y", "ShotDispenserML", "DisableSteppersAfterDone", "HomeMAXSpeed", "HomedistanceBounce"};
 const int EEPROM_size = 4096;                                  	//Max Amount of chars for 'SSID(16) + PASSWORD(16) + extra custom vars(?) +1(NULL)' defaults to 3
 
-#define WiFiManagerUser_Name_Defined                            
+#define WiFiManagerUser_Name_Defined
 char Name[16] = "Mixer";                                        //If you want to define the name somewhere else use 'char* Name = Name'
-																
+
 #define WiFiManager_mDNS                                        //Set up mDNS, this makes it so it responce to the url 'http://name.local/'
-																
+
 #define WiFiManager_OTA                                         //Define if you want to use the Over The Air update page (/ota)
 //#define WiFiManagerUser_UpdateWebpage_Defined
 //const String UpdateWebpage = "";                              //Set an custom OTA update URL to show the user
@@ -54,5 +53,5 @@ char Name[16] = "Mixer";                                        //If you want to
 
 //  WiFiManager.EnableSetup(true);                              //(runtime) Enable the settings, only enabled in APmode by default
 //  WiFiManager.WriteEEPROM();                                  //(runtime) If you want to manually save the settings(EEPROM LIMITED WRITES! do not spam)
-                                      
+
 //#define WiFiManager_DNS                                       //Was causing some troubles with stableness, note sure why yet
