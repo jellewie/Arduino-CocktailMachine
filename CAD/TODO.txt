@@ -1,0 +1,8 @@
+Limit switche Z
+Carrage Z
+Belt grapper on Y Carrage
+
+Holes
+M5 = 5.5MM with 9*5mm counterbore         
+	 4.5MM + 1MM chamfer for selftap
+M3 = 3.75MM with 5.75*3mm counterbore
