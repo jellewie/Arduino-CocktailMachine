@@ -287,6 +287,7 @@ void handle_OnConnect() {
 
   HTML += "<br><br><form action=\"/info\"><button>Info</button></form>";
   HTML += "<form action=\"/ota\"><button>OTA page</button></form>";
+  HTML += "<form action=\"/ip\"><button>Softsettings</button></form>";
   server.send(200, "text/html", HTML);
 }
 void handle_Reset() {
