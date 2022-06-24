@@ -13,6 +13,7 @@
 #define PreFixHomeMAXSpeed "hs"
 #define PreFixHomedistanceBounce "hd"
 #define PreFixDisableSteppersAfterMixDone "ds"
+#define PreFixHome "h"
 //Dispenser Settings
 #define PreFixSetDispenserType "dt"
 #define PreFixSetDispenserX "dx"
@@ -53,6 +54,7 @@ void handle_Set() {
   String ERRORMSG;                                              //emthy=no error
   bool WriteEEPROM = false;
   bool makeMix = false;
+  byte DoHoming = -1;
   Drink Mix;
   for (int i = 0; i < server.args(); i++) {
     String ArguName = server.argName(i);
@@ -126,6 +128,8 @@ void handle_Set() {
       } else {
         WriteEEPROM = true;
       }
+    } else if (ArguName == PreFixHome) {
+      DoHoming = true;
     } else if (ArguName == PreFix_Mix_Name) {
       Mix.Name = IngredientStringToID(ArgValue);
     } else if (ArguName == PreFix_0_Ingredient) {
@@ -218,8 +222,16 @@ void handle_Set() {
   } else {
     server.send(400, "application/json", ERRORMSG);
   }
-  if (WriteEEPROM) WiFiManager.WriteEEPROM();
-
+  
+  if (WriteEEPROM)
+    WiFiManager.WriteEEPROM();
+    
+  if (DoHoming == 0) {
+    DisableSteppers();
+  } else if (DoHoming == 1) {
+    Home();
+  }
+  
   if (Mix.Name != "") {
     Serial.println("MakeCocktail " + String(Mix.Name));
     MakeCocktail(Mix);
@@ -254,6 +266,8 @@ void handle_Get() {
     if (i != 0) Json += ",";
     Json += "\"" + IngredientIDtoString(i) + "\"";
   }
+  Json += "],\"Settings\":[";
+  Json += "\"Homed\":" + IsTrueToString(Homed) + ",";
   Json += "]";
 
   Json += "}";
