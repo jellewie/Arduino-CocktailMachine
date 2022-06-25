@@ -223,7 +223,7 @@ void handle_Set() {
   }
 
   if (ERRORMSG == "") {
-    server.send(200, "application/json", "Succes");
+    handle_Get();
   } else {
     server.send(400, "application/json", ERRORMSG);
   }
@@ -271,9 +271,20 @@ void handle_Get() {
     if (i != 0) Json += ",";
     Json += "\"" + IngredientIDtoString(i) + "\"";
   }
-  Json += "],\"Settings\":[";
-  Json += "\"Homed\":" + IsTrueToString(Homed) + ",";
-  Json += "]";
+  Json += "],\"Settings\":[{";
+  Json += "\"Homed\":\"" + IsTrueToString(Homed) + "\",";
+  Json += "\"DisableSteppersAfterMixDone\":\"" + IsTrueToString(DisableSteppersAfterMixDone) + "\",";
+  Json += "\"BedSize_X\":" + String(BedSize_X) + ",";
+  Json += "\"BedSize_Y\":" + String(BedSize_Y) + ",";
+  Json += "\"BedSize_Z\":" + String(BedSize_Z) + ",";
+  Json += "\"Manual_X\":" + String(Manual_X) + ",";
+  Json += "\"Manual_Y\":" + String(Manual_Y) + ",";
+  Json += "\"MotorMAXSpeed\":" + String(MotorMAXSpeed) + ",";
+  Json += "\"MotorMAXAccel\":" + String(MotorMAXAccel) + ",";
+  Json += "\"ShotDispenserML\":" + String(ShotDispenserML) + ",";
+  Json += "\"HomeMAXSpeed\":" + String(HomeMAXSpeed) + ",";
+  Json += "\"HomedistanceBounce\":" + String(HomedistanceBounce);
+  Json += "}]";
 
   Json += "}";
   server.send(200, "text/html", Json);
