@@ -222,7 +222,7 @@ void handle_Set() {
   } else {
     server.send(400, "application/json", ERRORMSG);
   }
-  
+
   if (WriteEEPROM)
     WiFiManager.WriteEEPROM();
 

@@ -91,40 +91,11 @@ void setup() {
   Serial.println("WiFi setup executed with responce code '" + String(Answer) + "' " + IpAddress2String(WiFi.localIP())); //The return codes can be found in "WiFiManager.cpp" in "CWiFiManager::Start("
   WiFiManager.OTA_Enabled = true;                               //(runtime) Turn off/on OTA
   WiFiManager.EnableSetup(true);                                //(runtime) Enable the settings, only enabled in APmode by default
-
-  if (Home(true, false, false) == false) {
-    while (true) {
-      static unsigned long LastTime;
-      if (TickEveryXms(&LastTime, 100)) {
-        Serial.println("Homing error, please reset");
-      }
-      static unsigned long LastTimea;
-      if (TickEveryXms(&LastTimea, ErrorLEDHoming)) {
-        digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-      }
-      static unsigned long LastTimeb = millis();
-      if (TickEveryXms(&LastTimeb, 2500)) {
-        ESP.restart();
-      }
-      MyYield();
-    }
-  }
   digitalWrite(LED_BUILTIN, LOW);
 }
 void loop() {
   WiFiManager.RunServer();                                      //(runtime) Note when using OTA, you need to run the server in your loop
-  //  static int GotoPos = 0;
-  //  if (!Stepper_X.run()) {
-  //    Serial.println("Reached target position, setting new one");
-  //    GotoPos = GotoPos == 0 ? BedSize_X : 0;
-  //    Stepper_X.moveTo(GotoPos);
-  //  }
 }
-//void GetDrink(byte DrinkID) {
-//  if (DrinkID > Drinks_Amount) return;                          //If a invalid drink is given
-//  MakeCocktail(Drinks[DrinkID]);
-//}
-
 void MakeCocktail(Drink Mix) {
   for (byte i = 0; i < 8; i++) {                                //For each Ingredient
     if (Mix.Ingredients[i].ID != 0 or Mix.Ingredients[i].Action != 0) {
