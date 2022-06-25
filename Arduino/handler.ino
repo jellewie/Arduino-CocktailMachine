@@ -225,13 +225,13 @@ void handle_Set() {
   
   if (WriteEEPROM)
     WiFiManager.WriteEEPROM();
-    
+
   if (DoHoming == 0) {
     DisableSteppers();
   } else if (DoHoming == 1) {
     Home();
   }
-  
+
   if (Mix.Name != "") {
     Serial.println("MakeCocktail " + String(Mix.Name));
     MakeCocktail(Mix);
