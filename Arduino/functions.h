@@ -211,17 +211,12 @@ void Move(AccelStepper Step, int Pos, int Max) {
     Pos = Max;
     Serial.print("Error move out of bouds, moving to MAX instead");
   }
-  if (!Homed)
-    Home();
-  Step.moveTo(Pos);
+  Serial.println("MoveTo done");
 }
 void DisableSteppers() {
   Homed = false;
   digitalWrite(PDO_Step_enable, HIGH);                          //Disable all stepper drivers
 }
-//byte IsAvailble(Ingredient IN){
-//  return GetDispenserID(IN.ID);
-//}
 bool IsAvailable(byte DrinkID) {
   Serial.println("Checking IsAvailable " + String(DrinkID));
   if (DrinkID > Drinks_Amount) return false;                    //If a invalid drink is given

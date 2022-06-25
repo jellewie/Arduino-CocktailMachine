@@ -97,6 +97,11 @@ void loop() {
   WiFiManager.RunServer();                                      //(runtime) Note when using OTA, you need to run the server in your loop
 }
 void MakeCocktail(Drink Mix) {
+  if (!Homed) {
+    if (!Home(true, false, false))
+      return;
+  }
+
   for (byte i = 0; i < 8; i++) {                                //For each Ingredient
     if (Mix.Ingredients[i].ID != 0 or Mix.Ingredients[i].Action != 0) {
       Serial.println(" == Drink " + String(Mix.Name) + "' Next ingredient ='" + IngredientIDtoString(Mix.Ingredients[i].ID) + "'");
