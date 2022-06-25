@@ -138,18 +138,27 @@ void MyDelay(int DelayMS) {                                     //Just a non-blo
   while (millis() < _StartTime + DelayMS)
     MyYield();
 }
-bool MoveWait(AccelStepper Step, byte RefferenceButton) {
+bool MoveWait(AccelStepper Step, byte RefferenceButton, int pos = 0);
+bool MoveWait(AccelStepper Step, byte RefferenceButton, int pos) {
+  Step.moveTo(pos);
   bool WaitMore = true;
   while (WaitMore) {
-    if (not Step.run()) {                                       //If we have done all steps
+    Step.run();
+    if (not Step.isRunning()) {                                 //If we have done all steps
       Step.setCurrentPosition(0);
+      Serial.println("MW: not Running");
       return false;
     } else if (digitalRead(RefferenceButton) == LOW) {          //If we have hit the switch
       Step.setCurrentPosition(0);
+      Serial.println("A1=" + String(Stepper_X.currentPosition()));
+      Step.run();
+      delay(100);
+      Serial.println("MW: Switch homed, pos= " + String(Step.currentPosition()));
       return true;
     }
-    yield();
+    MyYield();
   }
+  Serial.println("MW: UNK");
   return false;
 }
 bool Home(bool X = true, bool Y = true, bool Z = true);
@@ -159,27 +168,25 @@ bool Home(bool X, bool Y, bool Z) {
   bool Homed_X = false, Homed_Y = false, Homed_Z = false;
   if (X) {
     Serial.println("X");
-    Stepper_X.moveTo(-BedSize_X);
-    if (MoveWait(Stepper_X, PDI_X_Ref)) {                       //If the switch is touched
+    if (MoveWait(Stepper_X, PDI_X_Ref, -BedSize_X)) {           //If the switch is touched
       Stepper_X.moveTo(HomedistanceBounce);
       while (Stepper_X.run())
         MyYield();
       Stepper_X.setMaxSpeed(HomeMAXSpeed);
-      Stepper_X.moveTo(0);
-      Homed_X = MoveWait(Stepper_X, PDI_X_Ref);
+      Homed_X = MoveWait(Stepper_X, PDI_X_Ref, 0);
+      Stepper_X.setCurrentPosition(0);                          //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
       Stepper_X.setMaxSpeed(MotorMAXSpeed);                     //Reset max speed
     }
   }
   if (Y) {
     Serial.println("Y");
-    Stepper_Y.moveTo(-BedSize_Y);
-    if (MoveWait(Stepper_Y, PDI_Y_Ref)) {                       //If the switch is touched
+    if (MoveWait(Stepper_Y, PDI_Y_Ref, -BedSize_Y)) {           //If the switch is touched
       Stepper_Y.moveTo(HomedistanceBounce);
       while (Stepper_Y.run())
         MyYield();
       Stepper_Y.setMaxSpeed(HomeMAXSpeed);
-      Stepper_Y.moveTo(0);
       Homed_Y = MoveWait(Stepper_Y, PDI_Y_Ref);
+      Stepper_Y.setCurrentPosition(0);                          //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
       Stepper_Y.setMaxSpeed(MotorMAXSpeed);                     //Reset max speed
     }
   }
@@ -193,6 +200,7 @@ bool Home(bool X, bool Y, bool Z) {
       Stepper_Z.setMaxSpeed(HomeMAXSpeed);
       Stepper_Z.moveTo(0);
       Homed_Z = MoveWait(Stepper_Z, PDI_Z_Ref);
+      Stepper_Z.setCurrentPosition(0);                          //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
       Stepper_Z.setMaxSpeed(MotorMAXSpeed);                     //Reset max speed
     }
   }
@@ -200,16 +208,29 @@ bool Home(bool X, bool Y, bool Z) {
     Homed = true;
     return true;
   }
-  Serial.println(Homed);
-  return Homed;
+  Serial.println("Homed" + String(Homed) + " X" + String(X) + "," + String(Homed_X) + " Y" + String(Y) + "," + String(Homed_Y) + " Z" + String(Z) + "," + String(Homed_Z));
+  return false;
 }
-void Move(AccelStepper Step, int Pos, int Max) {
-  if (Pos < 0) {
-    Pos = 0;
-    Serial.print("Error move out of bouds, moving to MIN instead");
-  } else if (Pos > Max) {
-    Pos = Max;
-    Serial.print("Error move out of bouds, moving to MAX instead");
+void MoveTo(int LocationX, int LocationY, int LocationZ = -1);
+void MoveTo(int LocationX, int LocationY, int LocationZ) {
+  Serial.println("MoveTo " + String(LocationX) + " , " + String(LocationY));
+  if (LocationX >= 0) {
+    if (LocationX > BedSize_X)
+      LocationX = BedSize_X;
+    Stepper_X.moveTo(LocationX);
+  }
+  if (LocationY >= 0) {
+    if (LocationY > BedSize_Y)
+      LocationY = BedSize_Y;
+    Stepper_Y.moveTo(LocationY);
+  }
+  if (LocationZ >= 0) {
+    if (LocationZ > BedSize_Z)
+      LocationZ = BedSize_Z;
+    Stepper_Z.moveTo(LocationZ);
+  }
+  while (Stepper_X.run() or Stepper_Y.run() or Stepper_Z.run()) {
+    yield();
   }
   Serial.println("MoveTo done");
 }

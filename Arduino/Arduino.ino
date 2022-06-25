@@ -163,12 +163,3 @@ void GetIngredient(Ingredient IN) {
     MyDelay(2500);
   }
 }
-void MoveTo(int LocationX, int LocationY) {
-  Serial.println("MoveTo " + String(LocationX) + " , " + String(LocationY));
-  Stepper_X.moveTo(LocationX);
-  Stepper_Y.moveTo(LocationY);
-  while (Stepper_X.run() or Stepper_Y.run()) {
-    yield();
-  }
-  Serial.println("MoveTo done");
-}

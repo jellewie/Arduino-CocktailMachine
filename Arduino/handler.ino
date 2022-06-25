@@ -56,6 +56,11 @@ void handle_Set() {
   bool makeMix = false;
   byte DoHoming = -1;
   Drink Mix;
+  for (byte i = 0; i < 8; i++) {
+    Mix.Ingredients[i].ID = 0;
+    Mix.Ingredients[i].Action = "";
+    Mix.Ingredients[i].ml = 0;
+  }
   for (int i = 0; i < server.args(); i++) {
     String ArguName = server.argName(i);
     ArguName.toLowerCase();
