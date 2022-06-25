@@ -150,9 +150,7 @@ bool MoveWait(AccelStepper Step, byte RefferenceButton, int pos) {
       return false;
     } else if (digitalRead(RefferenceButton) == LOW) {          //If we have hit the switch
       Step.setCurrentPosition(0);
-      Serial.println("A1=" + String(Stepper_X.currentPosition()));
       Step.run();
-      delay(100);
       Serial.println("MW: Switch homed, pos= " + String(Step.currentPosition()));
       return true;
     }
