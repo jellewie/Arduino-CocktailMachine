@@ -1,0 +1,19 @@
+:host {
+	scroll-snap-align: center;
+}
+
+.image {
+	width: 200px;
+	height: 400px;
+	background: red;
+}
+
+.name {
+	text-align: center;
+}
+
+.ingredients-list {
+	list-style: none;
+	padding: 0;
+	text-align: center;
+}
