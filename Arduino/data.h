@@ -4,7 +4,7 @@
 */
 //Ingredients can NOT have a "." or "," or "-" in them!
 enum IngredientE {UNK, VODKA, GIN, ORANGE_JUICE, RUM, CRANBERRY_JUICE, LEMONADE, TRIPLE_SEC, LEMON_JUICE, COLA, SPRITE, TEQUILA, GRENADINE_SYRUP, MILK, PINEAPPLE_JUICE, LIME_JUICE, PEACH_TREE, WHITE_RUM, TONIC_WATER, WATERMELON_VODKA, GINGER_ALE, SIMPLE_SYRUP, WHISKY, LEMON_SODA};
-const String IngredientS[] = {"UNK", "VODKA", "GIN", "ORANGE_JUICE", "RUM", "CRANBERRY_JUICE", "LEMONADE", "TRIPLE_SEC", "LEMON_JUICE", "COLA", "SPRITE", "TEQUILA", "GRENADINE_SYRUP", "MILK", "PINEAPPLE_JUICE", "LIME_JUICE", "PEACH_TREE", "WHITE_RUM", "TONIC_WATER", "WATERMELON_VODKA", "GINGER_ALE", "SIMPLE_SYRUP", "WHISKY", "LEMON_SODA"};
+String IngredientS[] = {"UNK", "VODKA", "GIN"};
 
 Drink Drinks[60] = {
   {"Sex on the Beach", 0xBAB34, {{0, "#ice", 0}, {1, "", 45}, {17, "", 45}, {3, "", 135}, {0, "#shake", 0}, {5, "", 30}}},
@@ -44,7 +44,7 @@ Drink Drinks[60] = {
   {"Montana Sunrise", 0xFFFFFF, {{0, "#ice", 0}, {12, "", 23}, {3, "", 60}, {1, "", 120}, {0, "#shake", 0}, {0, "#strain", 0}}},
   {"Pimp Daddy", 0xFFFFFF, {{0, "#ice", 0}, {11, "", 60}, {1, "", 60}, {8, "", 30}, {5, "", 90}, {0, "#stir", 0}}},
   {"Adam Cocktail", 0xFFFFFF, {{0, "#ice", 0}, {4, "", 60}, {8, "", 30}, {12, "", 30}, {0, "#shake", 0}, {0, "#strain", 0}}},
-  {"Long Island Taxi", 0xFFFFFF, {{0, "#ice", 0}, {1, "", 60}, {2, "", 30}, {11, "", 30}, {4, "", 30}, {3, "", 60}, {0, "#shake", 0}, {0, "#strain",}}},
+  {"Long Island Taxi", 0xFFFFFF, {{0, "#ice", 0}, {1, "", 60}, {2, "", 30}, {11, "", 30}, {4, "", 30}, {3, "", 60}, {0, "#shake", 0}}},
   {"Caribe Cosmopolitan", 0xFFFFFF, {{0, "#ice", 0}, {4, "", 45}, {5, "", 30}, {7, "", 30}, {16, "", 15}, {0, "#shake", 0}}},
   {"Key West Screwdriver", 0xFFFFFF, {{1, "", 60}, {16, "", 30}, {3, "", 150}, {0, "#stir", 0}}},
   {"Shark Tank", 0xFFFFFF, {{6, "", 120}, {1, "", 120}, {12, "", 60}}},
@@ -69,5 +69,12 @@ Drink Drinks[60] = {
 Dispenser Dispensers[Dispensers_Amount] = {
   //Type        , X,     Y,   Z  , MSml, MSoff, IngredientID
   {PUMP         , 3000 , 0  , 1  , 500 , 500  , COLA},
-  {SHOTDispenser, 6000 , 0  , 50 , 100 , 1000 , VODKA}
+  {SHOTDispenser, 6000 , 0  , 50 , 100 , 1000 , VODKA},
+  {SHOTDispenser, 9000 , 0  , 50 , 100 , 1000 , GIN},
+  {SHOTDispenser, 11000, 0  , 50 , 100 , 1000 , 4},
+  {SHOTDispenser, 14000, 0  , 50 , 100 , 1000 , 5},
+  {SHOTDispenser, 17000, 0  , 50 , 100 , 1000 , 6},
+  {SHOTDispenser, 20000, 0  , 50 , 100 , 1000 , 7},
+  {SHOTDispenser, 23000, 0  , 50 , 100 , 1000 , 8},
+  {SHOTDispenser, 26000, 0  , 50 , 100 , 1000 , 17}
 };
