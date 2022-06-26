@@ -5,6 +5,7 @@ struct Ingredient {
 };
 struct Drink {
   String Name;
+  int Color;
   Ingredient Ingredients[8];
 };
 enum TypeE {UNSPECIFIED, SHOTDispenser, PUMP};
