@@ -269,8 +269,8 @@ void handle_Get() {
     Json += "\"" + IngredientIDtoString(i) + "\"";
   }
   Json += "],\"Settings\":[{";
-  Json += "\"Homed\":\"" + IsTrueToString(Homed) + "\"";
-  Json += ",\"DisableSteppersAfterMixDone\":\"" + IsTrueToString(DisableSteppersAfterMixDone) + "\"";
+  Json += "\"Homed\":" + IsTrueToString(Homed);
+  Json += ",\"DisableSteppersAfterMixDone\":" + IsTrueToString(DisableSteppersAfterMixDone);
   Json += ",\"BedSize_X\":" + String(BedSize_X);
   Json += ",\"BedSize_Y\":" + String(BedSize_Y);
   Json += ",\"BedSize_Z\":" + String(BedSize_Z);
