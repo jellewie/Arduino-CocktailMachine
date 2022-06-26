@@ -27,6 +27,9 @@ const byte PDI_X_Ref = 18;                           //LOW = TRIGGERED
 const byte PDI_Y_Ref = 19;
 const byte PDI_Z_Ref = 21;
 const byte PDO_Pump[] = {33, 27};
+bool DisableSteppersAfterMixDone = false;
+byte ShotDispenserML = 30;
+byte HomeMAXSpeed = 200;
 int MotorMAXSpeed = 5500;
 int MotorMAXAccel = 3000;
 int BedSize_X = 26000;
@@ -34,10 +37,8 @@ int BedSize_Y = 1000;
 int BedSize_Z = 1000;
 int Manual_X = 0;
 int Manual_Y = 0;
-byte ShotDispenserML = 30;
-byte HomeMAXSpeed = 200;
 int HomedistanceBounce = 400;
-bool DisableSteppersAfterMixDone = false;
+int MaxGlassSize = 300;
 
 bool Homed = false;
 byte Pump_Amount = sizeof(PDO_Pump) / sizeof(PDO_Pump[0]);      //Why filling this in if we can automate that? :)
@@ -111,7 +112,7 @@ void MakeCocktail(Drink Mix) {
   MoveTo(Manual_X, Manual_Y);
 }
 void GetIngredient(Ingredient IN) {
-  Serial.println("GetIngredient: Name=" + String(IN.ID) + " Action=" + IN.Action + " ml=" + String(IN.ml));
+  Serial.println("GetIngredient: ID=" + String(IN.ID) + " Action=" + IN.Action + " ml=" + String(IN.ml));
   if (IN.Action != "") {
     MoveTo(Manual_X, Manual_Y);
     Serial.println("TODO, Wait for user confirmation code, msg = '" + String(IN.Action) + "'");
@@ -144,6 +145,7 @@ void GetIngredient(Ingredient IN) {
           }
         } break;
       case PUMP: {
+          Serial.println("GetIngredient from Pump");
           if (Dispensers[DispenserID].LocationZ <= Pump_Amount) {
             MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);
             digitalWrite(PDO_Pump[Dispensers[DispenserID].LocationZ], HIGH);

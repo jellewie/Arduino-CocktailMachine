@@ -62,13 +62,5 @@ Drink Drinks[60] = {
 Dispenser Dispensers[Dispensers_Amount] = {
   //Type        , X,     Y,   Z  , MSml, MSoff, IngredientID
   {PUMP         , 3000 , 0  , 1  , 500 , 500  , COLA},
-  {PUMP         , 3000 , 100, 2  , 500 , 500  , ORANGE_JUICE},
-  {SHOTDispenser, 6000 , 0  , 50 , 100 , 1000 , VODKA},
-  {SHOTDispenser, 9000 , 0  , 50 , 100 , 1000 , GIN},
-  {SHOTDispenser, 11000, 0  , 50 , 100 , 1000 , 4},
-  {SHOTDispenser, 14000, 0  , 50 , 100 , 1000 , 5},
-  {SHOTDispenser, 17000, 0  , 50 , 100 , 1000 , 6},
-  {SHOTDispenser, 20000, 0  , 50 , 100 , 1000 , 7},
-  {SHOTDispenser, 23000, 0  , 50 , 100 , 1000 , 8},
-  {SHOTDispenser, 26000, 0  , 50 , 100 , 1000 , 17}
+  {SHOTDispenser, 6000 , 0  , 50 , 100 , 1000 , VODKA}
 };

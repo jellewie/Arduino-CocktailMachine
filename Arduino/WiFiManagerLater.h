@@ -56,9 +56,22 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
     case 11: {
         DisableSteppersAfterMixDone = IsTrue(Value); return true;
       } break;
+    case 12: {
+        if (!StringIsDigit(Value))                return false;
+        MaxGlassSize = Value.toInt();             return true;
+      } break;
+    case 13: {
+        //reserved
+      } break;
+    case 14: {
+        //reserved
+      } break;
+    case 15: {
+        //reserved
+      } break;
     default: {
-        byte i = ValueID - 12;                                  //Remove the amount above from the counter, so the next are of the Dispensers
-        if (i <= Dispensers_Amount) {
+        byte i = ValueID - 15;                                  //Remove the amount above from the counter, so the next are of the Dispensers
+        if (i < Dispensers_Amount) {
           String _Output[7];
           CutVariable(Value, &_Output[0], 7);
           Dispenser Dis;
@@ -80,21 +93,25 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
   //if its 'Safe' to return the real value (for example the password will return '****' or '1234')
   //'Convert' the value to a readable string for the user (bool '0/1' to 'FALSE/TRUE')
   switch (ValueID) {                                            //Note the numbers are shifted from what is in memory, 0 is the first user value
-    case 0:  return String(Name);                                  break;
-    case 1:  return String(MotorMAXSpeed);                         break;
-    case 2:  return String(MotorMAXAccel);                         break;
-    case 3:  return String(BedSize_X);                             break;
-    case 4:  return String(BedSize_Y);                             break;
-    case 5:  return String(BedSize_Z);                             break;
-    case 6:  return String(Manual_X);                              break;
-    case 7:  return String(Manual_Y);                              break;
-    case 8:  return String(ShotDispenserML);                       break;
-    case 9:  return String(HomeMAXSpeed);                          break;
-    case 10: return String(HomedistanceBounce);                    break;
-    case 11: return IsTrueToString(DisableSteppersAfterMixDone);   break;
+    case 0:  return String(Name);                                 break;
+    case 1:  return String(MotorMAXSpeed);                        break;
+    case 2:  return String(MotorMAXAccel);                        break;
+    case 3:  return String(BedSize_X);                            break;
+    case 4:  return String(BedSize_Y);                            break;
+    case 5:  return String(BedSize_Z);                            break;
+    case 6:  return String(Manual_X);                             break;
+    case 7:  return String(Manual_Y);                             break;
+    case 8:  return String(ShotDispenserML);                      break;
+    case 9:  return String(HomeMAXSpeed);                         break;
+    case 10: return String(HomedistanceBounce);                   break;
+    case 11: return IsTrueToString(DisableSteppersAfterMixDone);  break;
+    case 12: return String(MaxGlassSize);                         break;
+    case 13: return "";                                           break;
+    case 14: return "";                                           break;
+    case 15: return "";                                           break;
     default: {
-        byte i = ValueID - 12;                                  //Remove the amount above from the counter, so the next are of the Dispensers
-        if (i <= Dispensers_Amount) {
+        byte i = ValueID - 15;                                  //Remove the amount above from the counter, so the next are of the Dispensers
+        if (i < Dispensers_Amount) {
           String Output = String(Dispensers[i].Type) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].LocationZ) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].TimeMSoff) + "," + String(Dispensers[i].IngredientID);
           return String(Output);
         }
