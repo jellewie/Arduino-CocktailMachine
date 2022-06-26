@@ -270,6 +270,6 @@ bool IsTrue(String input) {
 }
 String IsTrueToString(bool input) {
   if (input)
-    return "TRUE";
-  return "FALSE";
+    return "true";
+  return "false";
 }
