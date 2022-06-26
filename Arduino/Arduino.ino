@@ -39,6 +39,7 @@ int Manual_X = 0;
 int Manual_Y = 0;
 int HomedistanceBounce = 400;
 int MaxGlassSize = 300;
+int SaveEEPROMinSeconds = 0;
 
 bool Homed = false;
 byte Pump_Amount = sizeof(PDO_Pump) / sizeof(PDO_Pump[0]);      //Why filling this in if we can automate that? :)
@@ -95,7 +96,7 @@ void setup() {
   digitalWrite(LED_BUILTIN, LOW);
 }
 void loop() {
-  WiFiManager.RunServer();                                      //(runtime) Note when using OTA, you need to run the server in your loop
+  MyYield();
 }
 void MakeCocktail(Drink Mix) {
   if (!Homed) {

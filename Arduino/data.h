@@ -3,8 +3,8 @@
   This file stores all data about all the types of drinks
 */
 //Ingredients can NOT have a "." or "," or "-" in them!
-enum IngredientE {UNK, VODKA, GIN, ORANGE_JUICE, RUM, CRANBERRY_JUICE, LEMONADE, TRIPLE_SEC, LEMON_JUICE, COLA, SPRITE, TEQUILA, GRENADINE_SYRUP, MILK, PINEAPPLE_JUICE, LIME_JUICE, PEACH_TREE, WHITE_RUM, TONIC_WATER, WATERMELON_VODKA, GINGER_ALE, SIMPLE_SYRUP};
-String IngredientS[] = {"UNK", "VODKA", "GIN", "ORANGE_JUICE", "RUM", "CRANBERRY_JUICE", "LEMONADE", "TRIPLE_SEC", "LEMON_JUICE", "COLA", "SPRITE", "TEQUILA", "GRENADINE_SYRUP", "MILK", "PINEAPPLE_JUICE", "LIME_JUICE", "PEACH_TREE", "WHITE_RUM", "TONIC_WATER", "WATERMELON_VODKA", "GINGER_ALE", "SIMPLE_SYRUP"};
+enum IngredientE {UNK, VODKA, GIN, ORANGE_JUICE, RUM, CRANBERRY_JUICE, LEMONADE, TRIPLE_SEC, LEMON_JUICE, COLA, SPRITE, TEQUILA, GRENADINE_SYRUP, MILK, PINEAPPLE_JUICE, LIME_JUICE, PEACH_TREE, WHITE_RUM, TONIC_WATER, WATERMELON_VODKA, GINGER_ALE, SIMPLE_SYRUP, WHISKY, LEMON_SODA};
+const String IngredientS[] = {"UNK", "VODKA", "GIN", "ORANGE_JUICE", "RUM", "CRANBERRY_JUICE", "LEMONADE", "TRIPLE_SEC", "LEMON_JUICE", "COLA", "SPRITE", "TEQUILA", "GRENADINE_SYRUP", "MILK", "PINEAPPLE_JUICE", "LIME_JUICE", "PEACH_TREE", "WHITE_RUM", "TONIC_WATER", "WATERMELON_VODKA", "GINGER_ALE", "SIMPLE_SYRUP", "WHISKY", "LEMON_SODA"};
 
 Drink Drinks[60] = {
   {"Sex on the Beach", 0xBAB34, {{0, "#ice", 0}, {1, "", 45}, {17, "", 45}, {3, "", 135}, {0, "#shake", 0}, {5, "", 30}}},
@@ -49,14 +49,21 @@ Drink Drinks[60] = {
   {"Key West Screwdriver", 0xFFFFFF, {{1, "", 60}, {16, "", 30}, {3, "", 150}, {0, "#stir", 0}}},
   {"Shark Tank", 0xFFFFFF, {{6, "", 120}, {1, "", 120}, {12, "", 60}}},
   {"A Gilligan's Island", 0xFFFFFF, {{1, "", 30}, {17, "", 30}, {3, "", 90}, {5, "", 90}, {0, "#shake", 0}}},
-  {"Bailey's White Russian", 0xFFFFFF, {{0, "#ice", 0}, {0, "Milk ", 120}, {0, "Bailey's", 60}, {1, "", 60}, {0, "#stir", 0}}},
+  {"Bailey's White Russian", 0xFFFFFF, {{0, "#ice", 0}, {13, "", 120}, {0, "Bailey's", 60}, {1, "", 60}, {0, "#stir", 0}}},
   {"Blind Bat", 0xFFFFFF, {{1, "", 120}, {9, "", 120}, {18, "", 10}, {0, "#stir", 0}}},
   {"Hot Sex Cocktail", 0xFFFFFF, {{0, "#ice", 0}, {7, "", 75}, {3, "", 120}, {0, "#stir", 0}, {12, "", 10}}},
   {"Bloody Nightmare", 0xFFFFFF, {{0, "#ice", 0}, {1, "", 30}, {16, "", 60}, {5, "", 210}, {0, "#stir", 0}}},
   {"Snoop Dogg", 0xFFFFFF, {{0, "Gin ", 60}, {3, "", 90}, {0, "#stir", 0}}},
   {"Gin Citric", 0xFFFFFF, {{0, "#ice", 0}, {2, "", 60}, {12, "", 5}, {8, "", 30}, {16, "", 30}, {3, "", 60}, {0, "#stir", 0}}},
   {"Cat Cocktail", 0xFFFFFF, {{0, "#ice", 0}, {1, "", 45}, {7, "", 15}, {5, "", 120}, {0, "#stir", 0}}},
-  {"Hard Dick", 0xFFFFFF, {{1, "", 30}, {2, "", 30}, {18, "", 30}, {0, "#stir", 0}, {10, "", 90}}}
+  {"Hard Dick", 0xFFFFFF, {{1, "", 30}, {2, "", 30}, {18, "", 30}, {0, "#stir", 0}, {10, "", 90}}},
+  {"Vodka soda", 0x964B00, {{0, "#ice", 0}, {1, "", 60}, {9, "", 240}}},
+  {"Rum and coke", 0x964B00, {{9, "", 120}, {18, "", 50}, {16, "", 10}}},
+  {"Long island iced tea", 0xFFFFFF, {{22, "", 30}, {11, "", 15}, {18, "", 15}, {8, "", 30}, {7, "", 15}, {9, "", 45}, {2, "", 15}, {1, "", 15}}},
+  {"Daiquiri", 0xFFFFFF, {{18, "", 45}, {16, "", 30}, {22, "", 15}}},
+  {"Margarita", 0x42F595, {{7, "", 30}, {16, "", 30}, {11, "", 60}}},
+  {"Mojito", 0x9DFF85, {{18, "", 45}, {16, "", 30}, {0, "#2 thee spoons of sugar", 0}, {0, "#6 leaves of mind", 0}, {24, "", 105}}},
+  {"Gin and tonic", 0xD4D2D2, {{2, "", 30}, {19, "", 90}}}
 };
 
 Dispenser Dispensers[Dispensers_Amount] = {

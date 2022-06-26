@@ -13,9 +13,9 @@ struct Dispenser {
   byte Type;
   int LocationX;
   int LocationY;
-  int LocationZ;         //Used for Pump_ID for PUMP
-  int TimeMSML;          //Timer per ms for each mL
-  int TimeMSoff;         //Delay in MS to wait after
+  int LocationZ;                                                //Used for Pump_ID for PUMP
+  int TimeMSML;                                                 //Timer per ms for each mL
+  int TimeMSoff;                                                //Delay in MS to wait after
   byte IngredientID;
 };
 
@@ -128,8 +128,19 @@ byte GetDispenserID(byte IngredientID) {
   }
   return 0;
 }
+void CheckEEPROMSave() {
+  if (SaveEEPROMinSeconds == 0) {
+    WiFiManager.WriteEEPROM();                                  //(runtime) If you want to manually save the settings(EEPROM LIMITED WRITES! do not spam)
+  } else if (SaveEEPROMinSeconds >= 0 ) {
+    static unsigned long LastTime;
+    if (TickEveryXms(&LastTime, 1000)) {
+      SaveEEPROMinSeconds -= 1;
+    }
+  }
+}
 void MyYield() {
   WiFiManager.RunServer();                                      //Do WIFI server stuff if needed
+  CheckEEPROMSave();
   //FastLED.delay(1);
   yield();
 }
