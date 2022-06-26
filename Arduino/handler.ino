@@ -52,7 +52,6 @@
 void handle_Set() {
   Serial.print("SV: /SET?");
   String ERRORMSG;                                              //emthy=no error
-  bool WriteEEPROM = false;
   bool makeMix = false;
   byte DoHoming = -1;
   Drink Mix;
@@ -71,67 +70,67 @@ void handle_Set() {
       if (!WiFiManagerUser_Set_Value(1, ArgValue)) {
         ERRORMSG = "MotorMAXSpeed Not set";
       } else {
-        WriteEEPROM = true;
+        SaveEEPROMinSeconds = 30;
       }
     } else if (ArguName == PreFixMotorMAXAccel) {
       if (!WiFiManagerUser_Set_Value(2, ArgValue)) {
         ERRORMSG = "MotorMAXAccel Not set";
       } else {
-        WriteEEPROM = true;
+        SaveEEPROMinSeconds = 30;
       }
     } else if (ArguName == PreFixBedSize_X) {
       if (!WiFiManagerUser_Set_Value(3, ArgValue)) {
         ERRORMSG = "BedSize_X Not set";
       } else {
-        WriteEEPROM = true;
+        SaveEEPROMinSeconds = 30;
       }
     } else if (ArguName == PreFixBedSize_Y) {
       if (!WiFiManagerUser_Set_Value(4, ArgValue)) {
         ERRORMSG = "BedSize_Y Not set";
       } else {
-        WriteEEPROM = true;
+        SaveEEPROMinSeconds = 30;
       }
     } else if (ArguName == PreFixBedSize_Z) {
       if (!WiFiManagerUser_Set_Value(5, ArgValue)) {
         ERRORMSG = "BedSize_Z Not set";
       } else {
-        WriteEEPROM = true;
+        SaveEEPROMinSeconds = 30;
       }
     } else if (ArguName == PreFixManual_X) {
       if (!WiFiManagerUser_Set_Value(6, ArgValue)) {
         ERRORMSG = "Manual_X Not set";
       } else {
-        WriteEEPROM = true;
+        SaveEEPROMinSeconds = 30;
       }
     } else if (ArguName == PreFixManual_Y) {
       if (!WiFiManagerUser_Set_Value(7, ArgValue)) {
         ERRORMSG = "Manual_Y Not set";
       } else {
-        WriteEEPROM = true;
+        SaveEEPROMinSeconds = 30;
       }
     } else if (ArguName == PreFixShotDispenserML) {
       if (!WiFiManagerUser_Set_Value(8, ArgValue)) {
         ERRORMSG = "ShotDispenserML Not set";
       } else {
-        WriteEEPROM = true;
+        SaveEEPROMinSeconds = 30;
       }
     } else if (ArguName == PreFixHomeMAXSpeed) {
       if (!WiFiManagerUser_Set_Value(9, ArgValue)) {
         ERRORMSG = "HomeMAXSpeed Not set";
       } else {
-        WriteEEPROM = true;
+        SaveEEPROMinSeconds = 30;
       }
     } else if (ArguName == PreFixHomedistanceBounce) {
       if (!WiFiManagerUser_Set_Value(10, ArgValue)) {
         ERRORMSG = "HomedistanceBounce Not set";
       } else {
-        WriteEEPROM = true;
+        SaveEEPROMinSeconds = 30;
       }
     } else if (ArguName == PreFixDisableSteppersAfterMixDone) {
       if (!WiFiManagerUser_Set_Value(11, ArgValue)) {
         ERRORMSG = "DisableSteppersAfterMixDone Not set";
       } else {
-        WriteEEPROM = true;
+        SaveEEPROMinSeconds = 30;
       }
     } else if (ArguName == PreFixHome) {
       DoHoming = true;
@@ -228,9 +227,6 @@ void handle_Set() {
     server.send(400, "application/json", ERRORMSG);
   }
 
-  if (WriteEEPROM)
-    WiFiManager.WriteEEPROM();
-
   if (DoHoming == 0) {
     DisableSteppers();
   } else if (DoHoming == 1) {
@@ -273,18 +269,19 @@ void handle_Get() {
     Json += "\"" + IngredientIDtoString(i) + "\"";
   }
   Json += "],\"Settings\":[{";
-  Json += "\"Homed\":\"" + IsTrueToString(Homed) + "\",";
-  Json += "\"DisableSteppersAfterMixDone\":\"" + IsTrueToString(DisableSteppersAfterMixDone) + "\",";
-  Json += "\"BedSize_X\":" + String(BedSize_X) + ",";
-  Json += "\"BedSize_Y\":" + String(BedSize_Y) + ",";
-  Json += "\"BedSize_Z\":" + String(BedSize_Z) + ",";
-  Json += "\"Manual_X\":" + String(Manual_X) + ",";
-  Json += "\"Manual_Y\":" + String(Manual_Y) + ",";
-  Json += "\"MotorMAXSpeed\":" + String(MotorMAXSpeed) + ",";
-  Json += "\"MotorMAXAccel\":" + String(MotorMAXAccel) + ",";
-  Json += "\"ShotDispenserML\":" + String(ShotDispenserML) + ",";
-  Json += "\"HomeMAXSpeed\":" + String(HomeMAXSpeed) + ",";
-  Json += "\"HomedistanceBounce\":" + String(HomedistanceBounce);
+  Json += "\"Homed\":\"" + IsTrueToString(Homed) + "\"";
+  Json += ",\"DisableSteppersAfterMixDone\":\"" + IsTrueToString(DisableSteppersAfterMixDone) + "\"";
+  Json += ",\"BedSize_X\":" + String(BedSize_X);
+  Json += ",\"BedSize_Y\":" + String(BedSize_Y);
+  Json += ",\"BedSize_Z\":" + String(BedSize_Z);
+  Json += ",\"Manual_X\":" + String(Manual_X);
+  Json += ",\"Manual_Y\":" + String(Manual_Y);
+  Json += ",\"MotorMAXSpeed\":" + String(MotorMAXSpeed);
+  Json += ",\"MotorMAXAccel\":" + String(MotorMAXAccel);
+  Json += ",\"ShotDispenserML\":" + String(ShotDispenserML);
+  Json += ",\"HomeMAXSpeed\":" + String(HomeMAXSpeed);
+  Json += ",\"HomedistanceBounce\":" + String(HomedistanceBounce);
+  Json += ",\"MaxGlassSize\":" + String(MaxGlassSize);
   Json += "}]";
 
   Json += "}";
