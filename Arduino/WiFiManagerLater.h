@@ -63,13 +63,14 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
           CutVariable(Value, &_Output[0], 7);
           Dispenser Dis;
           Dis.Type = _Output[0].toInt();
-          Dis.LocationX = _Output[0].toInt();
-          Dis.LocationY = _Output[0].toInt();
-          Dis.LocationZ = _Output[0].toInt();
-          Dis.TimeMSML = _Output[0].toInt();
-          Dis.TimeMSoff = _Output[0].toInt();
-          Dis.IngredientID = IngredientStringToID(_Output[0]);
+          Dis.LocationX = _Output[1].toInt();
+          Dis.LocationY = _Output[2].toInt();
+          Dis.LocationZ = _Output[3].toInt();
+          Dis.TimeMSML = _Output[4].toInt();
+          Dis.TimeMSoff = _Output[5].toInt();
+          Dis.IngredientID = IngredientStringToID(_Output[6]);
           SetDispencer(Dis, i);
+          return true;
         }
       }
   }
@@ -94,7 +95,7 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
     default: {
         byte i = ValueID - 12;                                  //Remove the amount above from the counter, so the next are of the Dispensers
         if (i <= Dispensers_Amount) {
-          String Output = String(Dispensers[i].Type) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].LocationZ) + "," + String(Dispensers[i].TimeMSML)  + "," + String(Dispensers[i].IngredientID);
+          String Output = String(Dispensers[i].Type) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].LocationZ) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].TimeMSoff) + "," + String(Dispensers[i].IngredientID);
           return String(Output);
         }
       }
