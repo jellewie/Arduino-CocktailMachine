@@ -82,7 +82,7 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
           Dis.TimeMSML = _Output[4].toInt();
           Dis.TimeMSoff = _Output[5].toInt();
           Dis.IngredientID = IngredientStringToID(_Output[6]);
-          SetDispencer(Dis, i);
+          SetDispenser(Dis, i);
           return true;
         }
       }

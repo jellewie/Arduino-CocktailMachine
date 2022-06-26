@@ -160,7 +160,7 @@ void GetIngredient(Ingredient IN) {
         Serial.println("Error, unknown Dispenser type, ID=" + String(DispenserID) + " Type=" + String(Dispensers[DispenserID].Type));
         break;
     }
-  } else { //No dispencer availble,
+  } else { //No Dispenser availble,
     MoveTo(Manual_X, Manual_Y);
     Serial.println("TODO, Wait for user confirmation, Drink is no in the machine so should be done manually, msg = '" + String(IN.Action) + "'");
     MyDelay(2500);

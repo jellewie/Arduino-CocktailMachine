@@ -42,11 +42,11 @@ void CutVariable(String _Input, String *_Variable, byte _VariableLength) {
   }
   _Variable[_WriteTo] = _Input.substring(_StartAt);
 }
-void SetDispencer(Dispenser Dis, byte i) {
+void SetDispenser(Dispenser Dis, byte i) {
   if (i < Dispensers_Amount)
     Dispensers[i] = Dis;
 }
-bool AddDispencer(Dispenser Dis) {
+bool AddDispenser(Dispenser Dis) {
   for (byte i = 0; i < Dispensers_Amount; i++) {
     if (Dispensers[i].Type != UNSPECIFIED) {
       Dispensers[i] = Dis;
@@ -55,7 +55,7 @@ bool AddDispencer(Dispenser Dis) {
   }
   return false;
 }
-bool RemoveDispencer(byte IngredientID) {
+bool RemoveDispenser(byte IngredientID) {
   for (byte i = 0; i < Dispensers_Amount; i++) {
     if (Dispensers[i].IngredientID == IngredientID) {
       if (i != 0) {                                             //If this is the first one (needs to be ocupied)

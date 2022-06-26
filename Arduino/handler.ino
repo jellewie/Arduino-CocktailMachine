@@ -256,7 +256,7 @@ void handle_Get() {
     }
     Json += "]}";
   }
-  Json += "],\"Dispencers\":[";
+  Json += "],\"Dispensers\":[";
   for (byte i = 0; i < Dispensers_Amount; i++) {
     if (Dispensers[i].Type != UNSPECIFIED) {
       if (i != 0) Json += ",";
