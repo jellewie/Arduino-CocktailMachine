@@ -244,17 +244,17 @@ void handle_Get() {
   String Json = "{\"Drinks\": [";
   for (byte i = 0; i < Drinks_Amount; i++) {
     if (i != 0) Json += ",";
-    Json += "{\"" + Drinks[i].Name + "\":[";
+    Json += "[\"" + Drinks[i].Name + "\",";
     if (IsAvailable(i))
       Json += "\"A\",";
-    Json += "\"BAB34\",";
+    Json += "\"" + String(Drinks[i].Color, HEX) + "\",";
     for (byte i = 0; i < 8; i++) {                                //For each Ingredient
       if (Drinks[i].Ingredients[i].ID != 0 or Drinks[i].Ingredients[i].Action != 0) {
         if (i != 0) Json += ",";
         Json += "[" + String(Drinks[i].Ingredients[i].ID) + ",\"" + Drinks[i].Ingredients[i].Action + "\"," + String(Drinks[i].Ingredients[i].ml) + "]";
       }
     }
-    Json += "]}";
+    Json += "]";
   }
   Json += "],\"Dispensers\":[";
   for (byte i = 0; i < Dispensers_Amount; i++) {
