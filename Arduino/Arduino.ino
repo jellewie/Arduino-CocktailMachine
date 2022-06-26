@@ -3,8 +3,6 @@
   Board: https://dl.espressif.com/dl/package_esp32_index.json
 
 
-  save dispencer data in EEPROM
-  Get AddDispencer code
 */
 //==============================================================//Note spacer
 #if !defined(ESP32)
@@ -49,11 +47,9 @@ AccelStepper Stepper_X(AccelStepper::DRIVER, PDO_X_Step, PDO_X_Dir);
 AccelStepper Stepper_Y(AccelStepper::DRIVER, PDO_Y_Step, PDO_Y_Dir);
 AccelStepper Stepper_Z(AccelStepper::DRIVER, PDO_Z_Step, PDO_Z_Dir);
 
-#include "Functions.h"
 #include "Data.h"
+#include "Functions.h"
 #include "WiFiManagerLater.h"                                   //Define options of WiFiManager (can also be done before), but WiFiManager can also be called here (example for DoRequest included here)
-byte Ingredient_Amount = sizeof(IngredientS) / sizeof(IngredientS[0]);//Why filling this in if we can automate that? :)
-byte Drinks_Amount = sizeof(Drinks) / sizeof(Drinks[0]);        //Why filling this in if we can automate that? :)
 
 void setup() {
   Serial.begin(115200);

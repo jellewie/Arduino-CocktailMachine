@@ -19,12 +19,12 @@ struct Dispenser {
   byte IngredientID;
 };
 
-extern Drink Drinks[];
-extern byte Drinks_Amount;
-extern String IngredientS[];
-extern byte Ingredient_Amount;
-extern Dispenser Dispensers[];
-
+byte Ingredient_Amount = sizeof(IngredientS) / sizeof(IngredientS[0]);//Why filling this in if we can automate that? :)
+Dispenser Dispensers[Dispensers_Amount] = {
+  //Type        , X,     Y,   Z  , MSml, MSoff, IngredientID
+  {PUMP         , 3000 , 0  , 1  , 500 , 500  , COLA},
+  {SHOTDispenser, 6000 , 0  , 50 , 100 , 1000 , VODKA},
+};
 void CutVariable(String _Input, String *_Variable, byte _VariableLength) {
   //Takes in a string, and cuts them into parts; "test,yes,clock" => {"test","yes","clock"}
   //Returns the output in the same string, for example
@@ -247,17 +247,6 @@ void MoveTo(int LocationX, int LocationY, int LocationZ) {
 void DisableSteppers() {
   Homed = false;
   digitalWrite(PDO_Step_enable, HIGH);                          //Disable all stepper drivers
-}
-bool IsAvailable(byte DrinkID) {
-  Serial.println("Checking IsAvailable " + String(DrinkID));
-  if (DrinkID > Drinks_Amount) return false;                    //If a invalid drink is given
-  for (byte i = 0; i < 8; i++) {                                //For each Ingredient
-    if (Drinks[DrinkID].Ingredients[i].ID != 0) {               //If there is a ingredient we should get
-      if (GetDispenserID(Drinks[DrinkID].Ingredients[i].ID) == 0)
-        return false;                                           //If it has no location, mark it as not available
-    }
-  }
-  return true;
 }
 String IpAddress2String(const IPAddress& ipAddress) {
   return String(ipAddress[0]) + String(".") + String(ipAddress[1]) + String(".") + String(ipAddress[2]) + String(".") + String(ipAddress[3])  ;

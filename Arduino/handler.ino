@@ -222,7 +222,7 @@ void handle_Set() {
   }
 
   if (ERRORMSG == "") {
-    handle_Get();
+    server.send(200, "text/plain", "OK");
   } else {
     server.send(400, "application/json", ERRORMSG);
   }
@@ -241,48 +241,33 @@ void handle_Set() {
   }
 }
 void handle_Get() {
-  String Json = "{\"Drinks\": [";
-  for (byte i = 0; i < Drinks_Amount; i++) {
-    if (i != 0) Json += ",";
-    Json += "[\"" + Drinks[i].Name + "\",";
-    if (IsAvailable(i))
-      Json += "\"A\",";
-    Json += "\"" + String(Drinks[i].Color, HEX) + "\",";
-    for (byte i = 0; i < 8; i++) {                                //For each Ingredient
-      if (Drinks[i].Ingredients[i].ID != 0 or Drinks[i].Ingredients[i].Action != 0) {
-        if (i != 0) Json += ",";
-        Json += "[" + String(Drinks[i].Ingredients[i].ID) + ",\"" + Drinks[i].Ingredients[i].Action + "\"," + String(Drinks[i].Ingredients[i].ml) + "]";
-      }
-    }
-    Json += "]";
-  }
-  Json += "],\"Dispensers\":[";
+  String Json = "{\"dispensers\":[";
   for (byte i = 0; i < Dispensers_Amount; i++) {
     if (Dispensers[i].Type != UNSPECIFIED) {
       if (i != 0) Json += ",";
       Json += "[" + String(Dispensers[i].Type) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].LocationZ) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].TimeMSoff) + "," + String(Dispensers[i].IngredientID) + "]";
     }
   }
-  Json += "],\"Ingredients\":[";
+  Json += "],\"ingredients\":[";
   for (byte i = 0; i < Ingredient_Amount; i++) {
     if (i != 0) Json += ",";
-    Json += "\"" + IngredientIDtoString(i) + "\"";
+    Json += "{\"n\":\"" + IngredientIDtoString(i) + "\",\"a\":" + IsTrueToString(GetDispenserID(i) == 0) + "}";
   }
-  Json += "],\"Settings\":[{";
-  Json += "\"Homed\":" + IsTrueToString(Homed);
-  Json += ",\"DisableSteppersAfterMixDone\":" + IsTrueToString(DisableSteppersAfterMixDone);
-  Json += ",\"BedSize_X\":" + String(BedSize_X);
-  Json += ",\"BedSize_Y\":" + String(BedSize_Y);
-  Json += ",\"BedSize_Z\":" + String(BedSize_Z);
-  Json += ",\"Manual_X\":" + String(Manual_X);
-  Json += ",\"Manual_Y\":" + String(Manual_Y);
-  Json += ",\"MotorMAXSpeed\":" + String(MotorMAXSpeed);
-  Json += ",\"MotorMAXAccel\":" + String(MotorMAXAccel);
-  Json += ",\"ShotDispenserML\":" + String(ShotDispenserML);
-  Json += ",\"HomeMAXSpeed\":" + String(HomeMAXSpeed);
-  Json += ",\"HomedistanceBounce\":" + String(HomedistanceBounce);
-  Json += ",\"MaxGlassSize\":" + String(MaxGlassSize);
-  Json += "}]";
+  Json += "],\"settings\":{";
+  Json += "\"homed\":" + IsTrueToString(Homed);
+  Json += ",\"disableSteppersAfterMixDone\":" + IsTrueToString(DisableSteppersAfterMixDone);
+  Json += ",\"bedSizeX\":" + String(BedSize_X);
+  Json += ",\"bedSizeY\":" + String(BedSize_Y);
+  Json += ",\"bedSizeZ\":" + String(BedSize_Z);
+  Json += ",\"manualX\":" + String(Manual_X);
+  Json += ",\"manualY\":" + String(Manual_Y);
+  Json += ",\"motorMaxSpeed\":" + String(MotorMAXSpeed);
+  Json += ",\"motorMaxAccel\":" + String(MotorMAXAccel);
+  Json += ",\"shotDispenserMl\":" + String(ShotDispenserML);
+  Json += ",\"homeMaxSpeed\":" + String(HomeMAXSpeed);
+  Json += ",\"homedistanceBounce\":" + String(HomedistanceBounce);
+  Json += ",\"naxGlassSize\":" + String(MaxGlassSize);
+  Json += "}";
 
   Json += "}";
   server.send(200, "text/html", Json);
@@ -300,18 +285,6 @@ void handle_Info() {
 }
 void handle_OnConnect() {
   String HTML = "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, viewport-fit=cover\"><strong>Cool mixer thingy</strong>";
-
-  HTML += "<br><br><strong>Available mixes:</strong><br><br><form method=\"POST\" action=\"set\"><label for=\"mix\">Choose a mix:</label><select id=\"mix\" name=\"mix\">";
-  for (byte i = 0; i < Drinks_Amount; i++) {
-    if (IsAvailable(i))
-      HTML += "<option value=\"" + String(i) + "\">" + Drinks[i].Name + "</option>";
-  }
-  HTML += "</select><input type=\"submit\" value=\"Submit\"></form>";
-
-  HTML += "<br><br><strong>All mixes:</strong><form action=\"/set\"><label for=\"mix\">Choose a mix:</label><select id=\"mix\" name=\"mix\">";
-  for (byte i = 0; i < Drinks_Amount; i++)
-    HTML += "<option value=\"" + String(i) + "\">" + Drinks[i].Name + "</option>";
-  HTML += "</select><input type=\"submit\" value=\"Submit\"></form>";
 
   HTML += "<br><br><form action=\"/info\"><button>Info</button></form>";
   HTML += "<form action=\"/ota\"><button>OTA page</button></form>";
