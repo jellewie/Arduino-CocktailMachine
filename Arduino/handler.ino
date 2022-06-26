@@ -136,78 +136,78 @@ void handle_Set() {
     } else if (ArguName == PreFixHome) {
       DoHoming = true;
     } else if (ArguName == PreFix_Mix_Name) {
-      Mix.Name = IngredientStringToID(ArgValue);
+      Mix.Name = ArgValue;
     } else if (ArguName == PreFix_0_Ingredient) {
       Mix.Ingredients[0].ID = IngredientStringToID(ArgValue); makeMix = true;
       makeMix = true;
     } else if (ArguName == PreFix_0_Action) {
-      Mix.Ingredients[0].Action = IngredientStringToID(ArgValue);
+      Mix.Ingredients[0].Action = ArgValue;
       makeMix = true;
     } else if (ArguName == PreFix_0_Ml) {
-      Mix.Ingredients[0].ml = IngredientStringToID(ArgValue);
+      Mix.Ingredients[0].ml = ArgValue.toInt();
       makeMix = true;
     } else if (ArguName == PreFix_1_Ingredient) {
       Mix.Ingredients[1].ID = IngredientStringToID(ArgValue);
       makeMix = true;
     } else if (ArguName == PreFix_1_Action) {
-      Mix.Ingredients[1].Action = IngredientStringToID(ArgValue);
+      Mix.Ingredients[1].Action = ArgValue;
       makeMix = true;
     } else if (ArguName == PreFix_1_Ml) {
-      Mix.Ingredients[1].ml = IngredientStringToID(ArgValue);
+      Mix.Ingredients[1].ml = ArgValue.toInt();
       makeMix = true;
     } else if (ArguName == PreFix_2_Ingredient) {
       Mix.Ingredients[2].ID = IngredientStringToID(ArgValue);
       makeMix = true;
     } else if (ArguName == PreFix_2_Action) {
-      Mix.Ingredients[2].Action = IngredientStringToID(ArgValue);
+      Mix.Ingredients[2].Action = ArgValue;
       makeMix = true;
     } else if (ArguName == PreFix_2_Ml) {
-      Mix.Ingredients[2].ml = IngredientStringToID(ArgValue);
+      Mix.Ingredients[2].ml = ArgValue.toInt();
       makeMix = true;
     } else if (ArguName == PreFix_3_Ingredient) {
       Mix.Ingredients[3].ID = IngredientStringToID(ArgValue);
       makeMix = true;
     } else if (ArguName == PreFix_3_Action) {
-      Mix.Ingredients[3].Action = IngredientStringToID(ArgValue);
+      Mix.Ingredients[3].Action = ArgValue;
       makeMix = true;
     } else if (ArguName == PreFix_3_Ml) {
-      Mix.Ingredients[3].ml = IngredientStringToID(ArgValue);
+      Mix.Ingredients[3].ml = ArgValue.toInt();
       makeMix = true;
     } else if (ArguName == PreFix_4_Ingredient) {
       Mix.Ingredients[4].ID = IngredientStringToID(ArgValue);
       makeMix = true;
     } else if (ArguName == PreFix_4_Action) {
-      Mix.Ingredients[4].Action = IngredientStringToID(ArgValue);
+      Mix.Ingredients[4].Action = ArgValue;
       makeMix = true;
     } else if (ArguName == PreFix_4_Ml) {
-      Mix.Ingredients[4].ml = IngredientStringToID(ArgValue);
+      Mix.Ingredients[4].ml = ArgValue.toInt();
       makeMix = true;
     } else if (ArguName == PreFix_5_Ingredient) {
       Mix.Ingredients[5].ID = IngredientStringToID(ArgValue);
       makeMix = true;
     } else if (ArguName == PreFix_5_Action) {
-      Mix.Ingredients[5].Action = IngredientStringToID(ArgValue);
+      Mix.Ingredients[5].Action = ArgValue;
       makeMix = true;
     } else if (ArguName == PreFix_5_Ml) {
-      Mix.Ingredients[5].ml = IngredientStringToID(ArgValue);
+      Mix.Ingredients[5].ml = ArgValue.toInt();
       makeMix = true;
     } else if (ArguName == PreFix_6_Ingredient) {
       Mix.Ingredients[6].ID = IngredientStringToID(ArgValue);
       makeMix = true;
     } else if (ArguName == PreFix_6_Action) {
-      Mix.Ingredients[6].Action = IngredientStringToID(ArgValue);
+      Mix.Ingredients[6].Action = ArgValue;
       makeMix = true;
     } else if (ArguName == PreFix_6_Ml) {
-      Mix.Ingredients[6].ml = IngredientStringToID(ArgValue);
+      Mix.Ingredients[6].ml = ArgValue.toInt();
       makeMix = true;
     } else if (ArguName == PreFix_7_Ingredient) {
       Mix.Ingredients[7].ID = IngredientStringToID(ArgValue);
       makeMix = true;
     } else if (ArguName == PreFix_7_Action) {
-      Mix.Ingredients[7].Action = IngredientStringToID(ArgValue);
+      Mix.Ingredients[7].Action = ArgValue;
       makeMix = true;
     } else if (ArguName == PreFix_7_Ml) {
-      Mix.Ingredients[7].ml = IngredientStringToID(ArgValue);
+      Mix.Ingredients[7].ml = ArgValue.toInt();
       makeMix = true;
     } else {
       ERRORMSG += "UNK argument" + ArguName + " = " + ArgValue + "/n";
