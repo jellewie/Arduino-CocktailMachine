@@ -2,10 +2,25 @@
 	scroll-snap-align: center;
 }
 
-.image {
+.mixer-container {
 	width: 200px;
 	height: 400px;
-	background: red;
+	position: relative;
+}
+
+.mixer-outline {
+	--image: url(./mixer.svg);
+}
+.mixer-accents {
+	--image: url(./mixerAccents.svg);
+}
+.mixer-outline, .mixer-accents {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	-webkit-mask-image: var(--image);
+	mask-image: var(--image);
+	background-color: white;
 }
 
 .name {

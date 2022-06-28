@@ -8,7 +8,8 @@ import drinkDisplaySheet from "./DrinkDisplay.style.css" assert {type: "css"}
  */
 
 export class DrinkDisplay extends HTMLElement {
-	#imageEl;
+	#mixerContainerEl;
+	#mixerAccentsImageEl;
 	#nameEl;
 	#ingredientsListEl;
 
@@ -18,9 +19,17 @@ export class DrinkDisplay extends HTMLElement {
 		const shadow = this.attachShadow({mode: "open"});
 		shadow.adoptedStyleSheets = [drinkDisplaySheet];
 
-		this.#imageEl = document.createElement("div");
-		this.#imageEl.classList.add("image");
-		shadow.appendChild(this.#imageEl);
+		this.#mixerContainerEl = document.createElement("div");
+		this.#mixerContainerEl.classList.add("mixer-container");
+		shadow.appendChild(this.#mixerContainerEl);
+
+		const mixerOutlineEl = document.createElement("div");
+		mixerOutlineEl.classList.add("mixer-outline");
+		this.#mixerContainerEl.appendChild(mixerOutlineEl);
+
+		this.#mixerAccentsImageEl = document.createElement("div");
+		this.#mixerAccentsImageEl.classList.add("mixer-accents");
+		this.#mixerContainerEl.appendChild(this.#mixerAccentsImageEl);
 
 		this.#nameEl = document.createElement("h2");
 		this.#nameEl.classList.add("name");
@@ -40,11 +49,11 @@ export class DrinkDisplay extends HTMLElement {
 	}
 
 	get color() {
-		return this.#imageEl.style.backgroundColor;
+		return this.#mixerAccentsImageEl.style.backgroundColor;
 	}
 
 	set color(value) {
-		this.#imageEl.style.backgroundColor = value;
+		this.#mixerAccentsImageEl.style.backgroundColor = value;
 	}
 
 	/**
