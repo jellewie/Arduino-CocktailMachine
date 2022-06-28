@@ -32,3 +32,8 @@
 	padding: 0;
 	text-align: center;
 }
+
+li:not(.available) {
+	color: rgb(225 165 222);
+	text-decoration: line-through;
+}

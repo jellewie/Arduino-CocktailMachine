@@ -68,6 +68,7 @@ export class DrinkDisplay extends HTMLElement {
 			const li = document.createElement("li");
 			li.textContent = ingredient.name;
 			this.#ingredientsListEl.appendChild(li);
+			li.classList.toggle("available", ingredient.available);
 		}
 	}
 }
