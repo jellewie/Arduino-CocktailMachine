@@ -50,7 +50,7 @@ main {
 input[type="text"] {
 	appearance: none;
 	border: none;
-	background: rgb(81 81 81 / 34%);
+	background: #51515157;
 	border-radius: 5px;
 	border-bottom: solid #7b7b7b33 1px;
 	box-shadow: inset 0px 9px 9px -6px #00000029;
@@ -61,6 +61,12 @@ input[type="text"] {
 	text-align: center;
 	margin: 30px;
 	max-width: calc(100% - 60px);
+	color: white;
+}
+#search:focus-visible {
+	outline: none;
+	background: #63636357;
+	box-shadow: #ffffff1c 0px 0px 20px;
 }
 
 #mixButton {
