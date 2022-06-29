@@ -1,49 +1,21 @@
-import { getAvailableIngredients } from "./configLoader.js";
 import { DrinkDisplay } from "./DrinkDisplay.js";
-import { drinksConfig } from "./drinksConfig.js";
-import { drinkSelectorEl } from "./globalElements.js";
+import { getSelectedDrink, initDrinkSelector } from "./drinkSelector.js";
+import { mixButtonEl } from "./globalElements.js";
 // @ts-ignore
 import globalStyleSheet from "./globalStyle.css" assert {type: "css"};
+import { sendMixRequest } from "./sendMixRequest.js";
 
 document.adoptedStyleSheets = [globalStyleSheet];
 
 customElements.define("drink-display", DrinkDisplay);
 
-/**
- * @typedef CreatedDrinkData
- * @property {DrinkDisplay} el
- * @property {import("./drinksConfig.js").DrinkConfig} config
- */
+mixButtonEl.addEventListener("click", () => {
+	const selectedDrink = getSelectedDrink();
+	const config = selectedDrink.config;
+	sendMixRequest({
+		name: config.name,
+		actions: config.actions,
+	})
+});
 
-/** @type {CreatedDrinkData[]} */
-const createdDrinks = [];
-
-for (const drinkConfig of drinksConfig) {
-	const {name, cssColor} = drinkConfig;
-	const drinkDisplayHtmlElement = document.createElement("drink-display");
-	const drinkDisplay = /** @type {DrinkDisplay} */ (drinkDisplayHtmlElement);
-	drinkDisplay.name = name;
-	drinkDisplay.color = cssColor;
-	drinkSelectorEl.appendChild(drinkDisplayHtmlElement);
-	createdDrinks.push({
-		el: drinkDisplay,
-		config: drinkConfig,
-	});
-}
-
-async function updateDrinkIngredients() {
-	const availableIngredients = await getAvailableIngredients();
-	for (const {el, config} of createdDrinks) {
-		const ingredients = [];
-		for (const action of config.actions) {
-			if ("ingredient" in action) {
-				ingredients.push({
-					name: action.ingredient,
-					available: availableIngredients.has(action.ingredient),
-				});
-			}
-		}
-		el.setIngredients(ingredients)
-	}
-}
-updateDrinkIngredients();
+initDrinkSelector();

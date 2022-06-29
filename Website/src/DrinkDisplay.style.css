@@ -1,5 +1,10 @@
 :host {
 	scroll-snap-align: center;
+	transition: opacity 0.5s;
+}
+
+:host(:not(.selected)) {
+	opacity: 0.4;
 }
 
 .mixer-container {

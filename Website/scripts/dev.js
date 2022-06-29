@@ -68,7 +68,9 @@ const server = new Server({
 			// doesn't have types for it yet.
 			return Response.json(mockGetData);
 		} else if (url.pathname == "/set") {
-			// TODO
+			const searchParams = Array.from(url.searchParams.entries()).map(([k,v]) => `${k}: ${v}`).join("\n");
+			console.log(`/set request received!\n${searchParams}`);
+			return new Response();
 		}
 		return serveDir(request, {
 			fsRoot: resolve(dirname(fromFileUrl(import.meta.url)), ".."),
