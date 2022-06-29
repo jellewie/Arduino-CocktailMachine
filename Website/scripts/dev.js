@@ -63,7 +63,7 @@ const server = new Server({
 	port: 8080,
 	handler: request => {
 		const url = new URL(request.url);
-		if (url.pathname == "/src/get") {
+		if (url.pathname == "/get") {
 			// @ts-expect-error Response.json is implemented in Deno but typescript
 			// doesn't have types for it yet.
 			return Response.json(mockGetData);

@@ -105,7 +105,7 @@ async function refreshConfigFn() {
 
 export async function getAvailableIngredients() {
 	const config = await getConfig();
-	/** @type {Set<import("./drinksConfig.js").Ingredients} */
+	/** @type {Set<import("./drinksConfig.js").Ingredients>} */
 	let availableIngredients = new Set();
 	for (const dispenser of config.dispensers) {
 		availableIngredients.add(dispenser.ingredient);
