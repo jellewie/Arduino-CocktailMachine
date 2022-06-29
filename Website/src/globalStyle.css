@@ -51,7 +51,7 @@ input[type="text"] {
 	appearance: none;
 	border: none;
 	background: rgb(81 81 81 / 34%);
-	border-radius: 5pt;
+	border-radius: 5px;
 	border-bottom: solid #7b7b7b33 1px;
 	box-shadow: inset 0px 9px 9px -6px #00000029;
 }
@@ -61,4 +61,27 @@ input[type="text"] {
 	text-align: center;
 	margin: 30px;
 	max-width: calc(100% - 60px);
+}
+
+#mixButton {
+	border: none;
+	appearance: none;
+	font-size: 30pt;
+	color: white;
+	padding: 5px 40px;
+	background: linear-gradient(#ec15aa, #da0097);
+	margin: 20px;
+	border-radius: 5px;
+	box-shadow: #e35bd6 0px -1px, #690079 0px 5px, #0000005e 0px 11px 6px -2px, #00000045 0px 21px 20px 4px;
+	cursor: pointer;
+}
+
+#mixButton:hover {
+	background: radial-gradient(#ff7bd6, #e316a4);
+	box-shadow: #ff44ba29 0px 0px 20px 15px, #e35bd6 0px -1px, #8c0082 0px 5px, #0000005e 0px 11px 6px -2px, #00000045 0px 21px 20px 4px;
+}
+
+#mixButton:active {
+	background: linear-gradient(#ca1291, #b7027f);
+	box-shadow: #e35bd6 0px -1px, #740059 0px 5px, #0000005e 0px 11px 6px -2px, #00000045 0px 21px 20px 4px;
 }
