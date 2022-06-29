@@ -3,7 +3,14 @@ import { getAvailableIngredients } from "./configLoader.js";
 import { drinksConfig } from "./drinksConfig.js";
 import { drinkSelectorEl } from "./globalElements.js";
 
-/** @type {Map<DrinkDisplay, import("./drinksConfig.js").DrinkConfig>} */
+/**
+ * @typedef DrinkData
+ * @property {import("./drinksConfig.js").DrinkConfig} config
+ * @property {boolean} allIngredientsAvailable
+ * @property {DrinkDisplay} el
+ */
+
+/** @type {Map<DrinkDisplay, DrinkData>} */
 const createdDrinks = new Map();
 
 /** @type {Set<DrinkDisplay>} */
@@ -32,7 +39,11 @@ export function initDrinkSelector() {
 		drinkDisplay.name = name;
 		drinkDisplay.color = cssColor;
 		drinkSelectorEl.appendChild(drinkDisplayHtmlElement);
-		createdDrinks.set(drinkDisplay, drinkConfig);
+		createdDrinks.set(drinkDisplay, {
+			config: drinkConfig,
+			allIngredientsAvailable: false,
+			el: drinkDisplay,
+		});
 		intersectionObserver.observe(drinkDisplay);
 	}
 
@@ -41,17 +52,39 @@ export function initDrinkSelector() {
 
 async function updateDrinkIngredients() {
 	const availableIngredients = await getAvailableIngredients();
-	for (const [el, config] of createdDrinks) {
+	for (const [el, drinkData] of createdDrinks) {
 		const ingredients = [];
-		for (const action of config.actions) {
+		let allIngredientsAvailable = true;
+		for (const action of drinkData.config.actions) {
 			if ("ingredient" in action) {
+				const available = availableIngredients.has(action.ingredient);
 				ingredients.push({
 					name: action.ingredient,
-					available: availableIngredients.has(action.ingredient),
+					available,
 				});
+				if (!available) allIngredientsAvailable = false;
 			}
 		}
+		drinkData.allIngredientsAvailable = allIngredientsAvailable;
 		el.setIngredients(ingredients)
+	}
+
+	sortDrinkElements();
+}
+
+function sortDrinkElements() {
+	while (drinkSelectorEl.firstChild) {
+		drinkSelectorEl.removeChild(drinkSelectorEl.firstChild);
+	}
+	const sortedDrinks = Array.from(createdDrinks.values());
+	sortedDrinks.sort((a, b) => {
+		if (a.allIngredientsAvailable && !b.allIngredientsAvailable) return -1;
+		if (!a.allIngredientsAvailable && b.allIngredientsAvailable) return 1;
+		return a.config.name.localeCompare(b.config.name);
+	});
+
+	for (const drinkData of sortedDrinks) {
+		drinkSelectorEl.appendChild(drinkData.el);
 	}
 }
 
@@ -72,10 +105,7 @@ export function getSelectedDrink() {
 	}
 
 	if (!centerDrink) throw new Error("No drink selected");
-	const config = createdDrinks.get(centerDrink);
-	if (!config) throw new Error("No config for selected drink");
-	return {
-		el: centerDrink,
-		config,
-	};
+	const data = createdDrinks.get(centerDrink);
+	if (!data) throw new Error("No config for selected drink");
+	return data;
 }
