@@ -1,3 +1,6 @@
+const search = document.getElementById("search");
+const searchEl = /** @type {HTMLInputElement} */ (search);
+
 const drinkSelector = document.getElementById("drinkSelector");
 const drinkSelectorEl = /** @type {HTMLDivElement} */ (drinkSelector);
 
@@ -8,6 +11,7 @@ const mixButton = document.getElementById("mixButton");
 const mixButtonEl = /** @type {HTMLButtonElement} */ (mixButton);
 
 export {
+	searchEl,
 	drinkSelectorEl,
 	customizeButtonEl,
 	mixButtonEl,

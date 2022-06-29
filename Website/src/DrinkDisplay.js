@@ -41,7 +41,7 @@ export class DrinkDisplay extends HTMLElement {
 	}
 
 	get name() {
-		return this.#nameEl.textContent;
+		return this.#nameEl.textContent || "";
 	}
 
 	set name(value) {

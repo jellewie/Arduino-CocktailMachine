@@ -39,12 +39,12 @@ main {
 	}
 }
 
-#drinkSelector > :first-child {
-	margin-left: 100%;
-}
-
-#drinkSelector > :last-child {
-	margin-right: 100%;
+#drinkSelector::before,
+#drinkSelector::after {
+	content: "";
+	width: 100%;
+	height: 100%;
+	flex-shrink: 0;
 }
 
 input[type="text"] {

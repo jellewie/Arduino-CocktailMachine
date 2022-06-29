@@ -109,3 +109,17 @@ export function getSelectedDrink() {
 	if (!data) throw new Error("No config for selected drink");
 	return data;
 }
+
+/**
+ * @param {string} filter
+ */
+export function setDrinkFilter(filter) {
+	filter = filter.toLocaleLowerCase().trim();
+	for (const drinkEl of createdDrinks.keys()) {
+		let visible = true;
+		if (filter) {
+			visible = drinkEl.name.toLocaleLowerCase().includes(filter);
+		}
+		drinkEl.style.display = visible ? "" : "none";
+	}
+}
