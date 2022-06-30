@@ -18,6 +18,8 @@ import {setCwd} from "https://deno.land/x/chdir_anywhere@v0.0.2/mod.js";
 import {resolve, dirname} from "https://deno.land/std@0.146.0/path/mod.ts";
 // @ts-expect-error
 import * as esbuild from "https://deno.land/x/esbuild@v0.14.48/mod.js"
+// @ts-expect-error
+import CleanCSS from "https://esm.sh/clean-css@5.3.0?pin=v86";
 setCwd();
 
 function postCssInlineUrlsPlugin() {
@@ -48,6 +50,23 @@ function postCssInlineUrlsPlugin() {
 					mediatype = "image/svg+xml";
 				}
 				decl.value = `url(data:${mediatype};base64,${base64})`;
+			}
+		}
+	}
+}
+
+function cleanCssPlugin() {
+	const cleanCss = new CleanCSS();
+	return {
+		name: "clean-css",
+		/**
+		 * @param {string} code
+		 * @param {string} id
+		 */
+		transform(code, id) {
+			if (id.endsWith(".css")) {
+				const minified = cleanCss.minify(code);
+				return minified.styles;
 			}
 		}
 	}
@@ -88,6 +107,7 @@ const bundle = await rollup({
 	acornInjectPlugins: [importAssertions],
 	plugins: [
 		postCssPlugin(),
+		cleanCssPlugin(),
 		importAssertionsPlugin(),
 	],
 });
