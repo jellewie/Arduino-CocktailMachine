@@ -109,6 +109,7 @@ export const drinksConfig = [
 		cssColor: "#db4f40",
 		actions: [
 			{action: "crushed ice"},
+			{ingredient: "GIN", amount: 60},
 			{ingredient: "WHITE_RUM", amount: 45},
 			{ingredient: "TRIPLE_SEC", amount: 30},
 			{ingredient: "LEMON_JUICE", amount: 30},
@@ -460,6 +461,16 @@ export const drinksConfig = [
 			{ingredient: "ORANGE_JUICE", amount: 90},
 			{ingredient: "CRANBERRY_JUICE", amount: 90},
 			{action: "shake"},
+		],
+	}, {
+		name: "Baileys White Russian",
+		cssColor: "#FFFFFF",
+		actions: [
+			{action: "ice"},
+			{ingredient: "MILK", amount: 120},
+			{ingredient: "BAILEYS", amount: 60},
+			{ingredient: "VODKA", amount: 60},
+			{action: "stir"},
 		],
 	}, {
 		name: "Blind Bat",
