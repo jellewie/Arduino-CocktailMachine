@@ -1,6 +1,8 @@
 :host {
 	scroll-snap-align: center;
 	transition: opacity 0.5s;
+	display: flex;
+	flex-direction: column;
 }
 
 :host(:not(.selected)) {
@@ -9,7 +11,7 @@
 
 .mixer-container {
 	width: 200px;
-	height: 400px;
+	height: 300px;
 	position: relative;
 }
 .mixer-container.unavailable {
@@ -22,13 +24,24 @@
 .mixer-accents {
 	--image: url(./mixerAccents.svg);
 }
-.mixer-outline, .mixer-accents {
+.mixer-outline,
+.mixer-accents {
 	position: absolute;
 	width: 100%;
 	height: 100%;
+	background-color: white;
+
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	mask-position: center;
+
 	-webkit-mask-image: var(--image);
 	mask-image: var(--image);
-	background-color: white;
+}
+
+h2 {
+	margin: 0;
 }
 
 .name {
