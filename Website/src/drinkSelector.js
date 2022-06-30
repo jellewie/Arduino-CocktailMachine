@@ -67,6 +67,7 @@ async function updateDrinkIngredients() {
 			}
 		}
 		drinkData.allIngredientsAvailable = allIngredientsAvailable;
+		el.available = allIngredientsAvailable;
 		el.setIngredients(ingredients)
 	}
 

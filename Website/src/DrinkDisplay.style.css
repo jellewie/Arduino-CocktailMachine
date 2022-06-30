@@ -12,6 +12,9 @@
 	height: 400px;
 	position: relative;
 }
+.mixer-container.unavailable {
+	opacity: 0.4;
+}
 
 .mixer-outline {
 	--image: url(./mixer.svg);

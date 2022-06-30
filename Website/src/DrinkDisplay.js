@@ -12,6 +12,7 @@ export class DrinkDisplay extends HTMLElement {
 	#mixerAccentsImageEl;
 	#nameEl;
 	#ingredientsListEl;
+	#available = true;
 
 	constructor() {
 		super();
@@ -54,6 +55,15 @@ export class DrinkDisplay extends HTMLElement {
 
 	set color(value) {
 		this.#mixerAccentsImageEl.style.backgroundColor = value;
+	}
+
+	get available() {
+		return this.#available;
+	}
+
+	set available(value) {
+		this.#available = value;
+		this.#mixerContainerEl.classList.toggle("unavailable", !value);
 	}
 
 	/**
