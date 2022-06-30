@@ -1,6 +1,6 @@
 import { DrinkDisplay } from "./DrinkDisplay.js";
 import { getAvailableIngredients } from "./configLoader.js";
-import { drinksConfig } from "./drinksConfig.js";
+import { drinksConfig, ingredientNames } from "./drinksConfig.js";
 import { drinkSelectorEl } from "./globalElements.js";
 
 /**
@@ -58,8 +58,9 @@ async function updateDrinkIngredients() {
 		for (const action of drinkData.config.actions) {
 			if ("ingredient" in action) {
 				const available = availableIngredients.has(action.ingredient);
+				const name = ingredientNames.get(action.ingredient) || action.ingredient;
 				ingredients.push({
-					name: action.ingredient,
+					name,
 					available,
 				});
 				if (!available) allIngredientsAvailable = false;

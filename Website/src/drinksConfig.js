@@ -22,7 +22,34 @@
  * @property {Actions} action
  */
 
-/** @typedef {"VODKA" | "PEACH_TREE" | "ORANGE_JUICE" | "CRANBERRY_JUICE" | "TRIPLE_SEC" | "LIME_JUICE" | "PINEAPPLE_JUICE" | "GIN" | "LEMONADE" | "LEMON_JUICE" | "WHITE_RUM" | "RUM" | "TEQUILA" | "SIMPLE_SYRUP" | "TONIC_WATER" | "GINGER_ALE" | "GRENADINE_SYRUP" | "COLA" | "WATERMELON_VODKA" | "MILK" | "SPRITE" | "LEMON_SODA"} Ingredients */
+/** @typedef {"VODKA" | "PEACH_TREE" | "ORANGE_JUICE" | "CRANBERRY_JUICE" | "TRIPLE_SEC" | "LIME_JUICE" | "PINEAPPLE_JUICE" | "GIN" | "LEMONADE" | "LEMON_JUICE" | "WHITE_RUM" | "RUM" | "TEQUILA" | "SIMPLE_SYRUP" | "TONIC_WATER" | "GINGER_ALE" | "GRENADINE_SYRUP" | "COLA" | "WATERMELON_VODKA" | "MILK" | "BAILEYS" | "SPRITE" | "LEMON_SODA"} Ingredients */
+
+/** @type {Map<Ingredients, string>} */
+export const ingredientNames = new Map([
+	["VODKA", "Vodka"],
+	["PEACH_TREE", "Peach Tree"],
+	["ORANGE_JUICE", "Orange juice"],
+	["CRANBERRY_JUICE", "Cranberry juice"],
+	["TRIPLE_SEC", "Triple Sec"],
+	["LIME_JUICE", "Lime juice"],
+	["PINEAPPLE_JUICE", "Pineapple juice"],
+	["GIN", "Gin"],
+	["LEMONADE", "Lemonade"],
+	["LEMON_JUICE", "Lemon juice"],
+	["WHITE_RUM", "White rum"],
+	["RUM", "Rum"],
+	["TEQUILA", "Tequila"],
+	["SIMPLE_SYRUP", "Simple syrup"],
+	["TONIC_WATER", "Tonic water"],
+	["GINGER_ALE", "Ginger ale"],
+	["GRENADINE_SYRUP", "Grenadine syrup"],
+	["COLA", "Cola"],
+	["WATERMELON_VODKA", "Watermelon Vodka"],
+	["MILK", "Milk"],
+	["BAILEYS", "Baileys"],
+	["SPRITE", "Sprite"],
+	["LEMON_SODA", "Lemon soda"],
+])
 
 /** @typedef {"ice" | "shake" | "stir" | "crushed ice" | "blend" | "strain" | "2 thee spoons of sugar" | "6 leaves of mind"} Actions */
 
