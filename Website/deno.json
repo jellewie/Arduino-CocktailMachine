@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "dev": "deno run -A --unstable scripts/dev.js",
-    "build": "deno run -A --unstable scripts/build.js"
+    "dev": "deno run -A scripts/dev.js",
+    "build": "deno run -A scripts/build.js"
   }
 }

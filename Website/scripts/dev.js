@@ -1,10 +1,9 @@
-#!/usr/bin/env -S deno run --allow-env --allow-run --allow-read --allow-write --allow-net --no-check --unstable
-
 /**
  * @fileoverview
  * Starts a local server for development.
  * This mostly serves files in the Website directory but also serves some extra
  * requests that the ESP would normally handle.
+ * Run with `deno task dev`.
  */
 
 import {serveDir} from "https://deno.land/std@0.145.0/http/file_server.ts";
