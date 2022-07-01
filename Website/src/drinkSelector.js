@@ -16,6 +16,16 @@ const createdDrinks = new Map();
 /** @type {Set<DrinkDisplay>} */
 const visibleDrinks = new Set();
 
+/** @type {string[]} */
+const recentDrinks = [];
+if (localStorage.recentDrinks) {
+	try {
+		recentDrinks.push(...JSON.parse(localStorage.recentDrinks));
+	} catch (e) {
+		console.error(e);
+	}
+}
+
 const intersectionObserver = new IntersectionObserver(entries => {
 	for (const entry of entries) {
 		entry.target.classList.toggle("selected", entry.isIntersecting);
@@ -82,6 +92,15 @@ function sortDrinkElements() {
 	sortedDrinks.sort((a, b) => {
 		if (a.allIngredientsAvailable && !b.allIngredientsAvailable) return -1;
 		if (!a.allIngredientsAvailable && b.allIngredientsAvailable) return 1;
+		const aIndex = recentDrinks.indexOf(a.config.name);
+		const bIndex = recentDrinks.indexOf(b.config.name);
+		if (aIndex >= 0 && bIndex >= 0) {
+			return bIndex - aIndex;
+		} else if (aIndex >= 0 && bIndex < 0) {
+			return -1;
+		} else if (aIndex < 0 && bIndex >= 0) {
+			return 1;
+		}
 		return a.config.name.localeCompare(b.config.name);
 	});
 
@@ -124,4 +143,19 @@ export function setDrinkFilter(filter) {
 		}
 		drinkEl.style.display = visible ? "" : "none";
 	}
+}
+
+/**
+ * Adds the drink to the end of the recent drink list and updates the order
+ * of drinks.
+ * @param {string} drinkName
+ */
+export function markRecentDrink(drinkName) {
+	const existingIndex = recentDrinks.indexOf(drinkName);
+	if (existingIndex !== -1) {
+		recentDrinks.splice(existingIndex, 1);
+	}
+	recentDrinks.push(drinkName);
+	localStorage.recentDrinks = JSON.stringify(recentDrinks);
+	sortDrinkElements();
 }
