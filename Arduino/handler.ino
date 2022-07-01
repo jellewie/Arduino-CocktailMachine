@@ -24,30 +24,32 @@
 #define PreFixSetDispenserIngredientID "dn"
 //Create a mix (max 8 ingredient)
 #define PreFix_Mix_Name     "m"            //this one MUST be set (=!"") to start creating a mix 
-#define PreFix_0_Ingredient "ai"
-#define PreFix_0_Action     "aa"
-#define PreFix_0_Ml         "am"
-#define PreFix_1_Ingredient "bi"
-#define PreFix_1_Action     "ba"
-#define PreFix_1_Ml         "bm"
-#define PreFix_2_Ingredient "ci"
-#define PreFix_2_Action     "ca"
-#define PreFix_2_Ml         "cm"
-#define PreFix_3_Ingredient "di"
-#define PreFix_3_Action     "da"
-#define PreFix_3_Ml         "dm"
-#define PreFix_4_Ingredient "ei"
-#define PreFix_4_Action     "ea"
-#define PreFix_4_Ml         "em"
-#define PreFix_5_Ingredient "fi"
-#define PreFix_5_Action     "fa"
-#define PreFix_5_Ml         "fm"
-#define PreFix_6_Ingredient "gi"
-#define PreFix_6_Action     "ga"
-#define PreFix_6_Ml         "gm"
-#define PreFix_7_Ingredient "hi"
-#define PreFix_7_Action     "ha"
-#define PreFix_7_Ml         "hm"
+#define PreFix_0_Ingredient "i0"
+#define PreFix_0_Action     "a0"
+#define PreFix_0_Ml         "m0"
+#define PreFix_1_Ingredient "i1"
+#define PreFix_1_Action     "a1"
+#define PreFix_1_Ml         "m1"
+#define PreFix_2_Ingredient "i2"
+#define PreFix_2_Action     "a2"
+#define PreFix_2_Ml         "m2"
+#define PreFix_3_Ingredient "i3"
+#define PreFix_3_Action     "a3"
+#define PreFix_3_Ml         "m3"
+#define PreFix_4_Ingredient "i4"
+#define PreFix_4_Action     "a4"
+#define PreFix_4_Ml         "m4"
+#define PreFix_5_Ingredient "i5"
+#define PreFix_5_Action     "a5"
+#define PreFix_5_Ml         "m5"
+#define PreFix_6_Ingredient "i6"
+#define PreFix_6_Action     "a6"
+#define PreFix_6_Ml         "m6"
+#define PreFix_7_Ingredient "i7"
+#define PreFix_7_Action     "a7"
+#define PreFix_7_Ml         "m7"
+
+#include "client.h"
 
 void handle_Set() {
   Serial.print("SV: /SET?");
@@ -251,7 +253,7 @@ void handle_Get() {
   Json += "],\"ingredients\":[";
   for (byte i = 0; i < Ingredient_Amount; i++) {
     if (i != 0) Json += ",";
-    Json += "{\"n\":\"" + IngredientIDtoString(i) + "\",\"a\":" + IsTrueToString(GetDispenserID(i) == 0) + "}";
+    Json += "\"" + IngredientIDtoString(i) + "\"";
   }
   Json += "],\"settings\":{";
   Json += "\"homed\":" + IsTrueToString(Homed);
@@ -284,11 +286,6 @@ void handle_Info() {
   server.send(200, "text/plain", Message);
 }
 void handle_OnConnect() {
-  String HTML = "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, viewport-fit=cover\"><strong>Cool mixer thingy</strong>";
-
-  HTML += "<br><br><form action=\"/info\"><button>Info</button></form>";
-  HTML += "<form action=\"/ota\"><button>OTA page</button></form>";
-  HTML += "<form action=\"/ip\"><button>Softsettings</button></form>";
   server.send(200, "text/html", HTML);
 }
 void handle_Reset() {
