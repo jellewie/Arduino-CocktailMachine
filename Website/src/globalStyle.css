@@ -25,6 +25,10 @@ main {
 	margin: 0px auto;
 }
 
+#drinkSelector::-webkit-scrollbar {
+    display: none;
+}
+
 @media (max-width: 600px) {
 	#drinkSelector {
 		margin: 0;
