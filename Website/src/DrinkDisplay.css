@@ -4,7 +4,7 @@
 	flex-direction: column;
 }
 
-.drink-icon-container {
+.drink-display > .drink-icon-container {
 	width: 150px;
 	height: 200px;
 	margin: 20px 20px;
@@ -12,21 +12,18 @@
 	filter: url(#svgNeon);
 }
 
-h2 {
+.drink-display > .name {
 	margin: 0;
-}
-
-.name {
 	text-align: center;
 }
 
-.ingredients-list {
+.drink-display > .ingredients-list {
 	list-style: none;
 	padding: 0;
 	text-align: center;
 }
 
-li:not(.available) {
+.ingredients-list > li:not(.available) {
 	color: rgb(225 165 222);
 	text-decoration: line-through;
 }
