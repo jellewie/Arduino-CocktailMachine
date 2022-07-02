@@ -1,13 +1,10 @@
-// @ts-ignore
-import drinkDisplaySheet from "./DrinkDisplay.style.css" assert {type: "css"}
-
 /**
- * @typedef DrinkDisplayIngredient
- * @property {string} name The name of the ingredient to display.
- * @property {boolean} available Whether the ingredient is available.
- */
+* @typedef DrinkDisplayIngredient
+* @property {string} name The name of the ingredient to display.
+* @property {boolean} available Whether the ingredient is available.
+*/
 
-export class DrinkDisplay extends HTMLElement {
+export class DrinkDisplay {
 	#mixerContainerEl;
 	#mixerAccentsImageEl;
 	#nameEl;
@@ -15,14 +12,12 @@ export class DrinkDisplay extends HTMLElement {
 	#available = true;
 
 	constructor() {
-		super();
-
-		const shadow = this.attachShadow({mode: "open"});
-		shadow.adoptedStyleSheets = [drinkDisplaySheet];
+		this.el = document.createElement("div");
+		this.el.classList.add("drink-display");
 
 		this.#mixerContainerEl = document.createElement("div");
 		this.#mixerContainerEl.classList.add("mixer-container");
-		shadow.appendChild(this.#mixerContainerEl);
+		this.el.appendChild(this.#mixerContainerEl);
 
 		const mixerOutlineEl = document.createElement("div");
 		mixerOutlineEl.classList.add("mixer-outline");
@@ -34,11 +29,11 @@ export class DrinkDisplay extends HTMLElement {
 
 		this.#nameEl = document.createElement("h2");
 		this.#nameEl.classList.add("name");
-		shadow.appendChild(this.#nameEl);
+		this.el.appendChild(this.#nameEl);
 
 		this.#ingredientsListEl = document.createElement("ul");
 		this.#ingredientsListEl.classList.add("ingredients-list");
-		shadow.appendChild(this.#ingredientsListEl);
+		this.el.appendChild(this.#ingredientsListEl);
 	}
 
 	get name() {
@@ -80,5 +75,12 @@ export class DrinkDisplay extends HTMLElement {
 			this.#ingredientsListEl.appendChild(li);
 			li.classList.toggle("available", ingredient.available);
 		}
+	}
+
+	/**
+	 * @param {boolean} visible
+	 */
+	setVisible(visible) {
+		this.el.style.display = visible ? "" : "none";
 	}
 }

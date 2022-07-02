@@ -1,11 +1,11 @@
-:host {
+.drink-display {
 	scroll-snap-align: center;
 	transition: opacity 0.5s;
 	display: flex;
 	flex-direction: column;
 }
 
-:host(:not(.selected)) {
+.drink-display(:not(.selected)) {
 	opacity: 0.4;
 }
 

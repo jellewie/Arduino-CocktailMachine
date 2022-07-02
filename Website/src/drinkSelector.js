@@ -7,14 +7,14 @@ import { drinkSelectorEl } from "./globalElements.js";
  * @typedef DrinkData
  * @property {import("./drinksConfig.js").DrinkConfig} config
  * @property {boolean} allIngredientsAvailable
- * @property {DrinkDisplay} el
+ * @property {DrinkDisplay} drinkDisplay
  */
 
-/** @type {Map<DrinkDisplay, DrinkData>} */
+/** @type {Map<Element, DrinkData>} */
 const createdDrinks = new Map();
 
-/** @type {Set<DrinkDisplay>} */
-const visibleDrinks = new Set();
+/** @type {Set<Element>} */
+const visibleDrinkEls = new Set();
 
 /** @type {string[]} */
 const recentDrinks = [];
@@ -29,11 +29,10 @@ if (localStorage.recentDrinks) {
 const intersectionObserver = new IntersectionObserver(entries => {
 	for (const entry of entries) {
 		entry.target.classList.toggle("selected", entry.isIntersecting);
-		if (!(entry.target instanceof DrinkDisplay)) throw new Error("Assertion failed");
 		if (entry.isIntersecting) {
-			visibleDrinks.add(entry.target);
+			visibleDrinkEls.add(entry.target);
 		} else {
-			visibleDrinks.delete(entry.target);
+			visibleDrinkEls.delete(entry.target);
 		}
 	}
 }, {
@@ -44,17 +43,16 @@ const intersectionObserver = new IntersectionObserver(entries => {
 export function initDrinkSelector() {
 	for (const drinkConfig of drinksConfig) {
 		const {name, cssColor} = drinkConfig;
-		const drinkDisplayHtmlElement = document.createElement("drink-display");
-		const drinkDisplay = /** @type {DrinkDisplay} */ (drinkDisplayHtmlElement);
+		const drinkDisplay = new DrinkDisplay();
 		drinkDisplay.name = name;
 		drinkDisplay.color = cssColor;
-		drinkSelectorEl.appendChild(drinkDisplayHtmlElement);
-		createdDrinks.set(drinkDisplay, {
+		drinkSelectorEl.appendChild(drinkDisplay.el);
+		createdDrinks.set(drinkDisplay.el, {
 			config: drinkConfig,
 			allIngredientsAvailable: false,
-			el: drinkDisplay,
+			drinkDisplay: drinkDisplay,
 		});
-		intersectionObserver.observe(drinkDisplay);
+		intersectionObserver.observe(drinkDisplay.el);
 	}
 
 	updateDrinkIngredients();
@@ -77,8 +75,8 @@ async function updateDrinkIngredients() {
 			}
 		}
 		drinkData.allIngredientsAvailable = allIngredientsAvailable;
-		el.available = allIngredientsAvailable;
-		el.setIngredients(ingredients)
+		drinkData.drinkDisplay.available = allIngredientsAvailable;
+		drinkData.drinkDisplay.setIngredients(ingredients)
 	}
 
 	sortDrinkElements();
@@ -105,7 +103,7 @@ function sortDrinkElements() {
 	});
 
 	for (const drinkData of sortedDrinks) {
-		drinkSelectorEl.appendChild(drinkData.el);
+		drinkSelectorEl.appendChild(drinkData.drinkDisplay.el);
 	}
 }
 
@@ -115,13 +113,13 @@ export function getSelectedDrink() {
 
 	let centerDrink = null;
 	let closestCenterDist = Infinity;
-	for (const drink of visibleDrinks) {
-		const bounds = drink.getBoundingClientRect();
+	for (const drinkEl of visibleDrinkEls) {
+		const bounds = drinkEl.getBoundingClientRect();
 		const center = bounds.left + bounds.width / 2;
 		const centerDist = Math.abs(center - selectorCenter);
 		if (centerDist < closestCenterDist) {
 			closestCenterDist = centerDist;
-			centerDrink = drink;
+			centerDrink = drinkEl;
 		}
 	}
 
@@ -136,12 +134,12 @@ export function getSelectedDrink() {
  */
 export function setDrinkFilter(filter) {
 	filter = filter.toLocaleLowerCase().trim();
-	for (const drinkEl of createdDrinks.keys()) {
+	for (const drinkData of createdDrinks.values()) {
 		let visible = true;
 		if (filter) {
-			visible = drinkEl.name.toLocaleLowerCase().includes(filter);
+			visible = drinkData.drinkDisplay.name.toLocaleLowerCase().includes(filter);
 		}
-		drinkEl.style.display = visible ? "" : "none";
+		drinkData.drinkDisplay.setVisible(visible);
 	}
 }
 

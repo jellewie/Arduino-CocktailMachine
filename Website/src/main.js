@@ -3,11 +3,11 @@ import { getSelectedDrink, initDrinkSelector, markRecentDrink, setDrinkFilter } 
 import { mixButtonEl, searchEl } from "./globalElements.js";
 // @ts-ignore
 import globalStyleSheet from "./globalStyle.css" assert {type: "css"};
+// @ts-ignore
+import drinkDisplaySheet from "./DrinkDisplay.css" assert {type: "css"};
 import { sendMixRequest } from "./sendMixRequest.js";
 
-document.adoptedStyleSheets = [globalStyleSheet];
-
-customElements.define("drink-display", DrinkDisplay);
+document.adoptedStyleSheets = [globalStyleSheet, drinkDisplaySheet];
 
 mixButtonEl.addEventListener("click", () => {
 	const selectedDrink = getSelectedDrink();
