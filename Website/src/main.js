@@ -7,6 +7,8 @@ import globalStyleSheet from "./globalStyle.css" assert {type: "css"};
 import drinkDisplaySheet from "./DrinkDisplay.css" assert {type: "css"};
 import { sendMixRequest } from "./sendMixRequest.js";
 
+globalThis["DEBUG_BUILD"] = true;
+
 document.adoptedStyleSheets = [globalStyleSheet, drinkDisplaySheet];
 
 mixButtonEl.addEventListener("click", () => {
