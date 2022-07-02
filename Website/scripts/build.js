@@ -23,7 +23,7 @@ import CleanCSS from "https://esm.sh/clean-css@5.3.0?pin=v86";
 setCwd();
 
 function postCssInlineUrlsPlugin() {
-	const urlRegex = /url\("?(.+)"?\)/d;
+	const urlRegex = /url\("?(?!#)(.+)"?\)/d;
 	return {
 		postcssPlugin: "postcss-inline-urls",
 		/**

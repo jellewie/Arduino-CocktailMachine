@@ -5,8 +5,7 @@
 */
 
 export class DrinkDisplay {
-	#mixerContainerEl;
-	#mixerAccentsImageEl;
+	#drinkIconEl;
 	#nameEl;
 	#ingredientsListEl;
 	#available = true;
@@ -15,17 +14,9 @@ export class DrinkDisplay {
 		this.el = document.createElement("div");
 		this.el.classList.add("drink-display");
 
-		this.#mixerContainerEl = document.createElement("div");
-		this.#mixerContainerEl.classList.add("mixer-container");
-		this.el.appendChild(this.#mixerContainerEl);
-
-		const mixerOutlineEl = document.createElement("div");
-		mixerOutlineEl.classList.add("mixer-outline");
-		this.#mixerContainerEl.appendChild(mixerOutlineEl);
-
-		this.#mixerAccentsImageEl = document.createElement("div");
-		this.#mixerAccentsImageEl.classList.add("mixer-accents");
-		this.#mixerContainerEl.appendChild(this.#mixerAccentsImageEl);
+		this.#drinkIconEl = document.createElement("div");
+		this.#drinkIconEl.classList.add("drink-icon-container");
+		this.el.appendChild(this.#drinkIconEl);
 
 		this.#nameEl = document.createElement("h2");
 		this.#nameEl.classList.add("name");
@@ -44,21 +35,13 @@ export class DrinkDisplay {
 		this.#nameEl.textContent = value;
 	}
 
-	get color() {
-		return this.#mixerAccentsImageEl.style.backgroundColor;
-	}
-
-	set color(value) {
-		this.#mixerAccentsImageEl.style.backgroundColor = value;
-	}
-
 	get available() {
 		return this.#available;
 	}
 
 	set available(value) {
 		this.#available = value;
-		this.#mixerContainerEl.classList.toggle("unavailable", !value);
+		this.#drinkIconEl.classList.toggle("unavailable", !value);
 	}
 
 	/**

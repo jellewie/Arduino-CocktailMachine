@@ -45,7 +45,6 @@ export function initDrinkSelector() {
 		const {name, cssColor} = drinkConfig;
 		const drinkDisplay = new DrinkDisplay();
 		drinkDisplay.name = name;
-		drinkDisplay.color = cssColor;
 		drinkSelectorEl.appendChild(drinkDisplay.el);
 		createdDrinks.set(drinkDisplay.el, {
 			config: drinkConfig,

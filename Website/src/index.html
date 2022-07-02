@@ -10,6 +10,32 @@
 			<div id="drinkSelector"></div>
 			<button id="mixButton">Mix!</button>
 		</main>
+		<svg height="0" xmlns="http://www.w3.org/2000/svg">
+			<filter id="svgNeon" x="-100%" y="-100%" width="300%" height="300%">
+				<feColorMatrix type="saturate" in="SourceGraphic" values="25" result="blur1"/>
+				<feGaussianBlur in="blur1" stdDeviation="3" result="blur1"/>
+				<feComponentTransfer in="blur1" result="blur1">
+					<feFuncR type="linear" slope="1" intercept="0"></feFuncR>
+					<feFuncG type="linear" slope="1" intercept="0"></feFuncG>
+					<feFuncB type="linear" slope="1" intercept="0"></feFuncB>
+					<feFuncA type="linear" slope="4" intercept="0"></feFuncA>
+				</feComponentTransfer>
+
+				<feColorMatrix type="saturate" in="blur1" values="200" result="blur2"/>
+				<feGaussianBlur in="blur2" stdDeviation="30" result="blur2"/>
+				<feComponentTransfer in="blur2" result="blur2">
+					<feFuncR type="linear" slope="1" intercept="0"></feFuncR>
+					<feFuncG type="linear" slope="1" intercept="0"></feFuncG>
+					<feFuncB type="linear" slope="1" intercept="0"></feFuncB>
+					<feFuncA type="linear" slope="2" intercept="0"></feFuncA>
+				</feComponentTransfer>
+
+				<feGaussianBlur in="SourceGraphic" stdDeviation="1" result="blur3"/>
+
+				<feBlend in="blur1" in2="blur2" mode="lighten" result="final"/>
+				<feBlend in="final" in2="blur3" mode="lighten" result="final"/>
+			</filter>
+		</svg>
 		<!--inline main.js inject position-->
 	</body>
 </html>

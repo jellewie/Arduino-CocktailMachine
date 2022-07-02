@@ -1,43 +1,18 @@
 .drink-display {
 	scroll-snap-align: center;
-	transition: opacity 0.5s;
 	display: flex;
 	flex-direction: column;
 }
 
-.drink-display(:not(.selected)) {
-	opacity: 0.4;
-}
-
-.mixer-container {
-	width: 200px;
-	height: 300px;
+.drink-icon-container {
+	width: 150px;
+	height: 200px;
+	margin: 20px 20px;
 	position: relative;
-}
-.mixer-container.unavailable {
-	opacity: 0.4;
-}
-
-.mixer-outline {
-	--image: url(./mixer.svg);
-}
-.mixer-accents {
-	--image: url(./mixerAccents.svg);
-}
-.mixer-outline,
-.mixer-accents {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	background-color: white;
-
-	-webkit-mask-repeat: no-repeat;
-	mask-repeat: no-repeat;
-	-webkit-mask-position: center;
-	mask-position: center;
-
-	-webkit-mask-image: var(--image);
-	mask-image: var(--image);
+	background-image: url(drinkIcons/1.svg);
+	background-repeat: no-repeat;
+	background-position: center;
+	filter: url(#svgNeon);
 }
 
 h2 {
