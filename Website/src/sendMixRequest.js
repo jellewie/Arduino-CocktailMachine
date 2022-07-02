@@ -12,10 +12,10 @@ export async function sendMixRequest({
 	for (const [i, action] of actions.entries()) {
 		const queryIndex = i + 1;
 		if ("ingredient" in action) {
-			url.searchParams.set("ai" + queryIndex, action.ingredient);
-			url.searchParams.set("am" + queryIndex, String(action.amount));
+			url.searchParams.set("i" + queryIndex, action.ingredient);
+			url.searchParams.set("m" + queryIndex, String(action.amount));
 		} else {
-			url.searchParams.set("aa" + queryIndex, "#" + action.action);
+			url.searchParams.set("a" + queryIndex, "#" + action.action);
 		}
 	}
 	const response = await fetch(url.href);
