@@ -19,7 +19,7 @@ export class NeonSvgImage {
 		const nodes = await getSvg(this.id);
 		this.el.appendChild(nodes);
 
-		for (const node of nodes.querySelectorAll("path, line, polygon, polyline")) {
+		for (const node of nodes.querySelectorAll("path, line, polygon, polyline, ellipse, rect")) {
 			const flickeringPath = new FlickeringSvgElement(node);
 			this.flickeringPaths.push(flickeringPath);
 		}

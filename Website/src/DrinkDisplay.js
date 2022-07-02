@@ -5,6 +5,7 @@
 */
 
 import { NeonSvgImage } from "./NeonSvgImage.js";
+import { randInt } from "./util.js";
 
 export class DrinkDisplay {
 	#drinkIconEl;
@@ -21,7 +22,7 @@ export class DrinkDisplay {
 		this.#drinkIconEl.classList.add("drink-icon-container");
 		this.el.appendChild(this.#drinkIconEl);
 
-		this.#drinkIcon = new NeonSvgImage("drink1");
+		this.#drinkIcon = new NeonSvgImage("drink" + randInt(1, 6));
 		this.#drinkIconEl.appendChild(this.#drinkIcon.el);
 
 		this.#nameEl = document.createElement("h2");
