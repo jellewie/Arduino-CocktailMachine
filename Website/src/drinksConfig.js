@@ -49,9 +49,21 @@ export const ingredientNames = new Map([
 	["BAILEYS", "Baileys"],
 	["SPRITE", "Sprite"],
 	["LEMON_SODA", "Lemon soda"],
-])
+]);
 
 /** @typedef {"ice" | "shake" | "stir" | "crushed ice" | "blend" | "strain" | "2 thee spoons of sugar" | "6 leaves of mind"} Actions */
+
+/** @type {Actions[]} */
+export const actionNames = [
+	"ice",
+	"shake",
+	"stir",
+	"crushed ice",
+	"blend",
+	"strain",
+	"2 thee spoons of sugar",
+	"6 leaves of mind",
+];
 
 /** @type {DrinkConfig[]} */
 export const drinksConfig = [
