@@ -176,8 +176,10 @@ dialog {
 	border-color: #30003f #340044 #47065a;
 	border-radius: 10px;
 	box-shadow: #00000087 0px -20px 30px 20px, #00000069 0px -10px 10px 0px;
-	min-width: 400px;
-	min-height: 300px;
+	width: 400px;
+	height: fit-content;
+	max-width: calc(100vw - 60px);
+	max-height: calc(100vh - 60px);
 }
 
 dialog::backdrop {
