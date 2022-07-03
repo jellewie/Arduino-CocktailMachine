@@ -279,9 +279,11 @@ void handle_Info() {
                    "Code compiled on " + String(__DATE__) + " " + String(__TIME__) + "\n"
                    "MAC adress = " + String(WiFi.macAddress()) + "\n"
                    "IP adress = " + IpAddress2String(WiFi.localIP()) + "\n"
-                   "X_Ref = " + IsTrue(digitalRead(PDI_X_Ref) == LOW) + "\n"
-                   "Y_Ref = " + IsTrue(digitalRead(PDI_Y_Ref) == LOW) + "\n"
-                   "Z_Ref = " + IsTrue(digitalRead(PDI_Z_Ref) == LOW) + "\n"
+                   "X_Ref = " + IsTrueToString(digitalRead(PDI_X_Ref) == LOW) + "\n"
+                   "Y_Ref = " + IsTrueToString(digitalRead(PDI_Y_Ref) == LOW) + "\n"
+                   "Z_Ref = " + IsTrueToString(digitalRead(PDI_Z_Ref) == LOW) + "\n"
+                   "Switch = " + IsTrueToString(digitalRead(PDI_S) == LOW) + "\n"
+
                    "\nSOFT_SETTINGS\n";
   for (byte i = 3; i < WiFiManager_Settings + 1; i++)
     Message += WiFiManager_VariableNames[i - 1] + " = " + WiFiManager.Get_Value(i, false, true) + "\n";
