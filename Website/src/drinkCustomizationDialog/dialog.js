@@ -58,6 +58,12 @@ addIngredientSelect.addEventListener("change", () => {
 	addIngredientSelect.value = "placeholder";
 });
 
+/** @type {CustomizableIngredient?} */
+let currentlyDraggingIngredient = null;
+/** @type {Map<CustomizableIngredient, number>?} */
+let computedIngredientPositionsBeforeDrag = null;
+const ingredientHeight = 30;
+
 /**
  * @param {import("../drinksConfig.js").DrinkIngredientOrAction} action
  */
@@ -79,7 +85,104 @@ function addIngredient(action) {
 		}
 	});
 	currentCustomizableIngredients.push(customizableIngredient);
+
+	customizableIngredient.onDragStart(() => {
+		if (currentlyDraggingIngredient) return false;
+		computeIngredientBounds();
+		currentlyDraggingIngredient = customizableIngredient;
+		return true;
+	});
+	customizableIngredient.onDragMove(() => {
+		if (currentlyDraggingIngredient != customizableIngredient) return;
+		updateDraggingIngredientTransforms();
+	});
+	customizableIngredient.onDragEnd(() => {
+		if (currentlyDraggingIngredient != customizableIngredient) return;
+		const {sortedIngredientsAfterDrag} = getSortedIngredients();
+
+		while (drinkCustomizationActionsList.firstChild) {
+			drinkCustomizationActionsList.removeChild(drinkCustomizationActionsList.firstChild);
+		}
+		for (const ingredient of sortedIngredientsAfterDrag) {
+			ingredient.el.style.transform = "";
+			drinkCustomizationActionsList.appendChild(ingredient.el);
+		}
+		currentCustomizableIngredients = [...sortedIngredientsAfterDrag];
+
+		currentlyDraggingIngredient = null;
+	});
+
 	drinkCustomizationActionsList.appendChild(customizableIngredient.el);
+}
+
+function computeIngredientBounds() {
+	if (currentlyDraggingIngredient) {
+		throw new Error("Assertion failed, an element is already being dragged");
+	}
+	computedIngredientPositionsBeforeDrag = new Map();
+	for (const ingredient of currentCustomizableIngredients) {
+		const pos = computeIngredientYPos(ingredient);
+		computedIngredientPositionsBeforeDrag.set(ingredient, pos);
+	}
+}
+
+/**
+ * @param {CustomizableIngredient} ingredient
+ */
+function computeIngredientYPos(ingredient) {
+	const bounds = ingredient.el.getBoundingClientRect();
+	return bounds.top + bounds.bottom / 2;
+}
+
+/**
+ * @param {Map<CustomizableIngredient, number>} ingredientPositions
+ */
+function sortIngredientsByPosition(ingredientPositions) {
+	return Array.from(ingredientPositions).sort((a, b) => {
+		return a[1] - b[1];
+	}).map(entry => entry[0]);
+}
+
+/**
+ * Gets all ingredients and sorts them by position from before and after dragging.
+ */
+function getSortedIngredients() {
+	if (!currentlyDraggingIngredient) {
+		throw new Error("Assertion failed, no element is being dragged");
+	}
+	if (!computedIngredientPositionsBeforeDrag) {
+		throw new Error("Assertion failed, bounds have not been computed");
+	}
+
+	const sortedIngredientsBeforeDrag = sortIngredientsByPosition(computedIngredientPositionsBeforeDrag);
+
+	const positionsAfterDrag = new Map(computedIngredientPositionsBeforeDrag.entries());
+	let draggingPosition = computeIngredientYPos(currentlyDraggingIngredient);
+	// To allow elements to move a little sooner, we shift the dragging position
+	// down by half the ingredientHeight. Otherwise you'd have to drag the element
+	// all the way past the element below it.
+	draggingPosition += ingredientHeight / 2;
+	positionsAfterDrag.set(currentlyDraggingIngredient, draggingPosition);
+
+	const sortedIngredientsAfterDrag = sortIngredientsByPosition(positionsAfterDrag);
+	return {
+		sortedIngredientsBeforeDrag,
+		sortedIngredientsAfterDrag,
+	}
+}
+
+function updateDraggingIngredientTransforms() {
+	const {sortedIngredientsBeforeDrag, sortedIngredientsAfterDrag} = getSortedIngredients();
+
+	for (const ingredient of currentCustomizableIngredients) {
+		if (ingredient == currentlyDraggingIngredient) continue;
+
+		const indexBeforeDrag = sortedIngredientsBeforeDrag.indexOf(ingredient);
+		const indexAfterDrag = sortedIngredientsAfterDrag.indexOf(ingredient);
+		const delta = indexAfterDrag - indexBeforeDrag;
+
+		ingredient.el.style.transform = `translateY(${delta * ingredientHeight}px)`;
+	}
 }
 
 /**

@@ -8,6 +8,15 @@ export class CustomizableIngredient {
 	#onDeleteClickCbs;
 	#deleteButtonEl;
 
+	#isDragging = false;
+	#dragStart = 0;
+	/** @type {Set<() => boolean>} */
+	#onDragStartCbs = new Set();
+	/** @type {Set<() => void>} */
+	#onDragMoveCbs = new Set();
+	/** @type {Set<() => void>} */
+	#onDragEndCbs = new Set();
+
 	constructor() {
 		this.el = document.createElement("li");
 
@@ -42,6 +51,14 @@ export class CustomizableIngredient {
 			this.#onDeleteClickCbs.forEach(cb => cb());
 		});
 		this.el.appendChild(this.#deleteButtonEl);
+
+		this.boundPointerDown = this.#onPointerDown.bind(this);
+		this.boundPointerMove = this.#onPointerMove.bind(this);
+		this.boundPointerUp = this.#onPointerUp.bind(this);
+
+		this.#grabHandleEl.addEventListener("pointerdown", this.boundPointerDown, {
+			passive: false,
+		});
 
 		this.#updateIsAction();
 	}
@@ -81,5 +98,74 @@ export class CustomizableIngredient {
 	 */
 	onDeleteClick(cb) {
 		this.#onDeleteClickCbs.add(cb);
+	}
+
+	/**
+	 * @param {PointerEvent} e
+	 */
+	#onPointerDown(e) {
+		if (this.#isDragging) return;
+		let allowed = true;
+		for (const cb of this.#onDragStartCbs) {
+			allowed = allowed && cb();
+		}
+		if (!allowed) return;
+		e.preventDefault();
+		this.#isDragging = true;
+		this.#dragStart = e.clientY;
+		this.el.classList.add("grabbing");
+
+		window.addEventListener("pointermove", this.boundPointerMove, {
+			passive: false,
+		});
+		window.addEventListener("pointerup", this.boundPointerUp, {
+			passive: false,
+		});
+	}
+
+	/**
+	 * @param {PointerEvent} e
+	 */
+	#onPointerMove(e) {
+		if (!this.#isDragging) return;
+		e.preventDefault();
+		this.el.style.transform = `translateY(${e.clientY - this.#dragStart}px)`;
+		this.#onDragMoveCbs.forEach(cb => cb());
+	}
+
+	/**
+	 * @param {PointerEvent} e
+	 */
+	#onPointerUp(e) {
+		if (!this.#isDragging) return;
+		e.preventDefault();
+		this.#isDragging = false;
+		this.el.style.transform = "";
+		this.el.classList.remove("grabbing");
+
+		window.removeEventListener("pointermove", this.boundPointerMove);
+		window.removeEventListener("pointerup", this.boundPointerUp);
+		this.#onDragEndCbs.forEach(cb => cb());
+	}
+
+	/**
+	 * @param {() => boolean} cb
+	 */
+	onDragStart(cb) {
+		this.#onDragStartCbs.add(cb);
+	}
+
+	/**
+	 * @param {() => void} cb
+	 */
+	onDragMove(cb) {
+		this.#onDragMoveCbs.add(cb);
+	}
+
+	/**
+	 * @param {() => void} cb
+	 */
+	onDragEnd(cb) {
+		this.#onDragEndCbs.add(cb);
 	}
 }

@@ -21,8 +21,12 @@
 	align-items: center;
 	border-radius: 10px;
 }
+#drinkCustomizationActionsList > li:not(.grabbing) {
+	transition: transform 0.3s;
+}
 #drinkCustomizationActionsList > li:hover,
-#drinkCustomizationDialog .add-ingredient:hover {
+#drinkCustomizationDialog .add-ingredient:hover,
+#drinkCustomizationActionsList > li.grabbing {
 	background-color: #ffffff1a;
 }
 
@@ -33,6 +37,11 @@
 	background: radial-gradient(#ffffff80 0%, #ffffff80 40%, transparent 60%, transparent 100%);
 	background-size: 50% 33%;
 	cursor: grab;
+	touch-action: none;
+}
+#drinkCustomizationActionsList > li.grabbing,
+#drinkCustomizationActionsList > li.grabbing > .grab-handle {
+	cursor: grabbing;
 }
 
 #drinkCustomizationActionsList > li > .amount-space {
