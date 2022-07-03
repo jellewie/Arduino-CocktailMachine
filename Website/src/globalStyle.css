@@ -55,7 +55,7 @@ input[type="text"] {
 	appearance: none;
 	border: none;
 	background: #51515157;
-	border-radius: 5px;
+	border-radius: 10px;
 	border-bottom: solid #7b7b7b33 1px;
 	box-shadow: inset 0px 9px 9px -6px #00000029;
 }
@@ -103,7 +103,7 @@ input[type="text"] {
 	padding: 5px 40px;
 	background: linear-gradient(#ec15aa, #da0097);
 	margin: 0;
-	border-radius: 5px;
+	border-radius: 10px;
 	box-shadow: #e35bd6 0px -1px, #690079 0px 5px, #0000005e 0px 11px 6px -2px, #00000045 0px 21px 20px 4px;
 	cursor: pointer;
 }
@@ -139,7 +139,7 @@ dialog {
 	background: radial-gradient(circle at 50% 110%, #6e1788 0%, #330042 40%, #0e0013 70%, black 100%);
 	border: solid 1px;
 	border-color: #30003f #340044 #47065a;
-	border-radius: 5px;
+	border-radius: 10px;
 	box-shadow: #00000087 0px -20px 30px 20px, #00000069 0px -10px 10px 0px;
 	min-width: 400px;
 	min-height: 300px;
