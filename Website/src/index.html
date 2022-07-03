@@ -8,8 +8,19 @@
 		<main>
 			<input id="search" type="text" placeholder="Search">
 			<div id="drinkSelector"></div>
-			<button id="mixButton">Mix!</button>
+			<button id="customizeButton" class="text-button">Customize</button>
+			<button id="mainMixButton" class="mix-button">Mix!</button>
 		</main>
+		<dialog id="drinkCustomizationDialog">
+			<form method="dialog">
+				<h1 id="drinkCustomizationTitle"></h1>
+				<ul id="drinkCustomizationActionsList"></ul>
+				<div class="button-section">
+					<button class="text-button" value="cancel">Cancel</button>
+					<button class="mix-button" value="mix">Mix!</button>
+				</div>
+			</form>
+		</dialog>
 		<svg height="0" xmlns="http://www.w3.org/2000/svg">
 			<filter id="svgNeon" x="-100%" y="-100%" width="300%" height="300%">
 				<feColorMatrix type="saturate" in="SourceGraphic" values="25" result="blur1"/>

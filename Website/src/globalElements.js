@@ -7,12 +7,12 @@ const drinkSelectorEl = /** @type {HTMLDivElement} */ (drinkSelector);
 const customizeButton = document.getElementById("customizeButton");
 const customizeButtonEl = /** @type {HTMLButtonElement} */ (customizeButton);
 
-const mixButton = document.getElementById("mixButton");
-const mixButtonEl = /** @type {HTMLButtonElement} */ (mixButton);
+const mainMixButton = document.getElementById("mainMixButton");
+const mainMixButtonEl = /** @type {HTMLButtonElement} */ (mainMixButton);
 
 export {
 	searchEl,
 	drinkSelectorEl,
 	customizeButtonEl,
-	mixButtonEl,
+	mainMixButtonEl,
 }

@@ -1,0 +1,22 @@
+#drinkCustomizationTitle {
+	text-align: center;
+}
+
+#drinkCustomizationDialog > form {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+#drinkCustomizationActionsList {
+	padding: 0;
+	flex-grow: 1;
+}
+
+#drinkCustomizationActionsList > li {
+	list-style-type: none;
+}
+
+#drinkCustomizationActionsList > li > .grab-handle {
+	width: 10px;
+}

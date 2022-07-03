@@ -73,26 +73,78 @@ input[type="text"] {
 	box-shadow: #ffffff1c 0px 0px 20px;
 }
 
-#mixButton {
+.text-button,
+.mix-button {
 	border: none;
 	appearance: none;
+	-webkit-tap-highlight-color: transparent;
+}
+
+.text-button {
+	background: transparent;
+	color: white;
+	font-size: 14pt;
+	margin: 20px;
+	cursor: pointer;
+}
+
+.text-button:hover,
+.text-button:focus-visible {
+	opacity: 0.8;
+}
+
+.text-button:active {
+	opacity: 0.6;
+}
+
+.mix-button {
 	font-size: 30pt;
 	color: white;
 	padding: 5px 40px;
 	background: linear-gradient(#ec15aa, #da0097);
-	margin-top: 0;
-	margin-bottom: 40px;
+	margin: 0;
 	border-radius: 5px;
 	box-shadow: #e35bd6 0px -1px, #690079 0px 5px, #0000005e 0px 11px 6px -2px, #00000045 0px 21px 20px 4px;
 	cursor: pointer;
 }
 
-#mixButton:hover {
+#mainMixButton {
+	margin-bottom: 40px;
+}
+
+.mix-button:hover,
+.mix-button:focus-visible {
 	background: radial-gradient(#ff7bd6, #e316a4);
 	box-shadow: #ff44ba29 0px 0px 20px 15px, #e35bd6 0px -1px, #8c0082 0px 5px, #0000005e 0px 11px 6px -2px, #00000045 0px 21px 20px 4px;
 }
 
-#mixButton:active {
+.mix-button:active {
 	background: linear-gradient(#ca1291, #b7027f);
 	box-shadow: #e35bd6 0px -1px, #740059 0px 5px, #0000005e 0px 11px 6px -2px, #00000045 0px 21px 20px 4px;
+}
+
+.mix-button:focus-visible,
+.text-button:focus-visible {
+	outline: rgb(144, 77, 255) solid 3px;
+}
+
+.button-section {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+dialog {
+	color: white;
+	background: radial-gradient(circle at 50% 110%, #6e1788 0%, #330042 40%, #0e0013 70%, black 100%);
+	border: solid 1px;
+	border-color: #30003f #340044 #47065a;
+	border-radius: 5px;
+	box-shadow: #00000087 0px -20px 30px 20px, #00000069 0px -10px 10px 0px;
+	min-width: 400px;
+	min-height: 300px;
+}
+
+dialog::backdrop {
+	background: rgba(0, 0, 0, 0.6);
 }
