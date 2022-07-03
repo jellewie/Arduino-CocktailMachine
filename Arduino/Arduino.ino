@@ -15,16 +15,16 @@
 #include <AccelStepper.h>                                       //Make sure to install AccelStepper V1.61.0(+) manually //https://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html#a68942c66e78fb7f7b5f0cdade6eb7f06
 
 const byte PDO_Step_enable = 22;
-const byte PDO_X_Dir = 5;
-const byte PDO_Y_Dir = 25;
-const byte PDO_Z_Dir = 14;
-const byte PDO_X_Step = 32;
-const byte PDO_Y_Step = 26;
-const byte PDO_Z_Step = 12;
-const byte PDI_X_Ref = 18;                           //LOW = TRIGGERED
-const byte PDI_Y_Ref = 19;
-const byte PDI_Z_Ref = 21;
-const byte PDO_Pump[] = {33, 27};
+const byte PDO_X_Dir = 15;
+const byte PDO_Y_Dir = 17;
+const byte PDO_Z_Dir = 18;
+const byte PDO_X_Step = 4;
+const byte PDO_Y_Step = 5;
+const byte PDO_Z_Step = 19;
+const byte PDI_X_Ref = 12;                           //LOW = TRIGGERED
+const byte PDI_Y_Ref = 35;
+const byte PDI_Z_Ref = 34;
+const byte PDO_Pump[] = {31, 33, 25, 26};
 bool DisableSteppersAfterMixDone = false;
 byte ShotDispenserML = 30;
 byte HomeMAXSpeed = 200;
