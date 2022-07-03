@@ -15,10 +15,69 @@ import {importAssertions} from "https://esm.sh/acorn-import-assertions@1.8.0?pin
 // @ts-expect-error
 import {setCwd} from "https://deno.land/x/chdir_anywhere@v0.0.2/mod.js";
 // @ts-expect-error
+import {resolve, dirname} from "https://deno.land/std@0.146.0/path/mod.ts";
+// @ts-expect-error
+import postcss from "https://deno.land/x/postcss@8.4.13/mod.js";
+// @ts-expect-error
 import * as esbuild from "https://deno.land/x/esbuild@v0.14.48/mod.js"
 // @ts-expect-error
 import CleanCSS from "https://esm.sh/clean-css@5.3.0?pin=v86";
 setCwd();
+
+function postCssInlineUrlsPlugin() {
+	const urlRegex = /url\("?(?!#)(.+)"?\)/d;
+	return {
+		postcssPlugin: "postcss-inline-urls",
+		/**
+		 * @param {{value: string}} decl
+		 * @param {{result: {opts: {from: string}}}} param1
+		 * @returns
+		 */
+		async Declaration(decl, {result}) {
+			const from = result.opts.from;
+			const match = decl.value.match(urlRegex);
+			if (match && match[1]) {
+				const url = match[1];
+				if (url.startsWith("data:")) {
+					// Already inline.
+					return;
+				}
+				await new Promise(r => setTimeout(r, 100));
+
+				const filePath = resolve(dirname(from), url);
+				const file = await Deno.readTextFile(filePath);
+				const base64 = btoa(file);
+				let mediatype = "text/plain";
+				if (url.endsWith(".svg")) {
+					mediatype = "image/svg+xml";
+				}
+				decl.value = `url(data:${mediatype};base64,${base64})`;
+			}
+		}
+	}
+}
+
+function postCssPlugin() {
+	return {
+		name: "postcss",
+		/**
+		 * @param {string} code
+		 * @param {string} id
+		 */
+		async transform(code, id) {
+			if (id.endsWith(".css")) {
+				const processor = postcss([
+					postCssInlineUrlsPlugin(),
+				]);
+				const result = await processor.process(code, {
+					from: id,
+					to: id,
+				});
+				return result.css;
+			}
+		}
+	}
+}
 
 function cleanCssPlugin() {
 	const cleanCss = new CleanCSS();
@@ -49,6 +108,7 @@ const bundle = await rollup({
 	},
 	acornInjectPlugins: [importAssertions],
 	plugins: [
+		postCssPlugin(),
 		replace({
 			values: {
 				DEBUG_BUILD: false,
