@@ -4,7 +4,6 @@
 //===========================================================================
 // Things that can/need to be defined after including "WiFiManager.h"
 //===========================================================================
-const byte Pin_LED  = LED_BUILTIN;                              //Just here for some examples, It's the LED to give feedback on (like blink on error)
 bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
   switch (ValueID) {                                            //Note the numbers are shifted from what is in memory, 0 is the first user value
     case 0: {
@@ -120,16 +119,15 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
   return "";
 }
 void WiFiManagerUser_Status_Start() {                           //Called before start of WiFi
-  pinMode(Pin_LED, OUTPUT);
-  digitalWrite(Pin_LED, HIGH);
 }
 void WiFiManagerUser_Status_Done() {                            //Called after succesfull connection to WiFi
-  digitalWrite(Pin_LED, LOW);
 }
 void WiFiManagerUser_Status_Blink() {                           //Used when trying to connect/not connected
-  digitalWrite(Pin_LED, !digitalRead(Pin_LED));
+  digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 }
-void WiFiManagerUser_Status_StartAP() {}                        //Called before start of APmode
+void WiFiManagerUser_Status_StartAP() {
+  LcdPrint("WiFi failed", "Starting ApMode");
+}                        //Called before start of APmode
 bool WiFiManagerUser_HandleAP() {                               //Called when in the While loop in APMode, this so you can exit it
   //Return true to leave APmode
 #define TimeOutApMode 15 * 60 * 1000;                           //Example for a timeout, (time in ms)
