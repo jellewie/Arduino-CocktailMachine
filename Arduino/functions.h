@@ -263,3 +263,32 @@ String IsTrueToString(bool input) {
     return "true";
   return "false";
 }
+void LcdPrint(String msg = "", String msg2 = "");
+void LcdPrint(String msg, String msg2) {
+  if (msg != "") {
+    for (byte i = msg.length(); i < 16; i++) {
+      msg += " ";
+    }
+    lcd.setCursor(1, 0);
+    lcd.print(msg);
+  }
+  if (msg2 != "") {
+    for (byte i = msg2.length(); i < 16; i++) {
+      msg2 += " ";
+    }
+    lcd.setCursor(1, 1);
+    lcd.print(msg2);
+  }
+}
+#define TimeoutWaitingOnUserMs 5 * 60 * 1000
+void WaitForUser() {
+  bool WaitMore = true;
+  while (WaitMore) {
+    if (digitalRead(PDI_S) == LOW)
+      WaitMore = false;
+    static unsigned long LastTime;
+    if (TickEveryXms(&LastTime, TimeoutWaitingOnUserMs))
+      WaitMore = false;
+    MyYield();
+  }
+}

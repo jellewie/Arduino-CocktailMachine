@@ -3,6 +3,14 @@
   Board: https://dl.espressif.com/dl/package_esp32_index.json
 
 
+  save Dispenser data in EEPROM
+  Get AddDispenser code
+
+
+
+  add taskscheduale for saving EEPROM
+  add PreFixSetDispenser code
+    Change Dispenser if the ID already exist
 */
 //==============================================================//Note spacer
 #if !defined(ESP32)
@@ -13,18 +21,24 @@
 #include "WiFiManager/WiFiManager.h"                            //Includes <WiFi> and <WebServer.h> and setups up 'WebServer server(80)' if needed
 //#include FastLED>
 #include <AccelStepper.h>                                       //Make sure to install AccelStepper V1.61.0(+) manually //https://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html#a68942c66e78fb7f7b5f0cdade6eb7f06
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>                                  //Make sure to install LiquidCrystal_I2C V1.1.2(+) manually https://github.com/johnrickman/LiquidCrystal_I2C/blob/master/LiquidCrystal_I2C.cpp
 
-const byte PDO_Step_enable = 22;
-const byte PDO_X_Dir = 15;
+const byte PDO_Step_enable = 16;
+const byte PDO_X_Dir = 23;
 const byte PDO_Y_Dir = 17;
 const byte PDO_Z_Dir = 18;
 const byte PDO_X_Step = 4;
-const byte PDO_Y_Step = 5;
+const byte PDO_Y_Step = 12;
 const byte PDO_Z_Step = 19;
-const byte PDI_X_Ref = 12;                           //LOW = TRIGGERED
-const byte PDI_Y_Ref = 35;
-const byte PDI_Z_Ref = 34;
-const byte PDO_Pump[] = {31, 33, 25, 26};
+const byte PDI_X_Ref = 5;                                      //LOW = TRIGGERED
+const byte PDI_Y_Ref = 27;
+const byte PDI_Z_Ref = 15;
+const byte PDI_S = 39;
+const byte PDO_Pump[] = {32, 33, 25, 26};
+//const byte I2C_SDA = 21;                                      //I2C can not be moved
+//const byte I2C_SCL = 22;
+
 bool DisableSteppersAfterMixDone = false;
 byte ShotDispenserML = 30;
 byte HomeMAXSpeed = 200;
@@ -46,6 +60,7 @@ const byte Dispensers_Amount = 20;                              //Only 20 are sa
 AccelStepper Stepper_X(AccelStepper::DRIVER, PDO_X_Step, PDO_X_Dir);
 AccelStepper Stepper_Y(AccelStepper::DRIVER, PDO_Y_Step, PDO_Y_Dir);
 AccelStepper Stepper_Z(AccelStepper::DRIVER, PDO_Z_Step, PDO_Z_Dir);
+LiquidCrystal_I2C lcd(0x27, 20, 4);                             //Set the LCD address to 0x27 for a 20 chars and 2 line display
 
 #include "Data.h"
 #include "Functions.h"
@@ -53,9 +68,13 @@ AccelStepper Stepper_Z(AccelStepper::DRIVER, PDO_Z_Step, PDO_Z_Dir);
 
 void setup() {
   Serial.begin(115200);
+  lcd.init();
+  lcd.backlight();
+  LcdPrint("Booting");
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
   pinMode(PDO_Step_enable, OUTPUT);
+  DisableSteppers();
   pinMode(PDO_X_Dir, OUTPUT);
   pinMode(PDO_Y_Dir, OUTPUT);
   pinMode(PDO_Z_Dir, OUTPUT);
@@ -65,10 +84,11 @@ void setup() {
   pinMode(PDI_X_Ref, INPUT_PULLUP);
   pinMode(PDI_Y_Ref, INPUT_PULLUP);
   pinMode(PDI_Z_Ref, INPUT_PULLUP);
+  pinMode(PDI_S, INPUT_PULLUP);
 
-  Stepper_X.setPinsInverted(false, true, false, false, false);
-  Stepper_Y.setPinsInverted(false, true, false, false, false);
-  Stepper_Z.setPinsInverted(false, true, false, false, false);
+  Stepper_X.setPinsInverted(false, false, false, false, false); //(bool pin1Invert, bool pin2Invert, bool pin3Invert, bool pin4Invert, bool enableInvert)
+  Stepper_Y.setPinsInverted(false, false, false, false, false);
+  Stepper_Z.setPinsInverted(false, false, false, false, false);
   Stepper_X.setMaxSpeed(MotorMAXSpeed);
   Stepper_Y.setMaxSpeed(MotorMAXSpeed);
   Stepper_Z.setMaxSpeed(MotorMAXSpeed);
@@ -85,35 +105,41 @@ void setup() {
   server.on("/reset",       handle_Reset);
   server.onNotFound(        handle_NotFound);                   //When a client requests an unknown URI
   //server.on("/url", CodeToCall);                              //Example of a url to function caller, These must be declaired before "WiFiManager.Start()"
+  lcd.setCursor(1, 1);
+  LcdPrint("", "WiFi connecting");
   byte Answer = WiFiManager.Start();                            //Run the wifi startup (and save results)
-  Serial.println("WiFi setup executed with responce code '" + String(Answer) + "' " + IpAddress2String(WiFi.localIP())); //The return codes can be found in "WiFiManager.cpp" in "CWiFiManager::Start("
   WiFiManager.OTA_Enabled = true;                               //(runtime) Turn off/on OTA
   WiFiManager.EnableSetup(true);                                //(runtime) Enable the settings, only enabled in APmode by default
+  Serial.println("WiFi setup executed with responce code '" + String(Answer) + "' " + IpAddress2String(WiFi.localIP())); //The return codes can be found in "WiFiManager.cpp" in "CWiFiManager::Start("
+  LcdPrint("WiFi = " + String(Answer), IpAddress2String(WiFi.localIP()));
   digitalWrite(LED_BUILTIN, LOW);
 }
 void loop() {
   MyYield();
 }
+
 void MakeCocktail(Drink Mix) {
+  LcdPrint("Mixing cocktail", Mix.Name);
   if (!Homed) {
-    if (!Home(true, false, false))
+    if (!Home(true, true, true))
       return;
   }
-
   for (byte i = 0; i < 8; i++) {                                //For each Ingredient
     if (Mix.Ingredients[i].ID != 0 or Mix.Ingredients[i].Action != 0) {
+      LcdPrint("", "Get" + IngredientIDtoString(Mix.Ingredients[i].ID));
       Serial.println(" == Drink " + String(Mix.Name) + "' Next ingredient ='" + IngredientIDtoString(Mix.Ingredients[i].ID) + "'");
       GetIngredient(Mix.Ingredients[i]);
     }
   }
   MoveTo(Manual_X, Manual_Y);
+  LcdPrint("Mixed cocktail", IpAddress2String(WiFi.localIP()));
 }
 void GetIngredient(Ingredient IN) {
   Serial.println("GetIngredient: ID=" + String(IN.ID) + " Action=" + IN.Action + " ml=" + String(IN.ml));
   if (IN.Action != "") {
     MoveTo(Manual_X, Manual_Y);
-    Serial.println("TODO, Wait for user confirmation code, msg = '" + String(IN.Action) + "'");
-    MyDelay(2500);
+    LcdPrint("Waiting on user", String(IN.Action));
+    WaitForUser();
   }
   byte DispenserID = GetDispenserID(IN.ID);
   if (DispenserID != 0) {
@@ -153,12 +179,13 @@ void GetIngredient(Ingredient IN) {
         }
         break;
       default:
-        Serial.println("Error, unknown Dispenser type, ID=" + String(DispenserID) + " Type=" + String(Dispensers[DispenserID].Type));
+        LcdPrint("UNK Dispenser type", String(Dispensers[DispenserID].Type));
+        WaitForUser();
         break;
     }
   } else { //No Dispenser availble,
     MoveTo(Manual_X, Manual_Y);
-    Serial.println("TODO, Wait for user confirmation, Drink is no in the machine so should be done manually, msg = '" + String(IN.Action) + "'");
-    MyDelay(2500);
+    LcdPrint("No dispenser", String(IN.Action));
+    WaitForUser();
   }
 }
