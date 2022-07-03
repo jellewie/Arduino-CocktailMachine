@@ -15,8 +15,35 @@
 
 #drinkCustomizationActionsList > li {
 	list-style-type: none;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-radius: 10px;
+}
+#drinkCustomizationActionsList > li:hover {
+	background-color: #ffffff1a;
 }
 
 #drinkCustomizationActionsList > li > .grab-handle {
-	width: 10px;
+	width: 12px;
+	height: 18px;
+	margin-left: 10px;
+	background: radial-gradient(#ffffff80 0%, #ffffff80 40%, transparent 60%, transparent 100%);
+	background-size: 50% 33%;
+	cursor: grab;
+}
+
+#drinkCustomizationActionsList > li > .amount-space {
+	width: 30px;
+	padding: 0 10px;
+	margin: 0 10px;
+}
+
+#drinkCustomizationActionsList > li > .text {
+	flex-grow: 1;
+}
+
+.delete-button {
+	border: none;
+	background-size: 70%;
 }

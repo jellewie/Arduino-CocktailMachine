@@ -1,3 +1,7 @@
+:root{
+	--svg-circle-x: url(../svg/circleX.svg);
+}
+
 html, body, main {
 	width: 100%;
 	height: 100%;
@@ -51,27 +55,36 @@ main {
 	flex-shrink: 0;
 }
 
-input[type="search"] {
+input[type="search"],
+input[type="number"] {
 	appearance: none;
 	border: none;
+	color: white;
 	background: #51515157;
 	border-radius: 10px;
 	border-bottom: solid #7b7b7b33 1px;
 	box-shadow: inset 0px 9px 9px -6px #00000029;
 }
 
+.delete-button ,
 input[type="search"]::-webkit-search-cancel-button {
 	opacity: 0.5;
 	width: 30px;
 	height: 30px;
-	background: url(../svg/circleX.svg) center/contain no-repeat;
+	background: var(--svg-circle-x) center/contain no-repeat;
 	cursor: pointer;
 }
+.delete-button:hover,
 input[type="search"]::-webkit-search-cancel-button:hover {
 	opacity: 0.7;
 }
+.delete-button:active,
 input[type="search"]::-webkit-search-cancel-button:active {
 	opacity: 0.6;
+}
+
+input[type="number"]::-webkit-inner-spin-button {
+	appearance: none;
 }
 
 #search {
@@ -79,7 +92,6 @@ input[type="search"]::-webkit-search-cancel-button:active {
 	text-align: center;
 	margin: 30px;
 	max-width: calc(100% - 60px);
-	color: white;
 }
 #search:focus-visible {
 	outline: none;

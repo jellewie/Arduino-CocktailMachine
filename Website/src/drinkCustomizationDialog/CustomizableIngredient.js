@@ -18,22 +18,26 @@ export class CustomizableIngredient {
 		this.#isAction = false;
 
 		this.#amountEl = document.createElement("input");
+		this.#amountEl.classList.add("amount-space");
 		this.#amountEl.type = "number";
 		this.#amountEl.min = "0";
 		this.#amountEl.max = "1000";
 		this.el.appendChild(this.#amountEl);
 
 		this.#amountPlaceholderEl = document.createElement("span");
+		this.#amountPlaceholderEl.classList.add("amount-space");
 		this.el.appendChild(this.#amountPlaceholderEl);
 
 		this.#textEl = document.createElement("span");
+		this.#textEl.classList.add("text");
 		this.el.appendChild(this.#textEl);
 
 		this.#onDeleteClickCbs = new Set();
 
 		this.#deleteButtonEl = document.createElement("button");
-		this.#deleteButtonEl.textContent = "X";
+		this.#deleteButtonEl.classList.add("delete-button");
 		this.#deleteButtonEl.type = "button";
+		this.#deleteButtonEl.ariaLabel = "Delete ingredient"
 		this.#deleteButtonEl.addEventListener("click", () => {
 			this.#onDeleteClickCbs.forEach(cb => cb());
 		});
