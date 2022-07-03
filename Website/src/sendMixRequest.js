@@ -8,9 +8,9 @@ export async function sendMixRequest({
 	actions,
 }) {
 	const url = new URL("/set", window.location.href);
-	url.searchParams.set("n", name);
+	url.searchParams.set("m", name);
 	for (const [i, action] of actions.entries()) {
-		const queryIndex = i + 1;
+		const queryIndex = i;
 		if ("ingredient" in action) {
 			url.searchParams.set("i" + queryIndex, action.ingredient);
 			url.searchParams.set("m" + queryIndex, String(action.amount));

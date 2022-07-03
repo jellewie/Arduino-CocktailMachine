@@ -4,8 +4,12 @@
 * @property {boolean} available Whether the ingredient is available.
 */
 
+import { NeonSvgImage } from "./NeonSvgImage.js";
+import { randInt } from "./util.js";
+
 export class DrinkDisplay {
 	#drinkIconEl;
+	#drinkIcon;
 	#nameEl;
 	#ingredientsListEl;
 	#available = true;
@@ -17,6 +21,9 @@ export class DrinkDisplay {
 		this.#drinkIconEl = document.createElement("div");
 		this.#drinkIconEl.classList.add("drink-icon-container");
 		this.el.appendChild(this.#drinkIconEl);
+
+		this.#drinkIcon = new NeonSvgImage("drink" + randInt(1, 6));
+		this.#drinkIconEl.appendChild(this.#drinkIcon.el);
 
 		this.#nameEl = document.createElement("h2");
 		this.#nameEl.classList.add("name");

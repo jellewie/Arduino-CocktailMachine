@@ -9,51 +9,16 @@ import {rollup} from "https://esm.sh/rollup@2.75.7?pin=v86";
 // @ts-expect-error
 import {importAssertionsPlugin} from "https://esm.sh/rollup-plugin-import-assert@2.1.0?pin=v86"
 // @ts-expect-error
+import replace from "https://esm.sh/@rollup/plugin-replace@4.0.0?pin=v86";
+// @ts-expect-error
 import {importAssertions} from "https://esm.sh/acorn-import-assertions@1.8.0?pin=v86";
 // @ts-expect-error
-import postcss from "https://deno.land/x/postcss@8.4.13/mod.js";
-// @ts-expect-error
 import {setCwd} from "https://deno.land/x/chdir_anywhere@v0.0.2/mod.js";
-// @ts-expect-error
-import {resolve, dirname} from "https://deno.land/std@0.146.0/path/mod.ts";
 // @ts-expect-error
 import * as esbuild from "https://deno.land/x/esbuild@v0.14.48/mod.js"
 // @ts-expect-error
 import CleanCSS from "https://esm.sh/clean-css@5.3.0?pin=v86";
 setCwd();
-
-function postCssInlineUrlsPlugin() {
-	const urlRegex = /url\("?(?!#)(.+)"?\)/d;
-	return {
-		postcssPlugin: "postcss-inline-urls",
-		/**
-		 * @param {{value: string}} decl
-		 * @param {{result: {opts: {from: string}}}} param1
-		 * @returns
-		 */
-		async Declaration(decl, {result}) {
-			const from = result.opts.from;
-			const match = decl.value.match(urlRegex);
-			if (match && match[1]) {
-				const url = match[1];
-				if (url.startsWith("data:")) {
-					// Already inline.
-					return;
-				}
-				await new Promise(r => setTimeout(r, 100));
-
-				const filePath = resolve(dirname(from), url);
-				const file = await Deno.readTextFile(filePath);
-				const base64 = btoa(file);
-				let mediatype = "text/plain";
-				if (url.endsWith(".svg")) {
-					mediatype = "image/svg+xml";
-				}
-				decl.value = `url(data:${mediatype};base64,${base64})`;
-			}
-		}
-	}
-}
 
 function cleanCssPlugin() {
 	const cleanCss = new CleanCSS();
@@ -72,28 +37,6 @@ function cleanCssPlugin() {
 	}
 }
 
-function postCssPlugin() {
-	return {
-		name: "postcss",
-		/**
-		 * @param {string} code
-		 * @param {string} id
-		 */
-		async transform(code, id) {
-			if (id.endsWith(".css")) {
-				const processor = postcss([
-					postCssInlineUrlsPlugin(),
-				]);
-				const result = await processor.process(code, {
-					from: id,
-					to: id,
-				});
-				return result.css;
-			}
-		}
-	}
-}
-
 console.log("Building client...");
 const bundle = await rollup({
 	input: "../src/main.js",
@@ -106,7 +49,12 @@ const bundle = await rollup({
 	},
 	acornInjectPlugins: [importAssertions],
 	plugins: [
-		postCssPlugin(),
+		replace({
+			values: {
+				DEBUG_BUILD: false,
+			},
+			preventAssignment: true,
+		}),
 		cleanCssPlugin(),
 		importAssertionsPlugin(),
 	],
@@ -126,16 +74,51 @@ const scriptEndIndex = htmlContent.indexOf("</script>", scriptStartIndex) + "</s
 // Remove the script tag
 htmlContent = htmlContent.slice(0, scriptStartIndex) + htmlContent.slice(scriptEndIndex);
 
-console.log("Minifying js...");
-const esbuildResult = await esbuild.transform(output[0].code, {
-	loader: "js",
-	minify: true,
-});
-const minifiedJs = esbuildResult.code;
+{
+	console.log("Minifying js...");
+	const esbuildResult = await esbuild.transform(output[0].code, {
+		loader: "js",
+		minify: true,
+	});
+	const minifiedJs = esbuildResult.code;
 
-// Inject an inline script tag with the build output before "<!--inline main.js inject position-->"
-const injectIndex = htmlContent.indexOf("<!--inline main.js inject position-->");
-htmlContent = htmlContent.slice(0, injectIndex) + `<script>${minifiedJs}</script>` + htmlContent.slice(injectIndex);
+	// Inject an inline script tag with the build output before "<!--inline main.js inject position-->"
+	const injectIndex = htmlContent.indexOf("<!--inline main.js inject position-->");
+	htmlContent = htmlContent.slice(0, injectIndex) + `<script>${minifiedJs}</script>` + htmlContent.slice(injectIndex);
+}
+
+{
+	console.log("Injecting svgs in html...");
+	/** @type {Map<string, string>} */
+	const svgs = new Map();
+	for await (const dirEntry of Deno.readDir("../svg")) {
+		if (dirEntry.isFile && dirEntry.name.endsWith(".svg")) {
+			const id = dirEntry.name.slice(0, -4);
+			const file = await Deno.readTextFile(`../svg/${dirEntry.name}`);
+			svgs.set(id, file);
+		}
+	}
+
+	let svgsContent = "";
+	for (const [id, svg] of svgs) {
+		let svgContent = svg;
+
+		// Remove the xml tag from the svg
+		const xmlTagStart = svg.indexOf("<?xml");
+		if (xmlTagStart >= 0) {
+			const xmlTagEnd = svg.indexOf(">", xmlTagStart);
+			svgContent = svgContent.slice(0, xmlTagStart) + svgContent.slice(xmlTagEnd + 1);
+		}
+
+		// wrap the svg content in a <template>
+		svgContent = `<template id="${id}">${svgContent}</template>`;
+
+		svgsContent += svgContent;
+	}
+
+	const injectIndex = htmlContent.indexOf("<!--inline svgs inject position-->");
+	htmlContent = htmlContent.slice(0, injectIndex) + svgsContent + htmlContent.slice(injectIndex);
+}
 
 // Write the output to dist.html so that we debug the client without having to build a new esp binary.
 console.log("writing to dist.html");
