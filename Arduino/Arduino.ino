@@ -1,16 +1,6 @@
 /*
   Program written by JelleWho https://github.com/jellewie
   Board: https://dl.espressif.com/dl/package_esp32_index.json
-
-
-  save Dispenser data in EEPROM
-  Get AddDispenser code
-
-
-
-  add taskscheduale for saving EEPROM
-  add PreFixSetDispenser code
-    Change Dispenser if the ID already exist
 */
 //==============================================================//Note spacer
 #if !defined(ESP32)
@@ -116,6 +106,7 @@ void setup() {
 }
 void loop() {
   MyYield();
+  server.handleClient();
 }
 
 void MakeCocktail(Drink Mix) {
