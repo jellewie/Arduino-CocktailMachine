@@ -37,7 +37,7 @@ int Manual_X = 0;
 int Manual_Y = 0;
 int HomedistanceBounce = 400;
 int MaxGlassSize = 300;
-int SaveEEPROMinSeconds = 0;
+int SaveEEPROMinSeconds = -1;
 
 bool Homed = false;
 byte Pump_Amount = sizeof(PDO_Pump) / sizeof(PDO_Pump[0]);      //Why filling this in if we can automate that? :)

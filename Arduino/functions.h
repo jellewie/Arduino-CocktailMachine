@@ -130,6 +130,7 @@ byte GetDispenserID(byte IngredientID) {
 }
 void CheckEEPROMSave() {
   if (SaveEEPROMinSeconds == 0) {
+    SaveEEPROMinSeconds -= 1;
     WiFiManager.WriteEEPROM();                                  //(runtime) If you want to manually save the settings(EEPROM LIMITED WRITES! do not spam)
   } else if (SaveEEPROMinSeconds >= 0 ) {
     static unsigned long LastTime;
