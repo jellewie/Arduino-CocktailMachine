@@ -47,8 +47,13 @@
 }
 
 .delete-button {
+	visibility: hidden;
 	border: none;
 	background-size: 70%;
+}
+
+#drinkCustomizationActionsList > li:hover > .delete-button {
+	visibility: visible;
 }
 
 #drinkCustomizationDialog .add-ingredient {
