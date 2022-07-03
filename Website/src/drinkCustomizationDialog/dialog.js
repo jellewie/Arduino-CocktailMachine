@@ -5,13 +5,15 @@ import { CustomizableIngredient } from "./CustomizableIngredient.js";
 const drinkCustomizationDialog = /** @type {HTMLDialogElement} */ (document.getElementById("drinkCustomizationDialog"));
 const drinkCustomizationTitle = /** @type {HTMLHeadingElement} */ (document.getElementById("drinkCustomizationTitle"));
 const drinkCustomizationActionsList = /** @type {HTMLUListElement} */ (document.getElementById("drinkCustomizationActionsList"));
+const addIngredientContainerEl = /** @type {HTMLDivElement} */ (document.getElementById("addIngredientContainer"));
 
 /** @type {CustomizableIngredient[]} */
 let currentCustomizableIngredients = [];
 
-const addIngredientLi = document.createElement("li");
 const addIngredientSelect = document.createElement("select");
-addIngredientLi.appendChild(addIngredientSelect);
+addIngredientSelect.classList.add("add-ingredient");
+addIngredientContainerEl.appendChild(addIngredientSelect);
+
 const addIngredientTextOption = document.createElement("option");
 addIngredientTextOption.textContent = "Add an ingredient";
 addIngredientTextOption.value = "placeholder";
@@ -78,7 +80,6 @@ function addIngredient(action) {
 	});
 	currentCustomizableIngredients.push(customizableIngredient);
 	drinkCustomizationActionsList.appendChild(customizableIngredient.el);
-	drinkCustomizationActionsList.appendChild(addIngredientLi);
 }
 
 /**
@@ -98,8 +99,6 @@ export function showModal({
 	for (const action of actions) {
 		addIngredient(action);
 	}
-
-	drinkCustomizationActionsList.appendChild(addIngredientLi);
 
 	drinkCustomizationDialog.showModal();
 }

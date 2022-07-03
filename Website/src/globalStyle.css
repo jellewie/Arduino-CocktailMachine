@@ -1,7 +1,3 @@
-:root{
-	--svg-circle-x: url(../svg/circleX.svg);
-}
-
 html, body, main {
 	width: 100%;
 	height: 100%;
@@ -66,7 +62,19 @@ input[type="number"] {
 	box-shadow: inset 0px 9px 9px -6px #00000029;
 }
 
-.delete-button ,
+:root{
+	--svg-circle-x: url(../svg/circleX.svg);
+}
+
+/* This is placed here because in other files it wouldn't resolve correctly,
+since url() paths are relative to the file that contains it. We can't use
+a different url either because that would cause the image to get inlined twice*/
+.add-button-icon {
+	-webkit-mask:  var(--svg-circle-x);
+	mask:  var(--svg-circle-x);
+}
+
+.delete-button,
 input[type="search"]::-webkit-search-cancel-button {
 	opacity: 0.5;
 	width: 30px;

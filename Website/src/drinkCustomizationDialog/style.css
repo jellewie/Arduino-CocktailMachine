@@ -13,14 +13,16 @@
 	flex-grow: 1;
 }
 
-#drinkCustomizationActionsList > li {
+#drinkCustomizationActionsList > li,
+#drinkCustomizationDialog .add-ingredient {
 	list-style-type: none;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	border-radius: 10px;
 }
-#drinkCustomizationActionsList > li:hover {
+#drinkCustomizationActionsList > li:hover,
+#drinkCustomizationDialog .add-ingredient:hover {
 	background-color: #ffffff1a;
 }
 
@@ -41,9 +43,31 @@
 
 #drinkCustomizationActionsList > li > .text {
 	flex-grow: 1;
+	font-size: 16px;
 }
 
 .delete-button {
 	border: none;
 	background-size: 70%;
+}
+
+#drinkCustomizationDialog .add-ingredient {
+	width: 100%;
+	height: 30px;
+	font-size: 16px;
+	appearance: none;
+	border: none;
+	padding-left: 40px;
+	background: transparent;
+	color: white;
+	cursor: pointer;
+}
+
+.add-button-icon {
+	background: #ff93dd;
+	width: 30px;
+	height: 30px;
+	position: absolute;
+	transform: rotate(45deg);
+	pointer-events: none;
 }
