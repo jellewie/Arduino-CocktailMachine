@@ -178,7 +178,7 @@ bool Home(bool X, bool Y, bool Z) {
   digitalWrite(PDO_Step_enable, LOW);                           //Enable all stepper drivers
   bool Homed_X = false, Homed_Y = false, Homed_Z = false;
   if (X) {
-    Serial.println("X");
+    Serial.println("Homeing X");
     if (MoveWait(Stepper_X, PDI_X_Ref, -BedSize_X)) {           //If the switch is touched
       Stepper_X.moveTo(HomedistanceBounce);
       while (Stepper_X.run())
@@ -190,7 +190,7 @@ bool Home(bool X, bool Y, bool Z) {
     }
   }
   if (Y) {
-    Serial.println("Y");
+    Serial.println("Homeing Y");
     if (MoveWait(Stepper_Y, PDI_Y_Ref, -BedSize_Y)) {           //If the switch is touched
       Stepper_Y.moveTo(HomedistanceBounce);
       while (Stepper_Y.run())
@@ -202,7 +202,7 @@ bool Home(bool X, bool Y, bool Z) {
     }
   }
   if (Z) {
-    Serial.println("Z");
+    Serial.println("Homeing Z");
     Stepper_Z.moveTo(-BedSize_Z);
     if (MoveWait(Stepper_Z, PDI_Z_Ref)) {                       //If the switch is touched
       Stepper_Z.moveTo(HomedistanceBounce);
@@ -225,6 +225,11 @@ bool Home(bool X, bool Y, bool Z) {
 void MoveTo(int LocationX, int LocationY, int LocationZ = -1);
 void MoveTo(int LocationX, int LocationY, int LocationZ) {
   Serial.println("MoveTo " + String(LocationX) + " , " + String(LocationY));
+  if (!Homed) {
+    if (!Home(true, true, true)) {
+      return;
+    }
+  }
   if (LocationX >= 0) {
     if (LocationX > BedSize_X)
       LocationX = BedSize_X;

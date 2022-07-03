@@ -214,7 +214,7 @@ void handle_Set() {
       ERRORMSG += "UNK argument" + ArguName + " = " + ArgValue + "/n";
     }
   }
-  Serial.println(Mix.Name);
+  Serial.println();
 
   Drink MixEmthy;
   if (makeMix and Mix.Name == "") {
@@ -245,10 +245,8 @@ void handle_Set() {
 void handle_Get() {
   String Json = "{\"dispensers\":[";
   for (byte i = 0; i < Dispensers_Amount; i++) {
-    if (Dispensers[i].Type != UNSPECIFIED) {
-      if (i != 0) Json += ",";
-      Json += "[" + String(Dispensers[i].Type) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].LocationZ) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].TimeMSoff) + "," + String(Dispensers[i].IngredientID) + "]";
-    }
+    if (i != 0) Json += ",";
+    Json += "[" + String(Dispensers[i].Type) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].LocationZ) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].TimeMSoff) + "," + String(Dispensers[i].IngredientID) + "]";
   }
   Json += "],\"ingredients\":[";
   for (byte i = 0; i < Ingredient_Amount; i++) {

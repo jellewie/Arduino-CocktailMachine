@@ -121,12 +121,14 @@ void loop() {
 void MakeCocktail(Drink Mix) {
   LcdPrint("Mixing cocktail", Mix.Name);
   if (!Homed) {
-    if (!Home(true, true, true))
+    if (!Home(true, true, true)) {
+      LcdPrint("Mix not started", "Homing failed");
       return;
+    }
   }
   for (byte i = 0; i < 8; i++) {                                //For each Ingredient
     if (Mix.Ingredients[i].ID != 0 or Mix.Ingredients[i].Action != 0) {
-      LcdPrint("", "Get" + IngredientIDtoString(Mix.Ingredients[i].ID));
+      LcdPrint("", "Get " + IngredientIDtoString(Mix.Ingredients[i].ID));
       Serial.println(" == Drink " + String(Mix.Name) + "' Next ingredient ='" + IngredientIDtoString(Mix.Ingredients[i].ID) + "'");
       GetIngredient(Mix.Ingredients[i]);
     }
