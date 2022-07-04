@@ -8,6 +8,7 @@ import { drinkSelectorEl } from "./globalElements.js";
  * @property {import("./drinksConfig.js").DrinkConfig} config
  * @property {boolean} allIngredientsAvailable
  * @property {DrinkDisplay} drinkDisplay
+ * @property {boolean} isCustomDrink
  */
 
 /** @type {Map<Element, DrinkData>} */
@@ -40,17 +41,31 @@ const intersectionObserver = new IntersectionObserver(entries => {
 	root: drinkSelectorEl,
 });
 
+/**
+ * @param {import("./drinksConfig.js").DrinkConfig} drinkConfig
+ */
+function addDrink(drinkConfig, isCustomDrink = false) {
+	const drinkDisplay = new DrinkDisplay({
+		name: drinkConfig.name,
+		isCustomDrink,
+	});
+	drinkSelectorEl.appendChild(drinkDisplay.el);
+	createdDrinks.set(drinkDisplay.el, {
+		config: drinkConfig,
+		allIngredientsAvailable: false,
+		drinkDisplay: drinkDisplay,
+		isCustomDrink,
+	});
+	intersectionObserver.observe(drinkDisplay.el);
+}
+
 export function initDrinkSelector() {
+	addDrink({
+		name: "Custom",
+		actions: [],
+	}, true);
 	for (const drinkConfig of drinksConfig) {
-		const drinkDisplay = new DrinkDisplay();
-		drinkDisplay.name = drinkConfig.name;
-		drinkSelectorEl.appendChild(drinkDisplay.el);
-		createdDrinks.set(drinkDisplay.el, {
-			config: drinkConfig,
-			allIngredientsAvailable: false,
-			drinkDisplay: drinkDisplay,
-		});
-		intersectionObserver.observe(drinkDisplay.el);
+		addDrink(drinkConfig);
 	}
 
 	updateDrinkIngredients();
@@ -86,6 +101,8 @@ function sortDrinkElements() {
 	}
 	const sortedDrinks = Array.from(createdDrinks.values());
 	sortedDrinks.sort((a, b) => {
+		if (a.isCustomDrink && !b.isCustomDrink) return -1;
+		if (!a.isCustomDrink && b.isCustomDrink) return 1;
 		if (a.allIngredientsAvailable && !b.allIngredientsAvailable) return -1;
 		if (!a.allIngredientsAvailable && b.allIngredientsAvailable) return 1;
 		const aIndex = recentDrinks.indexOf(a.config.name);
