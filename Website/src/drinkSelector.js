@@ -42,9 +42,8 @@ const intersectionObserver = new IntersectionObserver(entries => {
 
 export function initDrinkSelector() {
 	for (const drinkConfig of drinksConfig) {
-		const {name, cssColor} = drinkConfig;
 		const drinkDisplay = new DrinkDisplay();
-		drinkDisplay.name = name;
+		drinkDisplay.name = drinkConfig.name;
 		drinkSelectorEl.appendChild(drinkDisplay.el);
 		createdDrinks.set(drinkDisplay.el, {
 			config: drinkConfig,

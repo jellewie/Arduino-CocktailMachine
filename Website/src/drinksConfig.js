@@ -5,7 +5,6 @@
 /**
  * @typedef DrinkConfig
  * @property {string} name
- * @property {string} cssColor
  * @property {DrinkIngredientOrAction[]} actions
  */
 
@@ -69,7 +68,6 @@ export const actionNames = [
 export const drinksConfig = [
 	{
 		name: "Sex on the Beach",
-		cssColor: "#bab34",
 		actions: [
 			{action: "ice"},
 			{ingredient: "VODKA", amount: 45},
@@ -80,7 +78,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Screwdriver",
-		cssColor: "#e8d86d",
 		actions: [
 			{ingredient: "VODKA", amount: 45},
 			{ingredient: "ORANGE_JUICE", amount: 120},
@@ -88,7 +85,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Cosmopolitan Classic",
-		cssColor: "#e81058",
 		actions: [
 			{ingredient: "VODKA", amount: 23},
 			{ingredient: "TRIPLE_SEC", amount: 15},
@@ -98,7 +94,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Bay Breeze",
-		cssColor: "#ff8400",
 		actions: [
 			{ingredient: "VODKA", amount: 45},
 			{ingredient: "PINEAPPLE_JUICE", amount: 30},
@@ -107,7 +102,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Hole in One",
-		cssColor: "#e3c532",
 		actions: [
 			{action: "ice"},
 			{ingredient: "VODKA", amount: 45},
@@ -117,7 +111,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Gimlet",
-		cssColor: "#d5f5dd",
 		actions: [
 			{action: "crushed ice"},
 			{ingredient: "GIN", amount: 90},
@@ -126,7 +119,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Black widow",
-		cssColor: "#800101",
 		actions: [
 			{ingredient: "VODKA", amount: 30},
 			{ingredient: "CRANBERRY_JUICE", amount: 30},
@@ -135,7 +127,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Gin Sidecar",
-		cssColor: "#ced190",
 		actions: [
 			{action: "crushed ice"},
 			{ingredient: "GIN", amount: 60},
@@ -145,7 +136,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Little Devil",
-		cssColor: "#db4f40",
 		actions: [
 			{action: "crushed ice"},
 			{ingredient: "GIN", amount: 60},
@@ -156,7 +146,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Hoola Hoop",
-		cssColor: "#e3bc5b",
 		actions: [
 			{ingredient: "GIN", amount: 45},
 			{ingredient: "ORANGE_JUICE", amount: 30},
@@ -165,7 +154,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Hawaiian Cocktail",
-		cssColor: "#edc766",
 		actions: [
 			{ingredient: "GIN", amount: 60},
 			{ingredient: "TRIPLE_SEC", amount: 15},
@@ -174,7 +162,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Alpine Lemonade",
-		cssColor: "#f5e4bc",
 		actions: [
 			{action: "ice"},
 			{ingredient: "VODKA", amount: 30},
@@ -186,7 +173,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Hula Hula",
-		cssColor: "#baa165",
 		actions: [
 			{action: "crushed ice"},
 			{ingredient: "GIN", amount: 60},
@@ -197,7 +183,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Judge J Cocktail",
-		cssColor: "#ed775f",
 		actions: [
 			{action: "crushed ice"},
 			{ingredient: "GIN", amount: 60},
@@ -209,7 +194,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Rock Bottom",
-		cssColor: "#f27157",
 		actions: [
 			{ingredient: "VODKA", amount: 60},
 			{ingredient: "PINEAPPLE_JUICE", amount: 10},
@@ -221,7 +205,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Derby Daiquiri",
-		cssColor: "#f7dd59",
 		actions: [
 			{action: "crushed ice"},
 			{ingredient: "WHITE_RUM", amount: 90},
@@ -232,7 +215,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "The Huntsman",
-		cssColor: "#c9f097",
 		actions: [
 			{ingredient: "VODKA", amount: 45},
 			{ingredient: "RUM", amount: 15},
@@ -243,7 +225,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Vodka Tonic",
-		cssColor: "#f4f5f2",
 		actions: [
 			{action: "ice"},
 			{ingredient: "VODKA", amount: 60},
@@ -252,7 +233,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Beach Bum Shake",
-		cssColor: "#e3a452",
 		actions: [
 			{action: "crushed ice"},
 			{ingredient: "TEQUILA", amount: 30},
@@ -264,7 +244,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Gin Buck",
-		cssColor: "#f0ede9",
 		actions: [
 			{action: "ice"},
 			{ingredient: "GIN", amount: 60},
@@ -274,7 +253,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Pussy popper",
-		cssColor: "#db5740",
 		actions: [
 			{action: "ice"},
 			{ingredient: "VODKA", amount: 90},
@@ -286,7 +264,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Brass Monkey",
-		cssColor: "#f5b922",
 		actions: [
 			{ingredient: "RUM", amount: 15},
 			{ingredient: "VODKA", amount: 15},
@@ -296,7 +273,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Legspreader",
-		cssColor: "#f0ecd5",
 		actions: [
 			{ingredient: "TEQUILA", amount: 30},
 			{ingredient: "VODKA", amount: 30},
@@ -306,7 +282,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Leap Frog Highball",
-		cssColor: "#f0ebd1",
 		actions: [
 			{action: "ice"},
 			{ingredient: "GIN", amount: 60},
@@ -316,7 +291,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Vodka Sour",
-		cssColor: "#edeadd",
 		actions: [
 			{action: "ice"},
 			{ingredient: "VODKA", amount: 45},
@@ -326,7 +300,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Orange Buck",
-		cssColor: "#e8d997",
 		actions: [
 			{action: "ice"},
 			{ingredient: "GIN", amount: 60},
@@ -338,7 +311,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Liquid Bubble Gum",
-		cssColor: "#FFFFFF",
 		actions: [
 			{ingredient: "VODKA", amount: 60},
 			{ingredient: "PEACH_TREE", amount: 60},
@@ -347,7 +319,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Desert Sunrise",
-		cssColor: "#FFFFFF",
 		actions: [
 			{action: "crushed ice"},
 			{ingredient: "VODKA", amount: 38},
@@ -358,7 +329,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Absolute Vacation",
-		cssColor: "#FFFFFF",
 		actions: [
 			{action: "ice"},
 			{ingredient: "CRANBERRY_JUICE", amount: 30},
@@ -369,7 +339,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Hawaiian Seduction",
-		cssColor: "#FFFFFF",
 		actions: [
 			{action: "ice"},
 			{ingredient: "TEQUILA", amount: 30},
@@ -379,7 +348,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Hawaiian Sea Breeze",
-		cssColor: "#FFFFFF",
 		actions: [
 			{action: "ice"},
 			{ingredient: "VODKA", amount: 45},
@@ -389,7 +357,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Asian Cum Shot",
-		cssColor: "#FFFFFF",
 		actions: [
 			{action: "ice"},
 			{ingredient: "WATERMELON_VODKA", amount: 90},
@@ -398,7 +365,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Island Punch",
-		cssColor: "#FFFFFF",
 		actions: [
 			{action: "ice"},
 			{ingredient: "WHITE_RUM", amount: 30},
@@ -409,7 +375,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Jamaican Sunrise",
-		cssColor: "#FFFFFF",
 		actions: [
 			{ingredient: "ORANGE_JUICE", amount: 135},
 			{ingredient: "VODKA", amount: 60},
@@ -419,7 +384,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Montana Sunrise",
-		cssColor: "#FFFFFF",
 		actions: [
 			{action: "ice"},
 			{ingredient: "GRENADINE_SYRUP", amount: 23},
@@ -430,7 +394,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Pimp Daddy",
-		cssColor: "#FFFFFF",
 		actions: [
 			{action: "ice"},
 			{ingredient: "TEQUILA", amount: 60},
@@ -441,7 +404,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Adam Cocktail",
-		cssColor: "#FFFFFF",
 		actions: [
 			{action: "ice"},
 			{ingredient: "RUM", amount: 60},
@@ -452,7 +414,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Long Island Taxi",
-		cssColor: "#FFFFFF",
 		actions: [
 			{action: "ice"},
 			{ingredient: "VODKA", amount: 60},
@@ -465,7 +426,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Caribe Cosmopolitan",
-		cssColor: "#FFFFFF",
 		actions: [
 			{action: "ice"},
 			{ingredient: "RUM", amount: 45},
@@ -476,7 +436,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Key West Screwdriver",
-		cssColor: "#FFFFFF",
 		actions: [
 			{ingredient: "VODKA", amount: 60},
 			{ingredient: "LIME_JUICE", amount: 30},
@@ -485,7 +444,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Shark Tank",
-		cssColor: "#FFFFFF",
 		actions: [
 			{ingredient: "LEMONADE", amount: 120},
 			{ingredient: "VODKA", amount: 120},
@@ -493,7 +451,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "A Gilligans Island",
-		cssColor: "#FFFFFF",
 		actions: [
 			{ingredient: "VODKA", amount: 30},
 			{ingredient: "PEACH_TREE", amount: 30},
@@ -503,7 +460,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Baileys White Russian",
-		cssColor: "#FFFFFF",
 		actions: [
 			{action: "ice"},
 			{ingredient: "MILK", amount: 120},
@@ -513,7 +469,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Blind Bat",
-		cssColor: "#FFFFFF",
 		actions: [
 			{ingredient: "VODKA", amount: 120},
 			{ingredient: "COLA", amount: 120},
@@ -522,7 +477,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Hot Sex Cocktail",
-		cssColor: "#FFFFFF",
 		actions: [
 			{action: "ice"},
 			{ingredient: "TRIPLE_SEC", amount: 75},
@@ -532,7 +486,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Bloody Nightmare",
-		cssColor: "#FFFFFF",
 		actions: [
 			{action: "ice"},
 			{ingredient: "VODKA", amount: 30},
@@ -542,7 +495,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Snoop Dogg",
-		cssColor: "#FFFFFF",
 		actions: [
 			{ingredient: "GIN", amount: 60},
 			{ingredient: "ORANGE_JUICE", amount: 90},
@@ -550,7 +502,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Gin Citric",
-		cssColor: "#FFFFFF",
 		actions: [
 			{action: "ice"},
 			{ingredient: "GIN", amount: 60},
@@ -562,7 +513,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Cat Cocktail",
-		cssColor: "#FFFFFF",
 		actions: [
 			{action: "ice"},
 			{ingredient: "VODKA", amount: 45},
@@ -572,7 +522,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Hard Dick",
-		cssColor: "#FFFFFF",
 		actions: [
 			{ingredient: "VODKA", amount: 30},
 			{ingredient: "GIN", amount: 30},
@@ -582,7 +531,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Vodka soda",
-		cssColor: "#964B00",
 		actions: [
 			{action: "ice"},
 			{ingredient: "VODKA", amount: 60},
@@ -590,7 +538,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Rum and coke",
-		cssColor: "#964B00",
 		actions: [
 			{ingredient: "COLA", amount: 120},
 			{ingredient: "WHITE_RUM", amount: 50},
@@ -598,7 +545,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Long island iced tea",
-		cssColor: "#FFFFFF",
 		actions: [
 			{ingredient: "SIMPLE_SYRUP", amount: 30},
 			{ingredient: "TEQUILA", amount: 15},
@@ -611,7 +557,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Daiquiri",
-		cssColor: "#FFFFFF",
 		actions: [
 			{ingredient: "WHITE_RUM", amount: 45},
 			{ingredient: "LIME_JUICE", amount: 30},
@@ -619,7 +564,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Margarita",
-		cssColor: "#42F595",
 		actions: [
 			{ingredient: "TRIPLE_SEC", amount: 30},
 			{ingredient: "LIME_JUICE", amount: 30},
@@ -627,7 +571,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Mojito",
-		cssColor: "#9DFF85",
 		actions: [
 			{ingredient: "WHITE_RUM", amount: 45},
 			{ingredient: "LIME_JUICE", amount: 30},
@@ -637,7 +580,6 @@ export const drinksConfig = [
 		],
 	}, {
 		name: "Gin and tonic",
-		cssColor: "#D4D2D2",
 		actions: [
 			{ingredient: "GIN", amount: 30},
 			{ingredient: "TONIC_WATER", amount: 90},
