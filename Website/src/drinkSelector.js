@@ -1,5 +1,5 @@
 import { DrinkDisplay } from "./DrinkDisplay.js";
-import { getAvailableIngredients } from "./configLoader.js";
+import { getAvailableIngredients, getConfig } from "./configLoader.js";
 import { drinksConfig, ingredientNames } from "./drinksConfig.js";
 import { drinkSelectorEl } from "./globalElements.js";
 
@@ -59,7 +59,10 @@ function addDrink(drinkConfig, isCustomDrink = false) {
 	intersectionObserver.observe(drinkDisplay.el);
 }
 
-export function initDrinkSelector() {
+export async function initDrinkSelector() {
+	// We'll wait until the config is available, otherwise the drink locations
+	// jump once it loads.
+	await getConfig();
 	addDrink({
 		name: "Custom",
 		actions: [],
@@ -68,7 +71,13 @@ export function initDrinkSelector() {
 		addDrink(drinkConfig);
 	}
 
-	updateDrinkIngredients();
+	await updateDrinkIngredients();
+
+	if (drinkSelectorEl.children.length > 1) {
+		// The very first element is the custom drink
+		const firstDrink = drinkSelectorEl.children[2];
+		firstDrink.scrollIntoView();
+	}
 }
 
 async function updateDrinkIngredients() {

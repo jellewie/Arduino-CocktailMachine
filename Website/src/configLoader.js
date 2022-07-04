@@ -59,7 +59,7 @@ let lastRefreshingConfigPromise = null;
 /**
  * Returns the cached config if it exists, otherwise it loads the config first.
  */
-async function getConfig() {
+export async function getConfig() {
 	if (!currentConfigData) {
 		await refreshConfig();
 	}
