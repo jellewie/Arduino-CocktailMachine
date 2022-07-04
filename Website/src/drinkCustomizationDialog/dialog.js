@@ -90,6 +90,7 @@ function addIngredient(action) {
 		if (currentlyDraggingIngredient) return false;
 		computeIngredientBounds();
 		currentlyDraggingIngredient = customizableIngredient;
+		drinkCustomizationActionsList.classList.add("rearranging");
 		return true;
 	});
 	customizableIngredient.onDragMove(() => {
@@ -109,6 +110,7 @@ function addIngredient(action) {
 		}
 		currentCustomizableIngredients = [...sortedIngredientsAfterDrag];
 
+		drinkCustomizationActionsList.classList.remove("rearranging");
 		currentlyDraggingIngredient = null;
 	});
 

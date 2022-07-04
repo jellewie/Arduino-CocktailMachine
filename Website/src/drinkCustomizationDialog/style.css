@@ -29,6 +29,9 @@
 #drinkCustomizationActionsList > li.grabbing {
 	background-color: #ffffff1a;
 }
+#drinkCustomizationActionsList.rearranging > li:not(.grabbing) {
+	pointer-events: none;
+}
 
 #drinkCustomizationActionsList > li > .grab-handle {
 	min-width: 12px;
