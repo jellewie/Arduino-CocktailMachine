@@ -47,8 +47,8 @@ unsigned int MotorMAXAccel = 3000;
 unsigned int BedSize_X = 24000;
 unsigned int BedSize_Y = 7200;
 unsigned int BedSize_Z = 7000;
-unsigned int Manual_X = 0;
-unsigned int Manual_Y = 0;
+unsigned int Manual_X = BedSize_X;
+unsigned int Manual_Y = BedSize_Y;
 unsigned int HomedistanceBounce = 400;
 unsigned int MaxGlassSize = 300;
 int SaveEEPROMinSeconds = -1;
@@ -129,7 +129,7 @@ void MakeCocktail(Drink Mix) {
   }
   for (byte i = 0; i < 8; i++) {                                //For each Ingredient
     if (Mix.Ingredients[i].ID != 0 or Mix.Ingredients[i].Action != 0) {
-      LcdPrint("", "Get " + IngredientIDtoString(Mix.Ingredients[i].ID));
+      LcdPrint("Mixing cocktail", "Get " + IngredientIDtoString(Mix.Ingredients[i].ID));
       Serial.println(" == Drink " + String(Mix.Name) + "' Next ingredient ='" + IngredientIDtoString(Mix.Ingredients[i].ID) + "'");
       GetIngredient(Mix.Ingredients[i]);
     }
