@@ -19,7 +19,7 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	border-radius: 10px;
+	border-radius: var(--default-border-radius);
 }
 #drinkCustomizationActionsList > li:not(.grabbing) {
 	transition: transform 0.3s;
@@ -27,7 +27,7 @@
 #drinkCustomizationActionsList > li:hover,
 #drinkCustomizationDialog .add-ingredient:hover,
 #drinkCustomizationActionsList > li.grabbing {
-	background-color: #ffffff1a;
+	background-color: var(--row-hover-color);
 }
 #drinkCustomizationActionsList.rearranging > li:not(.grabbing) {
 	pointer-events: none;
