@@ -332,10 +332,9 @@ void handle_Set() {
     Home();
   }
 
-  if (GoTo[0] != -1 or GoTo[1] != -1 or GoTo[2] != -1) {
-    Serial.println("GoTo " + String(GoTo[0]) + "," + String(GoTo[1]) + "," + String(GoTo[2]));
+  //If we need to somewhere
+  if (GoTo[0] != -1 or GoTo[1] != -1 or GoTo[2] != -1)
     MoveTo(GoTo[0], GoTo[1], GoTo[2]);
-  }
 
   //If we need to mix
   if (Mix.Name != "") {
@@ -380,10 +379,10 @@ void handle_Info() {
                    "Code compiled on " + String(__DATE__) + " " + String(__TIME__) + "\n"
                    "MAC adress = " + String(WiFi.macAddress()) + "\n"
                    "IP adress = " + IpAddress2String(WiFi.localIP()) + "\n"
-                   "X_Ref = " + IsTrueToString(digitalRead(PDI_X_Ref) == LOW) + "\n"
-                   "Y_Ref = " + IsTrueToString(digitalRead(PDI_Y_Ref) == LOW) + "\n"
-                   "Z_Ref = " + IsTrueToString(digitalRead(PDI_Z_Ref) == LOW) + "\n"
-                   "Switch = " + IsTrueToString(digitalRead(PDI_S) == LOW) + "\n"
+                   "X_Ref = " + IsTrueToString(digitalRead(PDI_X_Ref) == LOW) + " " + (digitalRead(PDI_X_Ref) ? "HIGH" : "LOW") + "\n"
+                   "Y_Ref = " + IsTrueToString(digitalRead(PDI_Y_Ref) == LOW) + " " + (digitalRead(PDI_Y_Ref) ? "HIGH" : "LOW") + "\n"
+                   "Z_Ref = " + IsTrueToString(digitalRead(PDI_Z_Ref) == LOW) + " " + (digitalRead(PDI_Z_Ref) ? "HIGH" : "LOW") + "\n"
+                   "Switch = " + IsTrueToString(digitalRead(PDI_S)    == LOW) + " " + (digitalRead(PDI_S)     ? "HIGH" : "LOW") + "\n"
 
                    "\nSOFT_SETTINGS\n";
   for (byte i = 3; i < WiFiManager_Settings + 1; i++)
