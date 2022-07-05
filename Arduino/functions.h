@@ -25,6 +25,149 @@ Dispenser Dispensers[Dispensers_Amount] = {
   {PUMP         , 3000 , 0  , 1  , 500 , 500  , COLA},
   {SHOTDispenser, 6000 , 0  , 50 , 100 , 1000 , VODKA},
 };
+//==================================================
+//Basic universal LED functions. These includes start postion, amount (inc overflow correction and such)
+//==================================================
+void LED_Fill(int From, int Amount, CRGB Color, int MaxBound = TotalLEDs);
+void LED_Fill(int From, int Amount, CRGB Color, int MaxBound) {
+  while (From >= MaxBound) From -= MaxBound;                    //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
+  if (Amount > MaxBound) Amount = MaxBound;                     //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
+  if (From + Amount > MaxBound) {                               //Overflow protection
+    byte calc1 = MaxBound - From;                               //Calculates the amount of LEDs which need to on on the end of the strip
+    fill_solid(&(LEDs[From]), calc1, Color);
+    fill_solid(&(LEDs[0]), Amount - calc1, Color);
+  } else
+    fill_solid(&(LEDs[From]), Amount, Color);
+}
+void LED_Add(int From, int Amount, CRGB Color, int MaxBound = TotalLEDs);
+void LED_Add(int From, int Amount, CRGB Color, int MaxBound) {
+  while (From >= MaxBound) From -= MaxBound;                    //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
+  if (Amount > MaxBound) Amount = MaxBound;                     //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
+  if (From + Amount > MaxBound) {                               //Overflow protection
+    byte calc1 = MaxBound - From;                               //Calculates the amount of LEDs which need to on on the end of the strip
+    for (int i = From; i < From + calc1; i++)
+      LEDs[i] += Color;
+    for (int i = 0; i < Amount - calc1; i++)
+      LEDs[i] += Color;
+  } else
+    for (int i = From; i < From + Amount; i++)
+      LEDs[i] += Color;
+}
+void LED_Move(int From, int Amount, CRGB Color, byte Sets, byte Length, byte *Counter, bool Reverse = false, bool Reset = true, int MaxBound = TotalLEDs);
+void LED_Move(int From, int Amount, CRGB Color, byte Sets, byte Length, byte *Counter, bool Reverse, bool Reset, int MaxBound) {
+  //From = The first LED to do the animation on
+  //Amount = The amount of LEDS to do the animation on
+  //Color = the RGB value to use
+  //Sets = The amount of sets going around
+  //Length = How long each set would be
+  //Counter = a pointer to a counter where we keep track of how far we are
+  //Reverse = Reverse the animation direction
+  //Reset = reset the LED color with every call (do not use if using overlapping moves)
+  //Example:
+  //  static byte counter;
+  //  Move(5, 10, CRGB(0, 1, 0), 2, 2, &counter);
+
+  byte Count = *Counter;
+  if (Reverse)
+    Count = Amount - Count - 1;
+  if (Reset)
+    LED_Fill(From, Amount, CRGB(0, 0, 0), MaxBound);
+  byte poss[Sets];                                              //Array for saving the positions of the sections
+  for (byte i = 0; i < Sets; i++) {                             //Beginning of the loop which will send each position and length
+    poss[i] = Count + Amount * i / Sets;                        //This will calculate each position by adding the offset times the position number to the first position
+    byte posX;                                                  //This is the variable which will be used for sending position start. (this can overflow above TotalLEDs, but this will be fixed by the Fill command)
+    if (poss[i] >= Amount) {                                    //To see if the position is to bigger than the total amount
+      posX = From + poss[i] - Amount;                           //Subtract the total amount of LEDs from the position number
+    } else {                                                    //Otherwise it will just use the position data without modifying it
+      posX = From + poss[i];                                    //Just use the position number
+    }
+    if (posX <= From + Amount - Length) {                       //If the whole section ends before the total amount is reached it will just us the normal way of setting the LEDs
+      LED_Fill(posX, Length, Color, MaxBound);                  //With the standard fill solid command from FastLED, LEDs[posX] PosX stands for beginning position, Amount will stand for the size of the sections and the last one is the color
+    } else {
+      byte calc1 = (From + Amount) - posX;                      //Calculates the amount of LEDs which need to be set from the beginning
+      LED_Fill(posX, calc1, Color, MaxBound);                   //Fills the LEDs at the end of the strip
+      LED_Fill(From, Length - calc1, Color, MaxBound);          //Fills the LEDs at the beginning of the strip
+    }
+  }
+  *Counter += 1;
+  if (*Counter >= Amount)
+    *Counter = *Counter - Amount;
+}
+bool LED_Flash(int From, int Amount, CRGB Color, CRGB Color2 = CRGB(0, 0, 0), int MaxBound = TotalLEDs);
+bool LED_Flash(int From, int Amount, CRGB Color, CRGB Color2, int MaxBound) {
+  if (LEDs[From] != Color) {
+    LED_Fill(From, Amount, Color, MaxBound);
+    return true;
+  }
+  LED_Fill(From, Amount, Color2, MaxBound);
+  return false;
+}
+void LED_Rainbow(int From, int Amount, byte DeltaHue, int MaxBound = TotalLEDs);
+void LED_Rainbow(int From, int Amount, byte DeltaHue, int MaxBound) {
+  //byte DeltaHue = Diffrence between each LED in hue
+  static byte gHue;
+  gHue++;
+  while (From >= MaxBound) From -= MaxBound;                    //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
+  if (Amount > MaxBound) Amount = MaxBound;                     //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
+  if (From + Amount > MaxBound) {                               //Overflow protection
+    byte calc1 = MaxBound - From;                               //Calculates the amount of LEDs which need to on on the end of the strip
+    fill_rainbow(&(LEDs[From]), calc1, gHue, DeltaHue);
+    fill_rainbow(&(LEDs[0]), Amount - calc1, gHue, DeltaHue);
+  } else
+    fill_rainbow(&LEDs[From], Amount, gHue, DeltaHue);
+}
+void LED_Wobble(int From, int Amount, CRGB Color, byte Sets, byte Length, int MaxBound = TotalLEDs);
+void LED_Wobble(int From, int Amount, CRGB Color, byte Sets, byte Length, int MaxBound) {
+  //Sort of a move, but just back and forth between the start en end
+  static byte Counter;                                          //this function can only be called once, this 'Counter' is a 1 time counter (could not get the pointer working to attach it to the caller)
+  static bool Reverse = false;
+  LED_Move(From, Amount, Color, Sets, Length, &Counter, Reverse, MaxBound);
+  if (Reverse) {
+    if (Counter == Amount - 1) {
+      Reverse = false;
+      Counter = 0;
+    }
+  } else {
+    if (Counter == Amount - Length) {
+      Reverse = true;
+      Counter = Length - 1;
+    }
+  }
+}
+void LED_Blink(int From, int Amount, CRGB rgb, byte AlwaysOn, byte * Counter, bool Reverse = false, bool Reset = true, int MaxBound = TotalLEDs);
+void LED_Blink(int From, int Amount, CRGB rgb, byte AlwaysOn, byte * Counter, bool Reverse, bool Reset, int MaxBound) {
+  if (Reset)
+    LED_Fill(From, Amount, CRGB(0, 0, 0), MaxBound);            //Turn LEDs off
+  if (Reverse) {
+    LED_Fill(From + Amount - AlwaysOn, AlwaysOn, rgb, MaxBound); //Set some LEDs to be always on
+    LED_Fill(From + Amount - *Counter, *Counter, rgb, MaxBound); //Set the counter amount of LEDs on (this will increase)
+  } else {
+    LED_Fill(From, AlwaysOn, rgb, MaxBound);                    //Set some LEDs to be always on
+    LED_Fill(From, *Counter, rgb, MaxBound);                    //Set the counter amount of LEDs on (this will increase)
+  }
+  *Counter += 1;                                                //This will make the blink 1 longer each time
+  if (*Counter > Amount)                                        //If we are at max length
+    *Counter = 0;                                               //Reset counter
+}
+void LED_BackAndForth(int From, int Amount, CRGB Color, byte *Counter, bool *Direcion, bool Reverse = false, bool Reset = true, int MaxBound = TotalLEDs);
+void LED_BackAndForth(int From, int Amount, CRGB Color, byte *Counter, bool *Direcion, bool Reverse, bool Reset, int MaxBound) {
+  //Fills then emties the range of leds one by one
+  if (Reset)
+    LED_Fill(From, Amount, CRGB(0, 0, 0), MaxBound);
+
+  if (*Direcion)
+    *Counter -= 1;                                              //This will make the animation_on 1 shorter each time
+  else
+    *Counter += 1;                                              //This will make the animation_on 1 longer each time
+  if (*Counter >= Amount or * Counter == 0)                     //If we are at max length or at the start
+    *Direcion = !*Direcion;                                     //Flip direction
+
+  if (Reverse)
+    LED_Fill(From + Amount - *Counter, *Counter, Color, MaxBound); //Set the counter amount of LEDs on
+  else
+    LED_Fill(From, *Counter, Color, MaxBound);                  //Set the counter amount of LEDs on
+}
+//==================================================
 void CutVariable(String _Input, String *_Variable, byte _VariableLength) {
   //Takes in a string, and cuts them into parts; "test,yes,clock" => {"test","yes","clock"}
   //Returns the output in the same string, for example
@@ -139,10 +282,23 @@ void CheckEEPROMSave() {
     }
   }
 }
+void ShowAnimation(bool Start = false);
+void ShowAnimation(bool Start) {                                //This would be called to show an Animation every hour
+  switch (CurrentAnimation) {
+    case 7: {                                                   //RAINBOW
+        EVERY_N_MILLISECONDS(10) {
+          LED_Rainbow(0, TotalLEDs, 255 / TotalLEDs);
+          UpdateLEDs = true;
+        }
+      } break;
+  }
+}
 void MyYield() {
   WiFiManager.RunServer();                                      //Do WIFI server stuff if needed
   CheckEEPROMSave();
-  //FastLED.delay(1);
+  ShowAnimation();
+  if (UpdateLEDs)
+    FastLED.show();
   yield();
 }
 void MyDelay(int DelayMS) {                                     //Just a non-blocking delay
@@ -230,6 +386,13 @@ void MoveTo(int LocationX, int LocationY, int LocationZ) {
       return;
     }
   }
+
+  float Location = (LocationX / BedSize_X) * TotalLEDs;
+  byte LED = round(Location);
+  LED_Fill(0, TotalLEDs, CRGB(0, 0, 0));
+  LED_Fill(LED - 2, LED + 2, CRGB(0, 0, 255));
+  FastLED.show();                                             //Update
+  
   if (LocationX >= 0) {
     if (LocationX > BedSize_X)
       LocationX = BedSize_X;
@@ -252,9 +415,9 @@ void MoveTo(int LocationX, int LocationY, int LocationZ) {
 }
 void DisableSteppers() {
   Homed = false;
-  Stepper_X.targetPosition() = Stepper_X.currentPosition();
-  Stepper_Y.targetPosition() = Stepper_Y.currentPosition();
-  Stepper_Z.targetPosition() = Stepper_Z.currentPosition();
+  Stepper_X.moveTo(Stepper_X.currentPosition());
+  Stepper_Y.moveTo(Stepper_Y.currentPosition());
+  Stepper_Z.moveTo(Stepper_Z.currentPosition());
   digitalWrite(PDO_Step_enable, HIGH);                          //Disable all stepper drivers
 }
 String IpAddress2String(const IPAddress& ipAddress) {

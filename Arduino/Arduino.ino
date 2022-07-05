@@ -13,6 +13,7 @@
 #include <AccelStepper.h>                                       //Make sure to install AccelStepper V1.61.0(+) manually //https://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html#a68942c66e78fb7f7b5f0cdade6eb7f06
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>                                  //Make sure to install LiquidCrystal_I2C V1.1.2(+) manually https://github.com/johnrickman/LiquidCrystal_I2C/blob/master/LiquidCrystal_I2C.cpp
+#include <FastLED.h>                                            //Make sure to install FastLED V3.5.0(+) manually
 
 const byte PDO_Step_enable = 16;
 const byte PDO_X_Dir = 23;
@@ -21,10 +22,11 @@ const byte PDO_Z_Dir = 18;
 const byte PDO_X_Step = 4;
 const byte PDO_Y_Step = 12;
 const byte PDO_Z_Step = 19;
-const byte PDI_X_Ref = 5;                                      //LOW = TRIGGERED
+const byte PDI_X_Ref = 5;                                       //LOW = TRIGGERED
 const byte PDI_Y_Ref = 27;
 const byte PDI_Z_Ref = 15;
 const byte PDI_S = 39;
+const byte PAO_LED = 13;                                        //To which pin the <LED strip> is connected to
 const byte PDO_Pump[] = {32, 33, 25, 26};
 //const byte I2C_SDA = 21;                                      //I2C can not be moved
 //const byte I2C_SCL = 22;
@@ -44,13 +46,18 @@ int MaxGlassSize = 300;
 int SaveEEPROMinSeconds = -1;
 
 bool Homed = false;
-byte Pump_Amount = sizeof(PDO_Pump) / sizeof(PDO_Pump[0]);      //Why filling this in if we can automate that? :)
-const int ErrorLEDHoming = 250;
+bool UpdateLEDs = false;
+byte CurrentAnimation = 0;
+const byte Pump_Amount = sizeof(PDO_Pump) / sizeof(PDO_Pump[0]);//Why filling this in if we can automate that? :)
 const byte Dispensers_Amount = 20;                              //Only 20 are saved in the WiFiManager!!
+const int ErrorLEDHoming = 250;
+const int TotalLEDs = 60;                                       //The total amounts of LEDs in the strip
 AccelStepper Stepper_X(AccelStepper::DRIVER, PDO_X_Step, PDO_X_Dir);
 AccelStepper Stepper_Y(AccelStepper::DRIVER, PDO_Y_Step, PDO_Y_Dir);
 AccelStepper Stepper_Z(AccelStepper::DRIVER, PDO_Z_Step, PDO_Z_Dir);
 LiquidCrystal_I2C lcd(0x27, 20, 4);                             //Set the LCD address to 0x27 for a 20 chars and 2 line display
+#define LED_TYPE WS2812B                                        //WS2812B for 5V LEDs, WS2813 for 12V LEDs
+CRGB LEDs[TotalLEDs];
 
 #include "Data.h"
 #include "Functions.h"
@@ -86,6 +93,15 @@ void setup() {
   Stepper_Y.setAcceleration(MotorMAXAccel);
   Stepper_Z.setAcceleration(MotorMAXAccel);
   //===========================================================================
+  //Init LED and let them shortly blink
+  //===========================================================================
+  FastLED.addLeds<LED_TYPE, PAO_LED, GRB>(LEDs, TotalLEDs);
+  FastLED.setBrightness(1);                                     //Set start brightness to be amost off
+  for (int i = 255; i >= 0; i = i - 255) {                      //Blink on boot
+    LED_Fill(0, TotalLEDs, CRGB(i, i, i));
+    FastLED.show();                                             //Update
+  }
+  //===========================================================================
   //Set up all server UrlRequest stuff
   //===========================================================================
   server.on("/",            handle_OnConnect);                  //Call the 'handleRoot' function when a client requests URL "/"
@@ -103,12 +119,12 @@ void setup() {
   Serial.println("WiFi setup executed with responce code '" + String(Answer) + "' " + IpAddress2String(WiFi.localIP())); //The return codes can be found in "WiFiManager.cpp" in "CWiFiManager::Start("
   LcdPrint("WiFi = " + String(Answer), IpAddress2String(WiFi.localIP()));
   digitalWrite(LED_BUILTIN, LOW);
+  LED_Fill(0, TotalLEDs, CRGB(0, 255, 0));
+  FastLED.show();                                               //Update
 }
 void loop() {
   MyYield();
-  server.handleClient();
 }
-
 void MakeCocktail(Drink Mix) {
   LcdPrint("Mixing cocktail", Mix.Name);
   if (!Homed) {
