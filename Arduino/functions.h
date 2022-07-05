@@ -22,19 +22,19 @@ struct Dispenser {
 byte Ingredient_Amount = sizeof(IngredientS) / sizeof(IngredientS[0]);//Why filling this in if we can automate that? :)
 Dispenser Dispensers[Dispensers_Amount] = {
   //Type        , X,     Y,   Z  , MSml, MSoff, IngredientID
-  {PUMP         , 3000  , 0     , 1    , 500 , 500  , COLA},
-  {SHOTDispenser, 350   , 0     , 7350 , 100 , 1000 , VODKA},
-  {SHOTDispenser, 4310  , 0     , 7350 , 100 , 1000 , VODKA},
-  {SHOTDispenser, 8270  , 0     , 7350 , 100 , 1000 , VODKA},
-  {SHOTDispenser, 12230 , 0     , 7350 , 100 , 1000 , VODKA},
-  {SHOTDispenser, 16190 , 0     , 7350 , 100 , 1000 , VODKA},
-  {SHOTDispenser, 20150 , 0     , 7350 , 100 , 1000 , VODKA},
-  {SHOTDispenser, 350   , 7250  , 7350 , 100 , 1000 , VODKA},
-  {SHOTDispenser, 4310  , 7250  , 7350 , 100 , 1000 , VODKA},
-  {SHOTDispenser, 8270  , 7250  , 7350 , 100 , 1000 , VODKA},
-  {SHOTDispenser, 12230 , 7250  , 7350 , 100 , 1000 , VODKA},
-  {SHOTDispenser, 16190 , 7250  , 7350 , 100 , 1000 , VODKA},
-  {SHOTDispenser, 20150 , 7250  , 7350 , 100 , 1000 , VODKA}
+  {PUMP         , 3000  , 0     , 1    , 500 , 500  , 0},
+  {SHOTDispenser, 350   , 0     , 7350 , 100 , 1000 , 1},
+  {SHOTDispenser, 4310  , 0     , 7350 , 100 , 1000 , 2},
+  {SHOTDispenser, 8270  , 0     , 7350 , 100 , 1000 , 3},
+  {SHOTDispenser, 12230 , 0     , 7350 , 100 , 1000 , 4},
+  {SHOTDispenser, 16190 , 0     , 7350 , 100 , 1000 , 5},
+  {SHOTDispenser, 20150 , 0     , 7350 , 100 , 1000 , 6},
+  {SHOTDispenser, 350   , 7250  , 7350 , 100 , 1000 , 7},
+  {SHOTDispenser, 4310  , 7250  , 7350 , 100 , 1000 , 8},
+  {SHOTDispenser, 8270  , 7250  , 7350 , 100 , 1000 , 9},
+  {SHOTDispenser, 12230 , 7250  , 7350 , 100 , 1000 , 10},
+  {SHOTDispenser, 16190 , 7250  , 7350 , 100 , 1000 , 11},
+  {SHOTDispenser, 20150 , 7250  , 7350 , 100 , 1000 , 12}
 };
 void CutVariable(String _Input, String *_Variable, byte _VariableLength) {
   //Takes in a string, and cuts them into parts; "test,yes,clock" => {"test","yes","clock"}
@@ -254,7 +254,13 @@ void MoveTo(int LocationX, int LocationY, int LocationZ) {
       LocationZ = BedSize_Z;
     Stepper_Z.moveTo(LocationZ);
   }
-  while (Stepper_X.run() or Stepper_Y.run() or Stepper_Z.run()) {
+  bool WaitMore = true;
+  while (WaitMore) {
+    Stepper_X.run();
+    Stepper_Y.run();
+    Stepper_Z.run();
+    if (!Stepper_X.isRunning() and !Stepper_Y.isRunning() and !Stepper_Z.isRunning())
+      WaitMore = false;
     yield();
   }
   Serial.println("MoveTo done");
