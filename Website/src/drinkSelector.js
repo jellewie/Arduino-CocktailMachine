@@ -1,5 +1,5 @@
 import { DrinkDisplay } from "./DrinkDisplay.js";
-import { getAvailableIngredients } from "./configLoader.js";
+import { getAvailableIngredients, getConfig } from "./configLoader.js";
 import { drinksConfig, ingredientNames } from "./drinksConfig.js";
 import { drinkSelectorEl } from "./globalElements.js";
 
@@ -8,6 +8,7 @@ import { drinkSelectorEl } from "./globalElements.js";
  * @property {import("./drinksConfig.js").DrinkConfig} config
  * @property {boolean} allIngredientsAvailable
  * @property {DrinkDisplay} drinkDisplay
+ * @property {boolean} isCustomDrink
  */
 
 /** @type {Map<Element, DrinkData>} */
@@ -40,21 +41,43 @@ const intersectionObserver = new IntersectionObserver(entries => {
 	root: drinkSelectorEl,
 });
 
-export function initDrinkSelector() {
+/**
+ * @param {import("./drinksConfig.js").DrinkConfig} drinkConfig
+ */
+function addDrink(drinkConfig, isCustomDrink = false) {
+	const drinkDisplay = new DrinkDisplay({
+		name: drinkConfig.name,
+		isCustomDrink,
+	});
+	drinkSelectorEl.appendChild(drinkDisplay.el);
+	createdDrinks.set(drinkDisplay.el, {
+		config: drinkConfig,
+		allIngredientsAvailable: false,
+		drinkDisplay: drinkDisplay,
+		isCustomDrink,
+	});
+	intersectionObserver.observe(drinkDisplay.el);
+}
+
+export async function initDrinkSelector() {
+	// We'll wait until the config is available, otherwise the drink locations
+	// jump once it loads.
+	await getConfig();
+	addDrink({
+		name: "Custom",
+		actions: [],
+	}, true);
 	for (const drinkConfig of drinksConfig) {
-		const {name, cssColor} = drinkConfig;
-		const drinkDisplay = new DrinkDisplay();
-		drinkDisplay.name = name;
-		drinkSelectorEl.appendChild(drinkDisplay.el);
-		createdDrinks.set(drinkDisplay.el, {
-			config: drinkConfig,
-			allIngredientsAvailable: false,
-			drinkDisplay: drinkDisplay,
-		});
-		intersectionObserver.observe(drinkDisplay.el);
+		addDrink(drinkConfig);
 	}
 
-	updateDrinkIngredients();
+	await updateDrinkIngredients();
+
+	if (drinkSelectorEl.children.length > 1) {
+		// The very first element is the custom drink
+		const firstDrink = drinkSelectorEl.children[2];
+		firstDrink.scrollIntoView();
+	}
 }
 
 async function updateDrinkIngredients() {
@@ -87,6 +110,8 @@ function sortDrinkElements() {
 	}
 	const sortedDrinks = Array.from(createdDrinks.values());
 	sortedDrinks.sort((a, b) => {
+		if (a.isCustomDrink && !b.isCustomDrink) return -1;
+		if (!a.isCustomDrink && b.isCustomDrink) return 1;
 		if (a.allIngredientsAvailable && !b.allIngredientsAvailable) return -1;
 		if (!a.allIngredientsAvailable && b.allIngredientsAvailable) return 1;
 		const aIndex = recentDrinks.indexOf(a.config.name);

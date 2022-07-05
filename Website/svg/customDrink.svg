@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .str {
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 4px;
+    }
+  </style>
+  <ellipse style="stroke: rgb(142, 224, 255);" cx="75" cy="75" rx="57.502" ry="57.502" class="str"/>
+  <polyline style="stroke: rgb(142, 224, 255);" points="64.038 42.114 85.962 42.114 85.962 64.038 107.886 64.038 107.886 85.962 85.962 85.962 85.962 107.886 64.038 107.886 64.038 85.962 42.114 85.962 42.114 64.038 64.038 64.038 64.038 51.193" class="str"/>
+</svg>
