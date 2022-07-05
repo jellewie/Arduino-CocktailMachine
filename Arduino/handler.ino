@@ -62,6 +62,7 @@ void handle_Set() {
   bool makeMix = false;
   int8_t DoHoming = -1;
   Drink Mix;
+  unsigned int GoTo[3] = { -1, -1, -1};
   for (byte i = 0; i < 8; i++) {
     Mix.Ingredients[i].ID = 0;
     Mix.Ingredients[i].Action = "";
@@ -331,10 +332,11 @@ void handle_Set() {
     Home();
   }
 
-  if (GoTo[0] != 0 or GoTo[1]!= 0 or GoTo[3]!= 0){
-    MoveTo(GoTo[0], GoTo[1],GoTo[2]);
+  if (GoTo[0] != -1 or GoTo[1] != -1 or GoTo[2] != -1) {
+    Serial.println("GoTo " + String(GoTo[0]) + "," + String(GoTo[1]) + "," + String(GoTo[2]));
+    MoveTo(GoTo[0], GoTo[1], GoTo[2]);
   }
-  
+
   //If we need to mix
   if (Mix.Name != "") {
     Serial.println("MakeCocktail " + String(Mix.Name));

@@ -15,12 +15,22 @@
 #include <LiquidCrystal_I2C.h>                                  //Make sure to install LiquidCrystal_I2C V1.1.2(+) manually https://github.com/johnrickman/LiquidCrystal_I2C/blob/master/LiquidCrystal_I2C.cpp
 
 const byte PDO_Step_enable = 16;
+
 const byte PDO_X_Dir = 23;
 const byte PDO_Y_Dir = 17;
-const byte PDO_Z_Dir = 18;
+const byte PDO_Z_Dir = 14;//18;
 const byte PDO_X_Step = 4;
 const byte PDO_Y_Step = 12;
-const byte PDO_Z_Step = 19;
+const byte PDO_Z_Step = 19;//*/
+
+
+/*const byte PDO_X_Dir = 23;
+const byte PDO_Y_Dir = 14;
+const byte PDO_Z_Dir = 17;//18;
+const byte PDO_X_Step = 4;
+const byte PDO_Y_Step = 19;
+const byte PDO_Z_Step = 12;//*/
+
 const byte PDI_X_Ref = 5;                                      //LOW = TRIGGERED
 const byte PDI_Y_Ref = 27;
 const byte PDI_Z_Ref = 15;
@@ -32,15 +42,15 @@ const byte PDO_Pump[] = {32, 33, 25, 26};
 bool DisableSteppersAfterMixDone = false;
 byte ShotDispenserML = 30;
 byte HomeMAXSpeed = 200;
-int MotorMAXSpeed = 5500;
-int MotorMAXAccel = 3000;
-int BedSize_X = 26000;
-int BedSize_Y = 1000;
-int BedSize_Z = 1000;
-int Manual_X = 0;
-int Manual_Y = 0;
-int HomedistanceBounce = 400;
-int MaxGlassSize = 300;
+unsigned int MotorMAXSpeed = 5500;
+unsigned int MotorMAXAccel = 3000;
+unsigned int BedSize_X = 24000;
+unsigned int BedSize_Y = 7200;
+unsigned int BedSize_Z = 7000;
+unsigned int Manual_X = 0;
+unsigned int Manual_Y = 0;
+unsigned int HomedistanceBounce = 400;
+unsigned int MaxGlassSize = 300;
 int SaveEEPROMinSeconds = -1;
 
 bool Homed = false;

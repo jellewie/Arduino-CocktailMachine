@@ -184,7 +184,7 @@ bool Home(bool X, bool Y, bool Z) {
       while (Stepper_X.run())
         MyYield();
       Stepper_X.setMaxSpeed(HomeMAXSpeed);
-      Homed_X = MoveWait(Stepper_X, PDI_X_Ref, 0);
+      Homed_X = MoveWait(Stepper_X, PDI_X_Ref, -100);
       Stepper_X.setCurrentPosition(0);                          //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
       Stepper_X.setMaxSpeed(MotorMAXSpeed);                     //Reset max speed
     }
@@ -196,30 +196,28 @@ bool Home(bool X, bool Y, bool Z) {
       while (Stepper_Y.run())
         MyYield();
       Stepper_Y.setMaxSpeed(HomeMAXSpeed);
-      Homed_Y = MoveWait(Stepper_Y, PDI_Y_Ref);
+      Homed_Y = MoveWait(Stepper_Y, PDI_Y_Ref, -100);
       Stepper_Y.setCurrentPosition(0);                          //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
       Stepper_Y.setMaxSpeed(MotorMAXSpeed);                     //Reset max speed
     }
   }
   if (Z) {
     Serial.println("Homeing Z");
-    Stepper_Z.moveTo(-BedSize_Z);
-    if (MoveWait(Stepper_Z, PDI_Z_Ref)) {                       //If the switch is touched
+    if (MoveWait(Stepper_Z, PDI_Z_Ref, -BedSize_Z)) {           //If the switch is touched
       Stepper_Z.moveTo(HomedistanceBounce);
       while (Stepper_Z.run())
         MyYield();
       Stepper_Z.setMaxSpeed(HomeMAXSpeed);
-      Stepper_Z.moveTo(0);
-      Homed_Z = MoveWait(Stepper_Z, PDI_Z_Ref);
+      Homed_Z = MoveWait(Stepper_Z, PDI_Z_Ref, -100);
       Stepper_Z.setCurrentPosition(0);                          //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
       Stepper_Z.setMaxSpeed(MotorMAXSpeed);                     //Reset max speed
     }
   }
+  Serial.println("Homed" + String(Homed) + " X" + String(X) + "," + String(Homed_X) + " Y" + String(Y) + "," + String(Homed_Y) + " Z" + String(Z) + "," + String(Homed_Z));
   if (X == Homed_X and Y == Homed_Y and Z == Homed_Z) {
     Homed = true;
     return true;
   }
-  Serial.println("Homed" + String(Homed) + " X" + String(X) + "," + String(Homed_X) + " Y" + String(Y) + "," + String(Homed_Y) + " Z" + String(Z) + "," + String(Homed_Z));
   return false;
 }
 void MoveTo(int LocationX = -1, int LocationY = -1, int LocationZ = -1);
@@ -246,15 +244,15 @@ void MoveTo(int LocationX, int LocationY, int LocationZ) {
     Stepper_Z.moveTo(LocationZ);
   }
   while (Stepper_X.run() or Stepper_Y.run() or Stepper_Z.run()) {
-    MyYield();
+    yield();
   }
   Serial.println("MoveTo done");
 }
 void DisableSteppers() {
   Homed = false;
-  Stepper_X.targetPosition() = Stepper_X.currentPosition();
-  Stepper_Y.targetPosition() = Stepper_Y.currentPosition();
-  Stepper_Z.targetPosition() = Stepper_Z.currentPosition();
+  Stepper_X.moveTo(Stepper_X.currentPosition());
+  Stepper_Y.moveTo(Stepper_Y.currentPosition());
+  Stepper_Z.moveTo(Stepper_Z.currentPosition());
   digitalWrite(PDO_Step_enable, HIGH);                          //Disable all stepper drivers
 }
 String IpAddress2String(const IPAddress& ipAddress) {
