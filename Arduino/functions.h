@@ -22,8 +22,19 @@ struct Dispenser {
 byte Ingredient_Amount = sizeof(IngredientS) / sizeof(IngredientS[0]);//Why filling this in if we can automate that? :)
 Dispenser Dispensers[Dispensers_Amount] = {
   //Type        , X,     Y,   Z  , MSml, MSoff, IngredientID
-  {PUMP         , 3000 , 0  , 1  , 500 , 500  , COLA},
-  {SHOTDispenser, 6000 , 0  , 50 , 100 , 1000 , VODKA},
+  {PUMP         , 3000  , 0     , 1    , 500 , 500  , COLA},
+  {SHOTDispenser, 350   , 0     , 7350 , 100 , 1000 , VODKA},
+  {SHOTDispenser, 4310  , 0     , 7350 , 100 , 1000 , VODKA},
+  {SHOTDispenser, 8270  , 0     , 7350 , 100 , 1000 , VODKA},
+  {SHOTDispenser, 12230 , 0     , 7350 , 100 , 1000 , VODKA},
+  {SHOTDispenser, 16190 , 0     , 7350 , 100 , 1000 , VODKA},
+  {SHOTDispenser, 20150 , 0     , 7350 , 100 , 1000 , VODKA},
+  {SHOTDispenser, 350   , 7250  , 7350 , 100 , 1000 , VODKA},
+  {SHOTDispenser, 4310  , 7250  , 7350 , 100 , 1000 , VODKA},
+  {SHOTDispenser, 8270  , 7250  , 7350 , 100 , 1000 , VODKA},
+  {SHOTDispenser, 12230 , 7250  , 7350 , 100 , 1000 , VODKA},
+  {SHOTDispenser, 16190 , 7250  , 7350 , 100 , 1000 , VODKA},
+  {SHOTDispenser, 20150 , 7250  , 7350 , 100 , 1000 , VODKA}
 };
 void CutVariable(String _Input, String *_Variable, byte _VariableLength) {
   //Takes in a string, and cuts them into parts; "test,yes,clock" => {"test","yes","clock"}
