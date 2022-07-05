@@ -31,7 +31,7 @@ const byte PDO_Pump[] = {32, 33, 25, 26};
 //const byte I2C_SCL = 22;
 
 bool DisableSteppersAfterMixDone = false;
-byte ShotDispenserML = 30;
+byte ShotDispenserML = 40;
 byte HomeMAXSpeed = 200;
 unsigned int MotorMAXSpeed = 5500;
 unsigned int MotorMAXAccel = 3000;
@@ -76,7 +76,6 @@ void setup() {
   pinMode(PDI_Y_Ref, INPUT_PULLUP);
   pinMode(PDI_Z_Ref, INPUT_PULLUP);
   pinMode(PDI_S, INPUT_PULLUP);
-
   Stepper_X.setPinsInverted(false, false, false, false, false); //stepInvert, directionInvert, pin3Invert, pin4Invert, enableInvert
   Stepper_Y.setPinsInverted(false, false, false, false, false);
   Stepper_Z.setPinsInverted(false, false, false, false, false);
@@ -96,12 +95,10 @@ void setup() {
   server.on("/reset",       handle_Reset);
   server.onNotFound(        handle_NotFound);                   //When a client requests an unknown URI
   //server.on("/url", CodeToCall);                              //Example of a url to function caller, These must be declaired before "WiFiManager.Start()"
-  lcd.setCursor(1, 1);
   LcdPrint("", "WiFi connecting");
   byte Answer = WiFiManager.Start();                            //Run the wifi startup (and save results)
   WiFiManager.OTA_Enabled = true;                               //(runtime) Turn off/on OTA
   WiFiManager.EnableSetup(true);                                //(runtime) Enable the settings, only enabled in APmode by default
-  Serial.println("WiFi setup executed with responce code '" + String(Answer) + "' " + IpAddress2String(WiFi.localIP())); //The return codes can be found in "WiFiManager.cpp" in "CWiFiManager::Start("
   LcdPrint("WiFi = " + String(Answer), IpAddress2String(WiFi.localIP()));
   digitalWrite(LED_BUILTIN, LOW);
 }
@@ -117,23 +114,28 @@ void MakeCocktail(Drink Mix) {
       LcdPrint("Mix not started", "Homing failed");
       return;
     }
+  } else {
+    MoveTo(-1, -1, 0);
   }
   for (byte i = 0; i < 8; i++) {                                //For each Ingredient
     if (Mix.Ingredients[i].ID != 0 or Mix.Ingredients[i].Action != 0) {
-      LcdPrint("Mixing cocktail", "Get " + IngredientIDtoString(Mix.Ingredients[i].ID));
-      Serial.println(" == Drink " + String(Mix.Name) + "' Next ingredient ='" + IngredientIDtoString(Mix.Ingredients[i].ID) + "'");
+      String msg = "";
+      if (Mix.Ingredients[i].ID != 0)
+        msg = "Get " + IngredientIDtoString(Mix.Ingredients[i].ID);
+      else
+        msg = Mix.Ingredients[i].Action;
+      LcdPrint("Mixing cocktail", msg);
       GetIngredient(Mix.Ingredients[i]);
     }
   }
   MoveTo(Manual_X, Manual_Y);
+  MoveTo(Manual_X, Manual_Y, BedSize_Z);
   LcdPrint("Mixed cocktail", IpAddress2String(WiFi.localIP()));
 }
 void GetIngredient(Ingredient IN) {
   Serial.println("GetIngredient: ID=" + String(IN.ID) + " Action=" + IN.Action + " ml=" + String(IN.ml));
   if (IN.Action != "") {
-    MoveTo(Manual_X, Manual_Y);
-    LcdPrint("Waiting on user", String(IN.Action));
-    WaitForUser();
+    WaitForUser("Waiting on user", String(IN.Action));
   }
   byte DispenserID = GetDispenserID(IN.ID);
   if (DispenserID != 0) {
@@ -146,7 +148,7 @@ void GetIngredient(Ingredient IN) {
           byte DoAmount = ceil(IN.ml / ShotDispenserML);
           for (byte i = 1; i <= DoAmount; i++) {
             Stepper_Z.moveTo(Dispensers[DispenserID].LocationZ);
-            while (Stepper_Z.run()) MyYield();
+            while (Stepper_Z.run()) yield();
 
             //Do some funny stuff so we can try doing half dispensing
             DoDelay = Dispensers[DispenserID].TimeMSML * (mlToDo > ShotDispenserML ? ShotDispenserML : mlToDo);
@@ -156,7 +158,7 @@ void GetIngredient(Ingredient IN) {
             MyDelay(DoDelay);
 
             Stepper_Z.moveTo(0);
-            while (Stepper_Z.run()) MyYield();
+            while (Stepper_Z.run()) yield();
             if (DoAmount - i > 0)                               //If another one is required
               MyDelay(Dispensers[DispenserID].TimeMSoff);
           }
@@ -173,13 +175,8 @@ void GetIngredient(Ingredient IN) {
         }
         break;
       default:
-        LcdPrint("UNK Dispenser type", String(Dispensers[DispenserID].Type));
-        WaitForUser();
+        WaitForUser("UNK Dispenser type", String(Dispensers[DispenserID].Type));
         break;
     }
-  } else { //No Dispenser availble,
-    MoveTo(Manual_X, Manual_Y);
-    LcdPrint("No dispenser", String(IN.Action));
-    WaitForUser();
   }
 }

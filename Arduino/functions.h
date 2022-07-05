@@ -36,6 +36,154 @@ Dispenser Dispensers[Dispensers_Amount] = {
   {SHOTDispenser, 16190 , 7250  , 7350 , 100 , 1000 , 11},
   {SHOTDispenser, 20150 , 7250  , 7350 , 100 , 1000 , 12}
 };
+
+/*
+  //==================================================
+  //Basic universal LED functions. These includes start postion, amount (inc overflow correction and such)
+  //==================================================
+  void LED_Fill(int From, int Amount, CRGB Color, int MaxBound = TotalLEDs);
+  void LED_Fill(int From, int Amount, CRGB Color, int MaxBound) {
+  while (From >= MaxBound) From -= MaxBound;                    //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
+  if (Amount > MaxBound) Amount = MaxBound;                     //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
+  if (From + Amount > MaxBound) {                               //Overflow protection
+    byte calc1 = MaxBound - From;                               //Calculates the amount of LEDs which need to on on the end of the strip
+    fill_solid(&(LEDs[From]), calc1, Color);
+    fill_solid(&(LEDs[0]), Amount - calc1, Color);
+  } else
+    fill_solid(&(LEDs[From]), Amount, Color);
+  }
+  void LED_Add(int From, int Amount, CRGB Color, int MaxBound = TotalLEDs);
+  void LED_Add(int From, int Amount, CRGB Color, int MaxBound) {
+  while (From >= MaxBound) From -= MaxBound;                    //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
+  if (Amount > MaxBound) Amount = MaxBound;                     //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
+  if (From + Amount > MaxBound) {                               //Overflow protection
+    byte calc1 = MaxBound - From;                               //Calculates the amount of LEDs which need to on on the end of the strip
+    for (int i = From; i < From + calc1; i++)
+      LEDs[i] += Color;
+    for (int i = 0; i < Amount - calc1; i++)
+      LEDs[i] += Color;
+  } else
+    for (int i = From; i < From + Amount; i++)
+      LEDs[i] += Color;
+  }
+  void LED_Move(int From, int Amount, CRGB Color, byte Sets, byte Length, byte *Counter, bool Reverse = false, bool Reset = true, int MaxBound = TotalLEDs);
+  void LED_Move(int From, int Amount, CRGB Color, byte Sets, byte Length, byte *Counter, bool Reverse, bool Reset, int MaxBound) {
+  //From = The first LED to do the animation on
+  //Amount = The amount of LEDS to do the animation on
+  //Color = the RGB value to use
+  //Sets = The amount of sets going around
+  //Length = How long each set would be
+  //Counter = a pointer to a counter where we keep track of how far we are
+  //Reverse = Reverse the animation direction
+  //Reset = reset the LED color with every call (do not use if using overlapping moves)
+  //Example:
+  //  static byte counter;
+  //  Move(5, 10, CRGB(0, 1, 0), 2, 2, &counter);
+
+  byte Count = *Counter;
+  if (Reverse)
+    Count = Amount - Count - 1;
+  if (Reset)
+    LED_Fill(From, Amount, CRGB(0, 0, 0), MaxBound);
+  byte poss[Sets];                                              //Array for saving the positions of the sections
+  for (byte i = 0; i < Sets; i++) {                             //Beginning of the loop which will send each position and length
+    poss[i] = Count + Amount * i / Sets;                        //This will calculate each position by adding the offset times the position number to the first position
+    byte posX;                                                  //This is the variable which will be used for sending position start. (this can overflow above TotalLEDs, but this will be fixed by the Fill command)
+    if (poss[i] >= Amount) {                                    //To see if the position is to bigger than the total amount
+      posX = From + poss[i] - Amount;                           //Subtract the total amount of LEDs from the position number
+    } else {                                                    //Otherwise it will just use the position data without modifying it
+      posX = From + poss[i];                                    //Just use the position number
+    }
+    if (posX <= From + Amount - Length) {                       //If the whole section ends before the total amount is reached it will just us the normal way of setting the LEDs
+      LED_Fill(posX, Length, Color, MaxBound);                  //With the standard fill solid command from FastLED, LEDs[posX] PosX stands for beginning position, Amount will stand for the size of the sections and the last one is the color
+    } else {
+      byte calc1 = (From + Amount) - posX;                      //Calculates the amount of LEDs which need to be set from the beginning
+      LED_Fill(posX, calc1, Color, MaxBound);                   //Fills the LEDs at the end of the strip
+      LED_Fill(From, Length - calc1, Color, MaxBound);          //Fills the LEDs at the beginning of the strip
+    }
+  }
+   Counter += 1;
+  if (*Counter >= Amount)
+     Counter = *Counter - Amount;
+  }
+  bool LED_Flash(int From, int Amount, CRGB Color, CRGB Color2 = CRGB(0, 0, 0), int MaxBound = TotalLEDs);
+  bool LED_Flash(int From, int Amount, CRGB Color, CRGB Color2, int MaxBound) {
+  if (LEDs[From] != Color) {
+    LED_Fill(From, Amount, Color, MaxBound);
+    return true;
+  }
+  LED_Fill(From, Amount, Color2, MaxBound);
+  return false;
+  }
+  void LED_Rainbow(int From, int Amount, byte DeltaHue, int MaxBound = TotalLEDs);
+  void LED_Rainbow(int From, int Amount, byte DeltaHue, int MaxBound) {
+  //byte DeltaHue = Diffrence between each LED in hue
+  static byte gHue;
+  gHue++;
+  while (From >= MaxBound) From -= MaxBound;                    //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
+  if (Amount > MaxBound) Amount = MaxBound;                     //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
+  if (From + Amount > MaxBound) {                               //Overflow protection
+    byte calc1 = MaxBound - From;                               //Calculates the amount of LEDs which need to on on the end of the strip
+    fill_rainbow(&(LEDs[From]), calc1, gHue, DeltaHue);
+    fill_rainbow(&(LEDs[0]), Amount - calc1, gHue, DeltaHue);
+  } else
+    fill_rainbow(&LEDs[From], Amount, gHue, DeltaHue);
+  }
+  void LED_Wobble(int From, int Amount, CRGB Color, byte Sets, byte Length, int MaxBound = TotalLEDs);
+  void LED_Wobble(int From, int Amount, CRGB Color, byte Sets, byte Length, int MaxBound) {
+  //Sort of a move, but just back and forth between the start en end
+  static byte Counter;                                          //this function can only be called once, this 'Counter' is a 1 time counter (could not get the pointer working to attach it to the caller)
+  static bool Reverse = false;
+  LED_Move(From, Amount, Color, Sets, Length, &Counter, Reverse, MaxBound);
+  if (Reverse) {
+    if (Counter == Amount - 1) {
+      Reverse = false;
+      Counter = 0;
+    }
+  } else {
+    if (Counter == Amount - Length) {
+      Reverse = true;
+      Counter = Length - 1;
+    }
+  }
+  }
+  void LED_Blink(int From, int Amount, CRGB rgb, byte AlwaysOn, byte * Counter, bool Reverse = false, bool Reset = true, int MaxBound = TotalLEDs);
+  void LED_Blink(int From, int Amount, CRGB rgb, byte AlwaysOn, byte * Counter, bool Reverse, bool Reset, int MaxBound) {
+  if (Reset)
+    LED_Fill(From, Amount, CRGB(0, 0, 0), MaxBound);            //Turn LEDs off
+  if (Reverse) {
+    LED_Fill(From + Amount - AlwaysOn, AlwaysOn, rgb, MaxBound); //Set some LEDs to be always on
+    LED_Fill(From + Amount - *Counter, *Counter, rgb, MaxBound); //Set the counter amount of LEDs on (this will increase)
+  } else {
+    LED_Fill(From, AlwaysOn, rgb, MaxBound);                    //Set some LEDs to be always on
+    LED_Fill(From, *Counter, rgb, MaxBound);                    //Set the counter amount of LEDs on (this will increase)
+  }
+   Counter += 1;                                                //This will make the blink 1 longer each time
+  if (*Counter > Amount)                                        //If we are at max length
+     Counter = 0;                                               //Reset counter
+  }
+  void LED_BackAndForth(int From, int Amount, CRGB Color, byte *Counter, bool *Direcion, bool Reverse = false, bool Reset = true, int MaxBound = TotalLEDs);
+  void LED_BackAndForth(int From, int Amount, CRGB Color, byte *Counter, bool *Direcion, bool Reverse, bool Reset, int MaxBound) {
+  //Fills then emties the range of leds one by one
+  if (Reset)
+    LED_Fill(From, Amount, CRGB(0, 0, 0), MaxBound);
+
+  if (*Direcion)
+     Counter -= 1;                                              //This will make the animation_on 1 shorter each time
+  else
+     Counter += 1;                                              //This will make the animation_on 1 longer each time
+  if (*Counter >= Amount or * Counter == 0)                     //If we are at max length or at the start
+     Direcion = !*Direcion;                                     //Flip direction
+
+  if (Reverse)
+    LED_Fill(From + Amount - *Counter, *Counter, Color, MaxBound); //Set the counter amount of LEDs on
+  else
+    LED_Fill(From, *Counter, Color, MaxBound);                  //Set the counter amount of LEDs on
+  }
+  //==================================================
+
+
+  //*/
 void CutVariable(String _Input, String *_Variable, byte _VariableLength) {
   //Takes in a string, and cuts them into parts; "test,yes,clock" => {"test","yes","clock"}
   //Returns the output in the same string, for example
@@ -165,35 +313,64 @@ void MyDelay(int DelayMS) {                                     //Just a non-blo
 bool MoveWait(AccelStepper Step, byte RefferenceButton, int pos = 0);
 bool MoveWait(AccelStepper Step, byte RefferenceButton, int pos) {
   Step.moveTo(pos);
-  bool WaitMore = true;
-  while (WaitMore) {
+  Serial.println("MW: " + String(pos) + " b=" + String(RefferenceButton) + "=" + String(digitalRead(RefferenceButton)));
+  while (true) {
     Step.run();
     if (not Step.isRunning()) {                                 //If we have done all steps
       Step.setCurrentPosition(0);
-      Serial.println("MW: not Running");
+      Serial.println("MW: End of steps");
       return false;
-    } else if (digitalRead(RefferenceButton) == LOW) {          //If we have hit the switch
-      Step.setCurrentPosition(0);
-      Step.run();
-      Serial.println("MW: Switch homed, pos= " + String(Step.currentPosition()));
-      return true;
+    } else {
+      if (digitalRead(RefferenceButton) == LOW) {          //If we have hit the switch
+        Step.setCurrentPosition(0);
+        Serial.println("MW: Switch homed" + String(digitalRead(RefferenceButton)));
+        return true;
+      }
     }
-    MyYield();
+    yield();
   }
-  Serial.println("MW: UNK");
-  return false;
+}
+void LcdPrint(String msg = "", String msg2 = "");
+void LcdPrint(String msg, String msg2) {
+  Serial.println("LcdPrint:" + msg + "_" + msg2);
+  if (msg != "") {
+    for (byte i = msg.length(); i < 16; i++) {
+      msg += " ";
+    }
+    lcd.setCursor(1, 0);
+    lcd.print(msg);
+  }
+  if (msg2 != "") {
+    for (byte i = msg2.length(); i < 16; i++) {
+      msg2 += " ";
+    }
+    lcd.setCursor(1, 1);
+    lcd.print(msg2);
+  }
 }
 bool Home(bool X = true, bool Y = true, bool Z = true);
 bool Home(bool X, bool Y, bool Z) {
-  Serial.println("Homeing");
+  LcdPrint("Homing", " ");
   digitalWrite(PDO_Step_enable, LOW);                           //Enable all stepper drivers
   bool Homed_X = false, Homed_Y = false, Homed_Z = false;
+  if (Z) {
+    LcdPrint("Homing", "Z");
+    if (MoveWait(Stepper_Z, PDI_Z_Ref, -(BedSize_Z + 100))) {          //If the switch is touched
+      Stepper_Z.moveTo(HomedistanceBounce);
+      while (Stepper_Z.run())
+        yield();
+      Stepper_Z.setMaxSpeed(HomeMAXSpeed);
+      Homed_Z = MoveWait(Stepper_Z, PDI_Z_Ref, -100);
+      Stepper_Z.setCurrentPosition(0);                          //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
+      Stepper_Z.setMaxSpeed(MotorMAXSpeed);                     //Reset max speed
+    }
+  }
   if (X) {
-    Serial.println("Homeing X");
-    if (MoveWait(Stepper_X, PDI_X_Ref, -BedSize_X)) {           //If the switch is touched
+    LcdPrint("Homing", "X");
+    if (MoveWait(Stepper_X, PDI_X_Ref, -BedSize_X - 100)) {     //If the switch is touched
       Stepper_X.moveTo(HomedistanceBounce);
       while (Stepper_X.run())
-        MyYield();
+        yield();
       Stepper_X.setMaxSpeed(HomeMAXSpeed);
       Homed_X = MoveWait(Stepper_X, PDI_X_Ref, -100);
       Stepper_X.setCurrentPosition(0);                          //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
@@ -201,30 +378,18 @@ bool Home(bool X, bool Y, bool Z) {
     }
   }
   if (Y) {
-    Serial.println("Homeing Y");
-    if (MoveWait(Stepper_Y, PDI_Y_Ref, -BedSize_Y)) {           //If the switch is touched
+    LcdPrint("Homing", "Y");
+    if (MoveWait(Stepper_Y, PDI_Y_Ref, -BedSize_Y - 100)) {     //If the switch is touched
       Stepper_Y.moveTo(HomedistanceBounce);
       while (Stepper_Y.run())
-        MyYield();
+        yield();
       Stepper_Y.setMaxSpeed(HomeMAXSpeed);
       Homed_Y = MoveWait(Stepper_Y, PDI_Y_Ref, -100);
       Stepper_Y.setCurrentPosition(0);                          //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
       Stepper_Y.setMaxSpeed(MotorMAXSpeed);                     //Reset max speed
     }
   }
-  if (Z) {
-    Serial.println("Homeing Z");
-    if (MoveWait(Stepper_Z, PDI_Z_Ref, -BedSize_Z)) {           //If the switch is touched
-      Stepper_Z.moveTo(HomedistanceBounce);
-      while (Stepper_Z.run())
-        MyYield();
-      Stepper_Z.setMaxSpeed(HomeMAXSpeed);
-      Homed_Z = MoveWait(Stepper_Z, PDI_Z_Ref, -100);
-      Stepper_Z.setCurrentPosition(0);                          //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
-      Stepper_Z.setMaxSpeed(MotorMAXSpeed);                     //Reset max speed
-    }
-  }
-  Serial.println("Homed" + String(Homed) + " X" + String(X) + "," + String(Homed_X) + " Y" + String(Y) + "," + String(Homed_Y) + " Z" + String(Z) + "," + String(Homed_Z));
+  LcdPrint("Homed", String(Homed) + " X" + String(X) + "," + String(Homed_X) + " Y" + String(Y) + "," + String(Homed_Y) + " Z" + String(Z) + "," + String(Homed_Z));
   if (X == Homed_X and Y == Homed_Y and Z == Homed_Z) {
     Homed = true;
     return true;
@@ -239,17 +404,17 @@ void MoveTo(int LocationX, int LocationY, int LocationZ) {
       return;
     }
   }
-  if (LocationX >= 0) {
+  if (LocationX >= 0 and LocationX < BedSize_X * 10) {
     if (LocationX > BedSize_X)
       LocationX = BedSize_X;
     Stepper_X.moveTo(LocationX);
   }
-  if (LocationY >= 0) {
+  if (LocationY >= 0 and LocationY < BedSize_Y * 10) {
     if (LocationY > BedSize_Y)
       LocationY = BedSize_Y;
     Stepper_Y.moveTo(LocationY);
   }
-  if (LocationZ >= 0) {
+  if (LocationZ >= 0 and LocationZ < BedSize_Z * 10) {
     if (LocationZ > BedSize_Z)
       LocationZ = BedSize_Z;
     Stepper_Z.moveTo(LocationZ);
@@ -286,25 +451,11 @@ String IsTrueToString(bool input) {
     return "true";
   return "false";
 }
-void LcdPrint(String msg = "", String msg2 = "");
-void LcdPrint(String msg, String msg2) {
-  if (msg != "") {
-    for (byte i = msg.length(); i < 16; i++) {
-      msg += " ";
-    }
-    lcd.setCursor(1, 0);
-    lcd.print(msg);
-  }
-  if (msg2 != "") {
-    for (byte i = msg2.length(); i < 16; i++) {
-      msg2 += " ";
-    }
-    lcd.setCursor(1, 1);
-    lcd.print(msg2);
-  }
-}
 #define TimeoutWaitingOnUserMs 5 * 60 * 1000
-void WaitForUser() {
+void WaitForUser(String msg, String msg2) {
+  LcdPrint(msg, msg2);
+  MoveTo(Manual_X, Manual_Y);
+  MoveTo(-1, -1, BedSize_Z);
   bool WaitMore = true;
   while (WaitMore) {
     if (digitalRead(PDI_S) == LOW)
@@ -314,4 +465,6 @@ void WaitForUser() {
       WaitMore = false;
     MyYield();
   }
+  LcdPrint(msg, "User confirmed");
+  MoveTo(Manual_X, Manual_Y, 0);
 }
