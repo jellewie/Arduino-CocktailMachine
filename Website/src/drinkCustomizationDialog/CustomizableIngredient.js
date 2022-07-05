@@ -94,6 +94,13 @@ export class CustomizableIngredient {
 	}
 
 	/**
+	 * @param {boolean} value
+	 */
+	set disabled(value) {
+		this.#amountEl.disabled = value;
+	}
+
+	/**
 	 * @param {() => void} cb
 	 */
 	onDeleteClick(cb) {

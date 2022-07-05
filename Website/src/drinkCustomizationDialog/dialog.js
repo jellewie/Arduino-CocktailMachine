@@ -205,7 +205,15 @@ export function showModal({
 		addIngredient(action);
 	}
 
+	for (const ingredient of currentCustomizableIngredients) {
+		ingredient.disabled = true;
+	}
+	addIngredientSelect.disabled = true;
 	drinkCustomizationDialog.showModal();
+	for (const ingredient of currentCustomizableIngredients) {
+		ingredient.disabled = false;
+	}
+	addIngredientSelect.disabled = false;
 }
 
 function getCurrentActions() {
