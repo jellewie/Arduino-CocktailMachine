@@ -11,11 +11,11 @@ struct Drink {
 enum TypeE {UNSPECIFIED, SHOTDispenser, PUMP};
 struct Dispenser {
   byte Type;
-  int LocationX;
-  int LocationY;
-  int LocationZ;                                                //Used for Pump_ID for PUMP
-  int TimeMSML;                                                 //Timer per ms for each mL
-  int TimeMSoff;                                                //Delay in MS to wait after
+  unsigned int LocationX;
+  unsigned int LocationY;
+  unsigned int LocationZ;                                                //Used for Pump_ID for PUMP
+  unsigned int TimeMSML;                                                 //Timer per ms for each mL
+  unsigned int TimeMSoff;                                                //Delay in MS to wait after
   byte IngredientID;
 };
 
@@ -55,24 +55,24 @@ bool AddDispenser(Dispenser Dis) {
   }
   return false;
 }
-bool RemoveDispenser(byte IngredientID) {
-  for (byte i = 0; i < Dispensers_Amount; i++) {
-    if (Dispensers[i].IngredientID == IngredientID) {
-      if (i != 0) {                                             //If this is the first one (needs to be ocupied)
-        Dispensers[i].Type = UNSPECIFIED;
-      } else {
-        for (byte j = 1; j < Dispensers_Amount; j++) {
-          if (Dispensers[j].Type != UNSPECIFIED) {
-            Dispensers[i] = Dispensers[j];
-            Dispensers[j].Type = UNSPECIFIED;
-          }
-        }
-      }
-      return true;
-    }
-  }
-  return false;
-}
+//bool RemoveDispenser(byte IngredientID) {
+//  for (byte i = 0; i < Dispensers_Amount; i++) {
+//    if (Dispensers[i].IngredientID == IngredientID) {
+//      if (i != 0) {                                             //If this is the first one (needs to be ocupied)
+//        Dispensers[i].Type = UNSPECIFIED;
+//      } else {
+//        for (byte j = 1; j < Dispensers_Amount; j++) {
+//          if (Dispensers[j].Type != UNSPECIFIED) {
+//            Dispensers[i] = Dispensers[j];
+//            Dispensers[j].Type = UNSPECIFIED;
+//          }
+//        }
+//      }
+//      return true;
+//    }
+//  }
+//  return false;
+//}
 bool TickEveryXms(unsigned long *_LastTime, unsigned long _Delay) {
   //With overflow, can be adjusted, no overshoot correction, true when (Now < _LastTime + _Delay)
   /* Example:   static unsigned long LastTime;
@@ -222,9 +222,9 @@ bool Home(bool X, bool Y, bool Z) {
   Serial.println("Homed" + String(Homed) + " X" + String(X) + "," + String(Homed_X) + " Y" + String(Y) + "," + String(Homed_Y) + " Z" + String(Z) + "," + String(Homed_Z));
   return false;
 }
-void MoveTo(int LocationX, int LocationY, int LocationZ = -1);
+void MoveTo(int LocationX = -1, int LocationY = -1, int LocationZ = -1);
 void MoveTo(int LocationX, int LocationY, int LocationZ) {
-  Serial.println("MoveTo " + String(LocationX) + " , " + String(LocationY));
+  Serial.println("MoveTo " + String(LocationX) + " , " + String(LocationY) + " , " + String(LocationZ));
   if (!Homed) {
     if (!Home(true, true, true)) {
       return;
@@ -246,12 +246,15 @@ void MoveTo(int LocationX, int LocationY, int LocationZ) {
     Stepper_Z.moveTo(LocationZ);
   }
   while (Stepper_X.run() or Stepper_Y.run() or Stepper_Z.run()) {
-    yield();
+    MyYield();
   }
   Serial.println("MoveTo done");
 }
 void DisableSteppers() {
   Homed = false;
+  Stepper_X.targetPosition() = Stepper_X.currentPosition();
+  Stepper_Y.targetPosition() = Stepper_Y.currentPosition();
+  Stepper_Z.targetPosition() = Stepper_Z.currentPosition();
   digitalWrite(PDO_Step_enable, HIGH);                          //Disable all stepper drivers
 }
 String IpAddress2String(const IPAddress& ipAddress) {

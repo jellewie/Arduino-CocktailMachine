@@ -15,6 +15,7 @@
 #define PreFixDisableSteppersAfterMixDone "ds"
 #define PreFixHome "h"
 //Dispenser Settings
+#define PreFixSetDispenserID "di"
 #define PreFixSetDispenserType "dt"
 #define PreFixSetDispenserX "dx"
 #define PreFixSetDispenserY "dy"
@@ -59,14 +60,15 @@ void handle_Set() {
   Serial.print("SV: /SET?");
   String ERRORMSG;                                              //emthy=no error
   bool makeMix = false;
-  byte DoHoming = -1;
-  int GoTo[3];
+  int8_t DoHoming = -1;
   Drink Mix;
   for (byte i = 0; i < 8; i++) {
     Mix.Ingredients[i].ID = 0;
     Mix.Ingredients[i].Action = "";
     Mix.Ingredients[i].ml = 0;
   }
+  Dispenser Dis = {0, 0, 0, 0, 0, 0, 0};
+  int8_t DisID = -1;
   for (int i = 0; i < server.args(); i++) {
     String ArguName = server.argName(i);
     ArguName.toLowerCase();
@@ -144,7 +146,7 @@ void handle_Set() {
     } else if (ArguName == PreFix_Mix_Name) {
       Mix.Name = ArgValue;
     } else if (ArguName == PreFix_0_Ingredient) {
-      Mix.Ingredients[0].ID = IngredientStringToID(ArgValue); makeMix = true;
+      Mix.Ingredients[0].ID = IngredientStringToID(ArgValue);
       makeMix = true;
     } else if (ArguName == PreFix_0_Action) {
       Mix.Ingredients[0].Action = ArgValue;
@@ -221,12 +223,85 @@ void handle_Set() {
       GoTo[1] = ArgValue.toInt();
     } else if (ArguName == PreFix_Z) {
       GoTo[2] = ArgValue.toInt();
+    } else if (ArguName == PreFixSetDispenserID) {
+      if (!StringIsDigit(ArgValue)) {
+        ERRORMSG = "SetDispenserID not a value";
+      } else {
+        if (ArgValue.toInt() <= Dispensers_Amount and ArgValue.toInt() >= 0) {
+          ERRORMSG = "SetDispenserID out of valid range";
+        } else {
+          DisID = ArgValue.toInt();
+        }
+      }
+    } else if (ArguName == PreFixSetDispenserType) {
+      if (!StringIsDigit(ArgValue)) {
+        ERRORMSG = "SetDispenserType not a value";
+      } else {
+        if (ArgValue.toInt() <= 2 and ArgValue.toInt() >= 0) {
+          ERRORMSG = "SetDispenserType out of valid range";
+        } else {
+          Dis.Type = ArgValue.toInt();
+        }
+      }
+    } else if (ArguName == PreFixSetDispenserX) {
+      if (!StringIsDigit(ArgValue)) {
+        ERRORMSG = "SetDispenserX not a value";
+      } else {
+        if (ArgValue.toInt() < 0) {
+          ERRORMSG = "SetDispenserX out of valid range";
+        } else {
+          Dis.LocationX = ArgValue.toInt();
+        }
+      }
+    } else if (ArguName == PreFixSetDispenserY) {
+      if (!StringIsDigit(ArgValue)) {
+        ERRORMSG = "SetDispenserY not a value";
+      } else {
+        if (ArgValue.toInt() < 0) {
+          ERRORMSG = "SetDispenserY out of valid range";
+        } else {
+          Dis.LocationY = ArgValue.toInt();
+        }
+      }
+    } else if (ArguName == PreFixSetDispenserZ) {
+      if (!StringIsDigit(ArgValue)) {
+        ERRORMSG = "SetDispenserZ not a value";
+      } else {
+        if (ArgValue.toInt() < 0) {
+          ERRORMSG = "SetDispenserZ out of valid range";
+        } else {
+          Dis.LocationZ = ArgValue.toInt();
+        }
+      }
+    } else if (ArguName == PreFixSetDispenserMSml) {
+      if (!StringIsDigit(ArgValue)) {
+        ERRORMSG = "SetDispenserMSml not a value";
+      } else {
+        Dis.TimeMSML = ArgValue.toInt();
+      }
+    } else if (ArguName == PreFixSetDispenserMSoff) {
+      if (!StringIsDigit(ArgValue)) {
+        ERRORMSG = "SetDispenserMSoff not a value";
+      } else {
+        Dis.TimeMSoff = ArgValue.toInt();
+      }
+    } else if (ArguName == PreFixSetDispenserIngredientID) {
+      if (!StringIsDigit(ArgValue)) {
+        ERRORMSG = "SetDispenserIngredientID not a value";
+      } else {
+        if (ArgValue.toInt() <= Ingredient_Amount and ArgValue.toInt() >= 0) {
+          ERRORMSG = "SetDispenserIngredientID out of valid range";
+        } else {
+          Dis.IngredientID = ArgValue.toInt();
+        }
+      }
     } else {
       ERRORMSG += "UNK argument" + ArguName + " = " + ArgValue + "/n";
     }
   }
   Serial.println();
 
+  //Check if there is a error
   Drink MixEmthy;
   if (makeMix and Mix.Name == "") {
     ERRORMSG += "No mix name given/n";
@@ -240,6 +315,16 @@ void handle_Set() {
     server.send(400, "application/json", ERRORMSG);
   }
 
+  //Process the dispenser update
+  if (DisID != -1 or Dis.Type != 0 or Dis.LocationX != 0 or Dis.LocationY != 0 or Dis.LocationZ != 0 or Dis.TimeMSML != 0 or Dis.TimeMSoff != 0 or Dis.IngredientID != 0) {
+    if (DisID != -1) {
+      SetDispenser(Dis, DisID);
+    } else {
+      AddDispenser(Dis);
+    }
+  }
+
+  //If we need to home
   if (DoHoming == 0) {
     DisableSteppers();
   } else if (DoHoming == 1) {
@@ -250,6 +335,7 @@ void handle_Set() {
     MoveTo(GoTo[0], GoTo[1],GoTo[2]);
   }
   
+  //If we need to mix
   if (Mix.Name != "") {
     Serial.println("MakeCocktail " + String(Mix.Name));
     MakeCocktail(Mix);

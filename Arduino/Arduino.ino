@@ -60,7 +60,7 @@ void setup() {
   Serial.begin(115200);
   lcd.init();
   lcd.backlight();
-  LcdPrint("Booting");
+  LcdPrint("Booting", " ");
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
   pinMode(PDO_Step_enable, OUTPUT);
@@ -76,7 +76,7 @@ void setup() {
   pinMode(PDI_Z_Ref, INPUT_PULLUP);
   pinMode(PDI_S, INPUT_PULLUP);
 
-  Stepper_X.setPinsInverted(false, false, false, false, false); //(bool pin1Invert, bool pin2Invert, bool pin3Invert, bool pin4Invert, bool enableInvert)
+  Stepper_X.setPinsInverted(false, false, false, false, false); //stepInvert, directionInvert, pin3Invert, pin4Invert, enableInvert
   Stepper_Y.setPinsInverted(false, false, false, false, false);
   Stepper_Z.setPinsInverted(false, false, false, false, false);
   Stepper_X.setMaxSpeed(MotorMAXSpeed);
@@ -100,16 +100,13 @@ void setup() {
   byte Answer = WiFiManager.Start();                            //Run the wifi startup (and save results)
   WiFiManager.OTA_Enabled = true;                               //(runtime) Turn off/on OTA
   WiFiManager.EnableSetup(true);                                //(runtime) Enable the settings, only enabled in APmode by default
+  Serial.println("WiFi setup executed with responce code '" + String(Answer) + "' " + IpAddress2String(WiFi.localIP())); //The return codes can be found in "WiFiManager.cpp" in "CWiFiManager::Start("
   LcdPrint("WiFi = " + String(Answer), IpAddress2String(WiFi.localIP()));
   digitalWrite(LED_BUILTIN, LOW);
 }
 void loop() {
-  unsigned long start = micros();
-  
   MyYield();
   server.handleClient();
-  
-  Serial.println(1000000/ (micros() - start));    //Print FPS
 }
 
 void MakeCocktail(Drink Mix) {
@@ -148,7 +145,7 @@ void GetIngredient(Ingredient IN) {
           byte DoAmount = ceil(IN.ml / ShotDispenserML);
           for (byte i = 1; i <= DoAmount; i++) {
             Stepper_Z.moveTo(Dispensers[DispenserID].LocationZ);
-            while (Stepper_Z.run()) yield();
+            while (Stepper_Z.run()) MyYield();
 
             //Do some funny stuff so we can try doing half dispensing
             DoDelay = Dispensers[DispenserID].TimeMSML * (mlToDo > ShotDispenserML ? ShotDispenserML : mlToDo);
@@ -158,7 +155,7 @@ void GetIngredient(Ingredient IN) {
             MyDelay(DoDelay);
 
             Stepper_Z.moveTo(0);
-            while (Stepper_Z.run()) yield();
+            while (Stepper_Z.run()) MyYield();
             if (DoAmount - i > 0)                               //If another one is required
               MyDelay(Dispensers[DispenserID].TimeMSoff);
           }
