@@ -48,6 +48,10 @@
 #define PreFix_7_Ingredient "i7"
 #define PreFix_7_Action     "a7"
 #define PreFix_7_Ml         "m7"
+//Debug, move to XYZ
+#define PreFix_X         "x"
+#define PreFix_Y         "y"
+#define PreFix_Z         "z"
 
 #include "client.h"
 
@@ -56,6 +60,7 @@ void handle_Set() {
   String ERRORMSG;                                              //emthy=no error
   bool makeMix = false;
   byte DoHoming = -1;
+  int GoTo[3];
   Drink Mix;
   for (byte i = 0; i < 8; i++) {
     Mix.Ingredients[i].ID = 0;
@@ -210,6 +215,12 @@ void handle_Set() {
     } else if (ArguName == PreFix_7_Ml) {
       Mix.Ingredients[7].ml = ArgValue.toInt();
       makeMix = true;
+    } else if (ArguName == PreFix_X) {
+      GoTo[0] = ArgValue.toInt();
+    } else if (ArguName == PreFix_Y) {
+      GoTo[1] = ArgValue.toInt();
+    } else if (ArguName == PreFix_Z) {
+      GoTo[2] = ArgValue.toInt();
     } else {
       ERRORMSG += "UNK argument" + ArguName + " = " + ArgValue + "/n";
     }
@@ -235,6 +246,10 @@ void handle_Set() {
     Home();
   }
 
+  if (GoTo[0] != 0 or GoTo[1]!= 0 or GoTo[3]!= 0){
+    MoveTo(GoTo[0], GoTo[1],GoTo[2]);
+  }
+  
   if (Mix.Name != "") {
     Serial.println("MakeCocktail " + String(Mix.Name));
     MakeCocktail(Mix);

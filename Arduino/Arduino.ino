@@ -100,13 +100,16 @@ void setup() {
   byte Answer = WiFiManager.Start();                            //Run the wifi startup (and save results)
   WiFiManager.OTA_Enabled = true;                               //(runtime) Turn off/on OTA
   WiFiManager.EnableSetup(true);                                //(runtime) Enable the settings, only enabled in APmode by default
-  Serial.println("WiFi setup executed with responce code '" + String(Answer) + "' " + IpAddress2String(WiFi.localIP())); //The return codes can be found in "WiFiManager.cpp" in "CWiFiManager::Start("
   LcdPrint("WiFi = " + String(Answer), IpAddress2String(WiFi.localIP()));
   digitalWrite(LED_BUILTIN, LOW);
 }
 void loop() {
+  unsigned long start = micros();
+  
   MyYield();
   server.handleClient();
+  
+  Serial.println(1000000/ (micros() - start));    //Print FPS
 }
 
 void MakeCocktail(Drink Mix) {
