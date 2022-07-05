@@ -79,6 +79,10 @@
 	color: white;
 	cursor: pointer;
 }
+#drinkCustomizationDialog .add-ingredient option,
+#drinkCustomizationDialog .add-ingredient optgroup {
+	color: black;
+}
 
 .add-button-icon {
 	background: #ff93dd;
