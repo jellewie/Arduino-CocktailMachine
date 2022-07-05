@@ -18,20 +18,11 @@ const byte PDO_Step_enable = 16;
 
 const byte PDO_X_Dir = 23;
 const byte PDO_Y_Dir = 17;
-const byte PDO_Z_Dir = 14;//18;
+const byte PDO_Z_Dir = 18;
 const byte PDO_X_Step = 4;
 const byte PDO_Y_Step = 12;
-const byte PDO_Z_Step = 19;//*/
-
-
-/*const byte PDO_X_Dir = 23;
-const byte PDO_Y_Dir = 14;
-const byte PDO_Z_Dir = 17;//18;
-const byte PDO_X_Step = 4;
-const byte PDO_Y_Step = 19;
-const byte PDO_Z_Step = 12;//*/
-
-const byte PDI_X_Ref = 5;                                      //LOW = TRIGGERED
+const byte PDO_Z_Step = 19;
+const byte PDI_X_Ref = 5;                                       //LOW = TRIGGERED
 const byte PDI_Y_Ref = 27;
 const byte PDI_Z_Ref = 15;
 const byte PDI_S = 39;
