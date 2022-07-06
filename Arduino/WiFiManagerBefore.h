@@ -42,7 +42,7 @@ const String WiFiManager_VariableNames[] = {"SSID", "Password", "name", "MotorMA
 const int EEPROM_size = 4096;                                  	//Max Amount of chars for 'SSID(16) + PASSWORD(16) + extra custom vars(?) +1(NULL)' defaults to 3
 
 #define WiFiManagerUser_Name_Defined
-char Name[16] = "Mixer";                                        //If you want to define the name somewhere else use 'char* Name = Name'
+char Name[16] = "mixer";                                        //If you want to define the name somewhere else use 'char* Name = Name'
 
 #define WiFiManager_mDNS                                        //Set up mDNS, this makes it so it responce to the url 'http://name.local/'
 
