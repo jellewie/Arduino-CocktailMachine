@@ -1,14 +1,19 @@
-import { getConfig } from "../configLoader.js";
+import { getConfig, onConfigLoaded, refreshConfig } from "../configLoader.js";
 
 const drinkCustomizationDialog = /** @type {HTMLDialogElement} */ (document.getElementById("settingsDialog"));
 const settingsListEl = /** @type {HTMLUListElement} */ (document.getElementById("settingsList"));
 
+/** @type {Map<string, HTMLInputElement>} */
+const createdSettings = new Map();
+
 export function showModal() {
 	drinkCustomizationDialog.showModal();
 	initSettingsList();
+	refreshConfig();
 }
 
 let initSettingsListCalled = false;
+let settingsInitialized = false;
 async function initSettingsList() {
 	if (initSettingsListCalled) return;
 	initSettingsListCalled = true;
@@ -41,10 +46,26 @@ async function initSettingsList() {
 			} else {
 				value = input.value;
 			}
-			sendChangeSetting(key, value);
+			sendChangeSetting(key.replaceAll(" ", ""), value);
 		});
+		createdSettings.set(key, input);
 	}
+	settingsInitialized = true;
 }
+
+onConfigLoaded(config => {
+	if (!settingsInitialized) return;
+	for (const [key, value] of Object.entries(config.settings)) {
+		const inputEl = createdSettings.get(key);
+		if (inputEl) {
+			if (typeof value === "boolean") {
+				inputEl.checked = value;
+			} else {
+				inputEl.value = String(value);
+			}
+		}
+	}
+});
 
 /**
  * @param {string} key

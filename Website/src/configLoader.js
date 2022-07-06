@@ -33,21 +33,10 @@
  */
 
 /**
- * @typedef SettingsConfig
- * @property {boolean} homed
- * @property {boolean} disableSteppersAfterMixDone
- * @property {number} bedSizeX
- * @property {number} bedSizeY
- * @property {number} bedSizeZ
- * @property {number} manualX
- * @property {number} manualY
- * @property {number} motorMaxSpeed
- * @property {number} motorMaxAccel
- * @property {number} shotDispenserMl
- * @property {number} homeMaxSpeed
- * @property {number} homedistanceBounce
- * @property {number} naxGlassSize
+ * @typedef {Object.<string, number | boolean>} SettingsConfig
  */
+
+/** @typedef {(config: ParsedConfigData) => void} OnConfigLoadedCallback */
 
 /** @type {ParsedConfigData?} */
 let currentConfigData = null;
@@ -55,6 +44,9 @@ let currentConfigData = null;
 let isRefreshingConfigData = false;
 /** @type {Promise<void>?} */
 let lastRefreshingConfigPromise = null;
+
+/** @type {Set<OnConfigLoadedCallback>} */
+const onConfigLoadedCbs = new Set();
 
 /**
  * Returns the cached config if it exists, otherwise it loads the config first.
@@ -69,7 +61,7 @@ export async function getConfig() {
 	return currentConfigData;
 }
 
-async function refreshConfig() {
+export async function refreshConfig() {
 	if (!isRefreshingConfigData || !lastRefreshingConfigPromise) {
 		lastRefreshingConfigPromise = refreshConfigFn();
 	}
@@ -100,6 +92,8 @@ async function refreshConfigFn() {
 			dispensers,
 			settings: data.settings,
 		};
+		const config = currentConfigData;
+		onConfigLoadedCbs.forEach(cb => cb(config));
 	}
 }
 
@@ -111,4 +105,11 @@ export async function getAvailableIngredients() {
 		availableIngredients.add(dispenser.ingredient);
 	}
 	return availableIngredients;
+}
+
+/**
+ * @param {OnConfigLoadedCallback} cb
+ */
+export function onConfigLoaded(cb) {
+	onConfigLoadedCbs.add(cb);
 }

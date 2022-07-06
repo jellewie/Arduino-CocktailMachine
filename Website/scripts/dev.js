@@ -40,24 +40,22 @@ for (let i = 0; i < 11; i++) {
 const ingredients = ["VODKA", "GIN", "ORANGE_JUICE",
 "UNK","VODKA","GIN","ORANGE_JUICE","RUM","CRANBERRY_JUICE","LEMONADE","TRIPLE_SEC","LEMON_JUICE","COLA","SPRITE","TEQUILA","GRENADINE_SYRUP","MILK","PINEAPPLE_JUICE","LIME_JUICE","PEACH_TREE","WHITE_RUM","TONIC_WATER","WATERMELON_VODKA","GINGER_ALE","SIMPLE_SYRUP","WHISKY","LEMON_SODA"];
 
+/** @type {Object.<string, number | boolean>} */
+const currentSettings = {
+	booleanA: true,
+	booleanB: false,
+	numberA: 0,
+	numberB: 1,
+	numberC: 200,
+	numberD: 3000,
+	"Boolean with spaces": true,
+	"Number with spaces": 1234,
+}
+
 const mockGetData = {
 	dispensers,
 	ingredients,
-	settings: {
-		homed: false,
-		disableSteppersAfterMixDone: true,
-		bedSizeX: 26000,
-		bedSizeY: 3000,
-		bedSizeZ: 1000,
-		manualX: 0,
-		manualY: 0,
-		motorMaxSpeed: 5500,
-		motorMaxAccel: 3000,
-		shotDispenserMl: 30,
-		homeMaxSpeed: 200,
-		homedistanceBounce: 400,
-		naxGlassSize: 300
-	}
+	settings: currentSettings,
 };
 
 const server = new Server({
@@ -71,6 +69,17 @@ const server = new Server({
 		} else if (url.pathname == "/set") {
 			const searchParams = Array.from(url.searchParams.entries()).map(([k,v]) => `${k}: ${v}`).join("\n");
 			console.log(`/set request received!\n${searchParams}`);
+			for (const [searchKey, searchValue] of url.searchParams) {
+				for (const [settingKey, settingValue] of Object.entries(currentSettings)) {
+					if (searchKey == settingKey.replaceAll(" ", "")) {
+						if (typeof settingValue == "boolean") {
+							currentSettings[settingKey] = searchValue == "true";
+						} else {
+							currentSettings[settingKey] = parseInt(searchValue);
+						}
+					}
+				}
+			}
 			return new Response();
 		}
 		return serveDir(request, {
