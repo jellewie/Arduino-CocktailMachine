@@ -1,0 +1,43 @@
+#dispensersDialog {
+	width: fit-content;
+}
+
+#dispensersList {
+	list-style-type: none;
+	padding: 0;
+}
+
+#dispensersList > li {
+	display: flex;
+	gap: 4px;
+	width: fit-content;
+	transition: padding 0.2s ease-in-out;
+}
+
+.dispenser-setting {
+	display: flex;
+	flex-direction: column;
+}
+
+.dispenser-setting input[type="number"] {
+	width: 50px;
+}
+
+.dispenser-setting-label-text {
+	font-size: 9pt;
+	opacity: 0;
+	position: absolute;
+    transform: translateY(-10px);
+	transition: opacity 0.2s, transform 0.2s ease-in-out;
+}
+
+#dispensersList > li:hover .dispenser-setting-label-text,
+#dispensersList > li:focus-within .dispenser-setting-label-text {
+	opacity: 1;
+    transform: translateY(-14px);
+}
+
+#dispensersList > li:hover,
+#dispensersList > li:focus-within {
+	padding-top: 17px;
+}

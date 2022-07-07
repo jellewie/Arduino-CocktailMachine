@@ -8,14 +8,6 @@
 	justify-content: space-between;
 }
 
-#settingsList > li {
-	border-radius: var(--default-border-radius);
-	padding: 1px 7px;
-}
-#settingsList > li:hover {
-	background-color: var(--row-hover-color);
-}
-
 #settingsList input[type="number"] {
 	width: 70px;
 }

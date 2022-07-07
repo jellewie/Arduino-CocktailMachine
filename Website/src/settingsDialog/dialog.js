@@ -20,6 +20,7 @@ async function initSettingsList() {
 	const config = await getConfig();
 	for (const [key, value] of Object.entries(config.settings)) {
 		const li = document.createElement("li");
+		li.classList.add("list-setting-item");
 		settingsListEl.appendChild(li);
 
 		const label = document.createElement("label");

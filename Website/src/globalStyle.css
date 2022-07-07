@@ -209,3 +209,11 @@ dialog::backdrop {
 #settingsButton:active {
 	opacity: 0.6;
 }
+
+.list-setting-item {
+	border-radius: var(--default-border-radius);
+	padding: 1px 7px;
+}
+.list-setting-item:hover {
+	background-color: var(--row-hover-color);
+}

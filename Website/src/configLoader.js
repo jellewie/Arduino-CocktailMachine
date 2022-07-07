@@ -13,6 +13,7 @@
 
 /**
  * @typedef ParsedConfigData
+ * @property {import("./drinksConfig.js").Ingredients[]} ingredients
  * @property {DispenserConfig[]} dispensers
  * @property {SettingsConfig} settings
  */
@@ -90,6 +91,7 @@ async function refreshConfigFn() {
 		}
 		currentConfigData = {
 			dispensers,
+			ingredients: [...data.ingredients],
 			settings: data.settings,
 		};
 		const config = currentConfigData;
