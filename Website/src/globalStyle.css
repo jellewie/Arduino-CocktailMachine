@@ -128,6 +128,10 @@ button {
 	margin: 20px;
 	cursor: pointer;
 }
+.text-button.small {
+	font-size: 10pt;
+	margin: 10px;
+}
 
 .text-button:hover,
 .text-button:focus-visible {
