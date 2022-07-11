@@ -10,6 +10,8 @@
 import { mapValue, randRange } from "./util.js";
 
 export class FlickeringSvgElement {
+	#enabled = false;
+
 	/**
 	 * @param {Element} element
 	 */
@@ -40,11 +42,24 @@ export class FlickeringSvgElement {
 			this.warmUpStartTime = performance.now();
 			this.toggleLight(false);
 		}
-
-		this.startNewTimeout();
 	}
 
-	startNewTimeout() {
+	get enabled() {
+		return this.#enabled;
+	}
+
+	set enabled(value) {
+		this.#enabled = value;
+		if (value) {
+			this.#startNewTimeout();
+		} else {
+			this.#cancelTimeout();
+		}
+	}
+
+	#startNewTimeout() {
+		this.#cancelTimeout();
+
 		let timeout;
 		if (this.isWarmingUp) {
 			const t = performance.now() - this.warmUpStartTime;
@@ -70,8 +85,15 @@ export class FlickeringSvgElement {
 		}
 		this.currentTimeout = setTimeout(() => {
 			this.toggleLight();
-			this.startNewTimeout();
+			this.#startNewTimeout();
 		}, timeout);
+	}
+
+	#cancelTimeout() {
+		if (this.currentTimeout >= 0) {
+			clearTimeout(this.currentTimeout);
+			this.currentTimeout = -1;
+		}
 	}
 
 	/**
