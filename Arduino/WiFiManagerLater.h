@@ -112,7 +112,12 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
     default: {
         byte i = ValueID - 16;                                  //Remove the amount above from the counter, so the next are of the Dispensers
         if (i < Dispensers_Amount) {
-          String Output = String(Dispensers[i].Type) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].LocationZ) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].TimeMSoff) + "," + String(Dispensers[i].IngredientID);
+          String Output = "";
+          if (Convert) {
+            Output = TypeIDtoString(Dispensers[i].Type) + ",X=" + String(Dispensers[i].LocationX) + ",Y=" + String(Dispensers[i].LocationY) + ",ZI=" + String(Dispensers[i].LocationZ) + "," + String(Dispensers[i].TimeMSML) + "MSML," + String(Dispensers[i].TimeMSoff) + "MSoff," + IngredientIDtoString(Dispensers[i].IngredientID);
+          } else {
+            Output = String(Dispensers[i].Type) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].LocationZ) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].TimeMSoff) + "," + String(Dispensers[i].IngredientID);
+          }
           return String(Output);
         }
       }

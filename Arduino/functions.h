@@ -8,7 +8,6 @@ struct Drink {
   int Color;
   Ingredient Ingredients[8];
 };
-enum TypeE {UNSPECIFIED, SHOTDispenser, PUMP};
 struct Dispenser {
   byte Type;
   unsigned int LocationX;
@@ -18,8 +17,11 @@ struct Dispenser {
   unsigned int TimeMSoff;                                                //Delay in MS to wait after
   byte IngredientID;
 };
+enum TypeE {UNSPECIFIED, SHOTDispenser, PUMP};
+String TypeS[] {"UNSPECIFIED", "SHOTDispenser", "PUMP"};
 
 byte Ingredient_Amount = sizeof(IngredientS) / sizeof(IngredientS[0]);//Why filling this in if we can automate that? :)
+byte Type_Amount = sizeof(TypeS) / sizeof(TypeS[0]);//Why filling this in if we can automate that? :)
 Dispenser Dispensers[Dispensers_Amount] = {
   //Type        , X,     Y,   Z  , MSml, MSoff, IngredientID
   {PUMP         , 3000  , 0     , 1    , 500 , 500  , 0},
@@ -277,6 +279,11 @@ byte IngredientStringToID(String IN) {
       return i;
   }
   return 0;
+}
+String TypeIDtoString(byte IN) {
+  if (IN <= Type_Amount)
+    return TypeS[IN];
+  return "UNK";
 }
 byte GetDispenserID(byte IngredientID) {
   //  Serial.println("GetDispenserID " + String(IngredientID) + "(" + IngredientIDtoString(IngredientID) + ")");
