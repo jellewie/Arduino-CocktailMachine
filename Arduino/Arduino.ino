@@ -30,17 +30,18 @@ const byte PDO_Pump[] = {32, 33, 25, 26};
 //const byte I2C_SDA = 21;                                      //I2C can not be moved
 //const byte I2C_SCL = 22;
 
-bool DisableSteppersAfterMixDone = false;
+bool DisableSteppersAfterMixDone = true;
 byte ShotDispenserML = 40;
 byte HomeMAXSpeed = 200;
 unsigned int MotorMAXSpeed = 5500;
 unsigned int MotorMAXAccel = 3000;
-unsigned int BedSize_X = 24000;
-unsigned int BedSize_Y = 7200;
-unsigned int BedSize_Z = 7000;
+unsigned int BedSize_X = 23950;
+unsigned int BedSize_Y = 7100;
+unsigned int BedSize_Z = 7100;
 unsigned int Manual_X = BedSize_X;
 unsigned int Manual_Y = BedSize_Y;
-unsigned int HomedistanceBounce = 400;
+unsigned int HomedistanceBounce = 200;
+unsigned int HomedistanceBounceZ = HomedistanceBounce * 4;
 unsigned int MaxGlassSize = 300;
 int SaveEEPROMinSeconds = -1;
 
@@ -114,10 +115,9 @@ void MakeCocktail(Drink Mix) {
       LcdPrint("Mix not started", "Homing failed");
       return;
     }
-  } else {
-    MoveTo(-1, -1, 0);
   }
   for (byte i = 0; i < 8; i++) {                                //For each Ingredient
+    MyYield();
     if (Mix.Ingredients[i].ID != 0 or Mix.Ingredients[i].Action != 0) {
       String msg = "";
       if (Mix.Ingredients[i].ID != 0)
@@ -128,12 +128,11 @@ void MakeCocktail(Drink Mix) {
       GetIngredient(Mix.Ingredients[i]);
     }
   }
-  MoveTo(Manual_X, Manual_Y);
   MoveTo(Manual_X, Manual_Y, BedSize_Z);
   LcdPrint("Mixed cocktail", IpAddress2String(WiFi.localIP()));
 }
 void GetIngredient(Ingredient IN) {
-  Serial.println("GetIngredient: ID=" + String(IN.ID) + " Action=" + IN.Action + " ml=" + String(IN.ml));
+  Serial.println("GetIngredient: ID=" + String(IN.ID) + " Action=" + IN.Action + " ml=" + String(IN.ml) + " from dispenser=" + String(GetDispenserID(IN.ID)));
   if (IN.Action != "") {
     WaitForUser("Waiting on user", String(IN.Action));
   }
@@ -141,11 +140,11 @@ void GetIngredient(Ingredient IN) {
   if (DispenserID != 0) {
     switch (Dispensers[DispenserID].Type) {
       case SHOTDispenser: {
-          Serial.println("GetIngredient SHOTDispenser");
+          Serial.println("GetIngredient SHOTDispenser IN.ml=" + String(IN.ml) + " ShotDispenserML=" + String(ShotDispenserML));
           MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);
           int mlToDo = IN.ml;
           float DoDelay = 0;
-          byte DoAmount = ceil(IN.ml / ShotDispenserML);
+          byte DoAmount = ceil((float)IN.ml / ShotDispenserML);
           for (byte i = 1; i <= DoAmount; i++) {
             Stepper_Z.moveTo(Dispensers[DispenserID].LocationZ);
             while (Stepper_Z.run()) yield();
@@ -164,13 +163,15 @@ void GetIngredient(Ingredient IN) {
           }
         } break;
       case PUMP: {
-          Serial.println("GetIngredient from Pump");
+          Serial.println("GetIngredient from Pump ID=" + String(Dispensers[DispenserID].LocationZ));
           if (Dispensers[DispenserID].LocationZ <= Pump_Amount) {
             MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);
             digitalWrite(PDO_Pump[Dispensers[DispenserID].LocationZ], HIGH);
             MyDelay(Dispensers[DispenserID].TimeMSML);
             digitalWrite(PDO_Pump[Dispensers[DispenserID].LocationZ], LOW);
             MyDelay(Dispensers[DispenserID].TimeMSoff);
+          } else {
+            WaitForUser("UNK pump ID", "LocationZ=" + String(Dispensers[DispenserID].LocationZ));
           }
         }
         break;

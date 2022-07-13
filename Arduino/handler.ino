@@ -228,7 +228,7 @@ void handle_Set() {
       if (!StringIsDigit(ArgValue)) {
         ERRORMSG = "SetDispenserID not a value";
       } else {
-        if (ArgValue.toInt() <= Dispensers_Amount and ArgValue.toInt() >= 0) {
+        if (ArgValue.toInt() < 0 or ArgValue.toInt() >= Dispensers_Amount) {
           ERRORMSG = "SetDispenserID out of valid range";
         } else {
           DisID = ArgValue.toInt();
@@ -238,7 +238,7 @@ void handle_Set() {
       if (!StringIsDigit(ArgValue)) {
         ERRORMSG = "SetDispenserType not a value";
       } else {
-        if (ArgValue.toInt() <= 0 or ArgValue.toInt() > 2) {
+        if (ArgValue.toInt() < 0 or ArgValue.toInt() > 2) {
           ERRORMSG = "SetDispenserType out of valid range";
         } else {
           Dis.Type = ArgValue.toInt();
@@ -310,18 +310,13 @@ void handle_Set() {
     ERRORMSG += "No mix ingredients given/n";
   }
 
-  bool DispenserAdded = false;
   //Process the dispenser update
   if (DisID != -1 or Dis.Type != 0 or Dis.LocationX != 0 or Dis.LocationY != 0 or Dis.LocationZ != 0 or Dis.TimeMSML != 0 or Dis.TimeMSoff != 0 or Dis.IngredientID != 0) {
     if (DisID >= 0) {
       SetDispenser(Dis, DisID);
-      DispenserAdded = true;
     } else {
-      if (AddDispenser(Dis)) {
-        DispenserAdded = true;
-      } else {
+      if (!AddDispenser(Dis))
         ERRORMSG += "No more space for a new dispenser";
-      }
     }
   }
 
@@ -336,10 +331,6 @@ void handle_Set() {
     DisableSteppers();
   } else if (DoHoming == 1) {
     Home();
-  }
-
-  if (DispenserAdded) {
-    MoveTo(Dis.LocationX, Dis.LocationY);
   }
 
   //If we need to somewhere

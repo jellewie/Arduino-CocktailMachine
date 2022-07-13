@@ -201,9 +201,10 @@ void CutVariable(String _Input, String *_Variable, byte _VariableLength) {
   }
   _Variable[_WriteTo] = _Input.substring(_StartAt);
 }
-void SetDispenser(Dispenser Dis, byte i) {
-  if (i < Dispensers_Amount)
-    Dispensers[i] = Dis;
+bool SetDispenser(Dispenser Dis, byte i) {
+  if (i < 0 or i >= Dispensers_Amount)
+    return false;
+  Dispensers[i] = Dis;
 }
 bool AddDispenser(Dispenser Dis) {
   for (byte i = 0; i < Dispensers_Amount; i++) {
@@ -298,6 +299,17 @@ void CheckEEPROMSave() {
     }
   }
 }
+bool IsTrue(String input) {
+  input.toLowerCase();
+  if (input == "1" or input == "true" or input == "yes" or input == "high")
+    return true;
+  return false;
+}
+String IsTrueToString(bool input) {
+  if (input)
+    return "true";
+  return "false";
+}
 void MyYield() {
   WiFiManager.RunServer();                                      //Do WIFI server stuff if needed
   CheckEEPROMSave();
@@ -323,7 +335,7 @@ bool MoveWait(AccelStepper Step, byte RefferenceButton, int pos) {
     } else {
       if (digitalRead(RefferenceButton) == LOW) {          //If we have hit the switch
         Step.setCurrentPosition(0);
-        Serial.println("MW: Switch homed" + String(digitalRead(RefferenceButton)));
+        Serial.println("MW: Switch reached");
         return true;
       }
     }
@@ -354,42 +366,45 @@ bool Home(bool X, bool Y, bool Z) {
   digitalWrite(PDO_Step_enable, LOW);                           //Enable all stepper drivers
   bool Homed_X = false, Homed_Y = false, Homed_Z = false;
   if (Z) {
-    LcdPrint("Homing", "Z");
-    if (MoveWait(Stepper_Z, PDI_Z_Ref, -(BedSize_Z + 100))) {          //If the switch is touched
-      Stepper_Z.moveTo(HomedistanceBounce);
+    LcdPrint("", "Z");
+    Stepper_Z.setCurrentPosition(0);
+    if (MoveWait(Stepper_Z, PDI_Z_Ref, BedSize_Z * -1.1)) {  //If the switch is touched
+      Stepper_Z.moveTo(HomedistanceBounceZ);
       while (Stepper_Z.run())
         yield();
       Stepper_Z.setMaxSpeed(HomeMAXSpeed);
-      Homed_Z = MoveWait(Stepper_Z, PDI_Z_Ref, -100);
+      Homed_Z = MoveWait(Stepper_Z, PDI_Z_Ref, -(BedSize_Z / 20));
       Stepper_Z.setCurrentPosition(0);                          //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
       Stepper_Z.setMaxSpeed(MotorMAXSpeed);                     //Reset max speed
     }
   }
   if (X) {
-    LcdPrint("Homing", "X");
-    if (MoveWait(Stepper_X, PDI_X_Ref, -BedSize_X - 100)) {     //If the switch is touched
+    LcdPrint("", "X");
+    Stepper_X.setCurrentPosition(0);
+    if (MoveWait(Stepper_X, PDI_X_Ref, BedSize_X  * -1.1)) {     //If the switch is touched
       Stepper_X.moveTo(HomedistanceBounce);
       while (Stepper_X.run())
         yield();
       Stepper_X.setMaxSpeed(HomeMAXSpeed);
-      Homed_X = MoveWait(Stepper_X, PDI_X_Ref, -100);
+      Homed_X = MoveWait(Stepper_X, PDI_X_Ref, -(BedSize_X / 20));
       Stepper_X.setCurrentPosition(0);                          //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
       Stepper_X.setMaxSpeed(MotorMAXSpeed);                     //Reset max speed
     }
   }
   if (Y) {
-    LcdPrint("Homing", "Y");
-    if (MoveWait(Stepper_Y, PDI_Y_Ref, -BedSize_Y - 100)) {     //If the switch is touched
+    LcdPrint("", "Y");
+    Stepper_Y.setCurrentPosition(0);
+    if (MoveWait(Stepper_Y, PDI_Y_Ref, BedSize_Y * -1.1)) {  //If the switch is touched
       Stepper_Y.moveTo(HomedistanceBounce);
       while (Stepper_Y.run())
         yield();
       Stepper_Y.setMaxSpeed(HomeMAXSpeed);
-      Homed_Y = MoveWait(Stepper_Y, PDI_Y_Ref, -100);
+      Homed_Y = MoveWait(Stepper_Y, PDI_Y_Ref, -(BedSize_Y / 20));
       Stepper_Y.setCurrentPosition(0);                          //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
       Stepper_Y.setMaxSpeed(MotorMAXSpeed);                     //Reset max speed
     }
   }
-  LcdPrint("Homed", String(Homed) + " X" + String(X) + "," + String(Homed_X) + " Y" + String(Y) + "," + String(Homed_Y) + " Z" + String(Z) + "," + String(Homed_Z));
+  LcdPrint("Homed " + IsTrueToString(Homed) , "X" + String(X) + "," + String(Homed_X) + " Y" + String(Y) + "," + String(Homed_Y) + " Z" + String(Z) + "," + String(Homed_Z));
   if (X == Homed_X and Y == Homed_Y and Z == Homed_Z) {
     Homed = true;
     return true;
@@ -402,6 +417,14 @@ void MoveTo(int LocationX, int LocationY, int LocationZ) {
   if (!Homed) {
     if (!Home(true, true, true)) {
       return;
+    }
+  }
+  if ((LocationX != -1 or LocationY != -1 ) and Stepper_Z.currentPosition() != 0 ) {//Always move Z down before moving XY
+    if (LocationX != Stepper_X.currentPosition() or LocationY != Stepper_Y.currentPosition()) {//Unless we are already at XY
+      Stepper_Z.moveTo(0);
+      while (Stepper_Z.run()) {
+        yield();
+      }
     }
   }
   if (LocationX >= 0 and LocationX < BedSize_X * 10) {
@@ -423,12 +446,13 @@ void MoveTo(int LocationX, int LocationY, int LocationZ) {
   while (WaitMore) {
     Stepper_X.run();
     Stepper_Y.run();
-    Stepper_Z.run();
-    if (!Stepper_X.isRunning() and !Stepper_Y.isRunning() and !Stepper_Z.isRunning())
+    if (!Stepper_X.isRunning() and !Stepper_Y.isRunning())
       WaitMore = false;
     yield();
   }
-  Serial.println("MoveTo done");
+  while (Stepper_Z.run()) {//Always move Z after moving XY
+    yield();
+  }
 }
 void DisableSteppers() {
   Homed = false;
@@ -440,22 +464,10 @@ void DisableSteppers() {
 String IpAddress2String(const IPAddress& ipAddress) {
   return String(ipAddress[0]) + String(".") + String(ipAddress[1]) + String(".") + String(ipAddress[2]) + String(".") + String(ipAddress[3])  ;
 }
-bool IsTrue(String input) {
-  input.toLowerCase();
-  if (input == "1" or input == "true" or input == "yes" or input == "high")
-    return true;
-  return false;
-}
-String IsTrueToString(bool input) {
-  if (input)
-    return "true";
-  return "false";
-}
 #define TimeoutWaitingOnUserMs 5 * 60 * 1000
 void WaitForUser(String msg, String msg2) {
   LcdPrint(msg, msg2);
-  MoveTo(Manual_X, Manual_Y);
-  MoveTo(-1, -1, BedSize_Z);
+  MoveTo(Manual_X, Manual_Y, BedSize_Z);
   bool WaitMore = true;
   while (WaitMore) {
     if (digitalRead(PDI_S) == LOW)
@@ -466,5 +478,4 @@ void WaitForUser(String msg, String msg2) {
     MyYield();
   }
   LcdPrint(msg, "User confirmed");
-  MoveTo(Manual_X, Manual_Y, 0);
 }

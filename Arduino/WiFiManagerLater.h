@@ -129,10 +129,12 @@ void WiFiManagerUser_Status_Done() {                            //Called after s
 void WiFiManagerUser_Status_Blink() {                           //Used when trying to connect/not connected
   digitalWrite(Pin_LED, !digitalRead(Pin_LED));
 }
-void WiFiManagerUser_Status_StartAP() {}                        //Called before start of APmode
+void WiFiManagerUser_Status_StartAP() {
+  LcdPrint("", "APMode: " + String(Name));
+}                        //Called before start of APmode
 bool WiFiManagerUser_HandleAP() {                               //Called when in the While loop in APMode, this so you can exit it
   //Return true to leave APmode
-#define TimeOutApMode 15 * 60 * 1000;                           //Example for a timeout, (time in ms)
+#define TimeOutApMode 1 * 60 * 1000;                            //Example for a timeout, (time in ms)
   unsigned long StopApAt = millis() + TimeOutApMode;
   if (millis() > StopApAt)    return true;                      //If we are running for to long, then flag we need to exit APMode
   return false;
