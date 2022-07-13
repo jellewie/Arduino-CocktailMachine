@@ -47,8 +47,8 @@ char Name[16] = "mixer";                                        //If you want to
 #define WiFiManager_mDNS                                        //Set up mDNS, this makes it so it responce to the url 'http://name.local/'
 
 #define WiFiManager_OTA                                         //Define if you want to use the Over The Air update page (/ota)
-//#define WiFiManagerUser_UpdateWebpage_Defined
-//const String UpdateWebpage = "";                              //Set an custom OTA update URL to show the user
+#define WiFiManagerUser_UpdateWebpage_Defined
+const String UpdateWebpage = "https://github.com/jellewie/Arduino-CocktailMachine/releases";//Set an custom OTA update URL to show the user
 //  WiFiManager.RunServer();                                    //(runtime) Note when using OTA, you need to run the server in your loop
 //  WiFiManager.OTA_Enabled = false;                            //(runtime) Turn off/on OTA
 
