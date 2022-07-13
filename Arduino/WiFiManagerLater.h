@@ -104,11 +104,13 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
     case 8:  return String(ShotDispenserML);                      break;
     case 9:  return String(HomeMAXSpeed);                         break;
     case 10: return String(HomedistanceBounce);                   break;
-    case 11:  if (Convert) {
-        return IsTrueToString(DisableSteppersAfterMixDone);
-      } else {
-        return String(DisableSteppersAfterMixDone);
-      }  break;
+    case 11:  {
+        if (Convert) {
+          return IsTrueToString(DisableSteppersAfterMixDone);
+        } else {
+          return String(DisableSteppersAfterMixDone);
+        }
+      } break;
     case 12: return String(MaxGlassSize);                         break;
     case 13: return "";                                           break;
     case 14: return "";                                           break;
