@@ -31,7 +31,7 @@
 #define WiFiManagerUser_Status_Start_Defined                    //^
 #define WiFiManagerUser_Status_Done_Defined                     //^
 #define WiFiManagerUser_Status_Blink_Defined                    //^
-#define WiFiManagerUser_Status_StartAP_Defined                  //^
+//#define WiFiManagerUser_Status_StartAP_Defined                  //^
 #define WiFiManagerUser_HandleAP_Defined                        //^
 
 #define WiFiManager_DoRequest                                   //Adds a simple way to do stable URL request (with optional json)
