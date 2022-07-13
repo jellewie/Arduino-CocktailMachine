@@ -2,18 +2,18 @@
 //"/set" commands
 //===========================================================================
 //Settings
-#define PreFixMotorMAXSpeed "ms"
-#define PreFixMotorMAXAccel "ma"
-#define PreFixBedSize_X "sx"
-#define PreFixBedSize_Y "sy"
-#define PreFixBedSize_Z "sz"
-#define PreFixManual_X "mx"
-#define PreFixManual_Y "my"
-#define PreFixShotDispenserML "dv"
-#define PreFixHomeMAXSpeed "hs"
-#define PreFixHomedistanceBounce "hd"
-#define PreFixDisableSteppersAfterMixDone "ds"
-#define PreFixHome "h"
+#define PreFixMotorMAXSpeed "motormaxspeed"
+#define PreFixMotorMAXAccel "motormaxaccel"
+#define PreFixBedSize_X "bedsizex"
+#define PreFixBedSize_Y "bedsizey"
+#define PreFixBedSize_Z "bedsizez"
+#define PreFixManual_X "manualx"
+#define PreFixManual_Y "manualy"
+#define PreFixShotDispenserML "shotdispenserml"
+#define PreFixHomeMAXSpeed "homemaxspeed"
+#define PreFixHomedistanceBounce "homedistancebounce"
+#define PreFixDisableSteppersAfterMixDone "disablesteppersaftermixdone"
+#define PreFixHome "homed"
 //Dispenser Settings
 #define PreFixSetDispenserID "di"
 #define PreFixSetDispenserType "dt"
@@ -62,7 +62,7 @@ void handle_Set() {
   bool makeMix = false;
   int8_t DoHoming = -1;
   Drink Mix;
-  unsigned int GoTo[3] = { -1, -1, -1};
+  int GoTo[3] = { -1, -1, -1};
   for (byte i = 0; i < 8; i++) {
     Mix.Ingredients[i].ID = 0;
     Mix.Ingredients[i].Action = "";
@@ -238,7 +238,7 @@ void handle_Set() {
       if (!StringIsDigit(ArgValue)) {
         ERRORMSG = "SetDispenserType not a value";
       } else {
-        if (ArgValue.toInt() <= 2 and ArgValue.toInt() >= 0) {
+        if (ArgValue.toInt() <= 0 or ArgValue.toInt() > 2) {
           ERRORMSG = "SetDispenserType out of valid range";
         } else {
           Dis.Type = ArgValue.toInt();
@@ -290,14 +290,14 @@ void handle_Set() {
       if (!StringIsDigit(ArgValue)) {
         ERRORMSG = "SetDispenserIngredientID not a value";
       } else {
-        if (ArgValue.toInt() <= Ingredient_Amount and ArgValue.toInt() >= 0) {
+        if (ArgValue.toInt() < 0 or ArgValue.toInt() >= Ingredient_Amount) {
           ERRORMSG = "SetDispenserIngredientID out of valid range";
         } else {
           Dis.IngredientID = ArgValue.toInt();
         }
       }
     } else {
-      ERRORMSG += "UNK argument" + ArguName + " = " + ArgValue + "/n";
+      ERRORMSG += "UNK argument " + ArguName + " = " + ArgValue + "\n";
     }
   }
   Serial.println();
@@ -310,19 +310,25 @@ void handle_Set() {
     ERRORMSG += "No mix ingredients given/n";
   }
 
+  bool DispenserAdded = false;
+  //Process the dispenser update
+  if (DisID != -1 or Dis.Type != 0 or Dis.LocationX != 0 or Dis.LocationY != 0 or Dis.LocationZ != 0 or Dis.TimeMSML != 0 or Dis.TimeMSoff != 0 or Dis.IngredientID != 0) {
+    if (DisID >= 0) {
+      SetDispenser(Dis, DisID);
+      DispenserAdded = true;
+    } else {
+      if (AddDispenser(Dis)) {
+        DispenserAdded = true;
+      } else {
+        ERRORMSG += "No more space for a new dispenser";
+      }
+    }
+  }
+
   if (ERRORMSG == "") {
     server.send(200, "text/plain", "OK");
   } else {
     server.send(400, "application/json", ERRORMSG);
-  }
-
-  //Process the dispenser update
-  if (DisID != -1 or Dis.Type != 0 or Dis.LocationX != 0 or Dis.LocationY != 0 or Dis.LocationZ != 0 or Dis.TimeMSML != 0 or Dis.TimeMSoff != 0 or Dis.IngredientID != 0) {
-    if (DisID != -1) {
-      SetDispenser(Dis, DisID);
-    } else {
-      AddDispenser(Dis);
-    }
   }
 
   //If we need to home
@@ -330,6 +336,10 @@ void handle_Set() {
     DisableSteppers();
   } else if (DoHoming == 1) {
     Home();
+  }
+
+  if (DispenserAdded) {
+    MoveTo(Dis.LocationX, Dis.LocationY);
   }
 
   //If we need to somewhere
@@ -368,7 +378,7 @@ void handle_Get() {
   Json += ",\"shotDispenserMl\":" + String(ShotDispenserML);
   Json += ",\"homeMaxSpeed\":" + String(HomeMAXSpeed);
   Json += ",\"homedistanceBounce\":" + String(HomedistanceBounce);
-  Json += ",\"naxGlassSize\":" + String(MaxGlassSize);
+  Json += ",\"maxGlassSize\":" + String(MaxGlassSize);
   Json += "}";
 
   Json += "}";

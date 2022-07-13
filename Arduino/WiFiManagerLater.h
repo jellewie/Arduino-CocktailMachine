@@ -70,7 +70,7 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
         //reserved
       } break;
     default: {
-        byte i = ValueID - 15;                                  //Remove the amount above from the counter, so the next are of the Dispensers
+        byte i = ValueID - 16;                                  //Remove the amount above from the counter, so the next are of the Dispensers
         if (i < Dispensers_Amount) {
           String _Output[7];
           CutVariable(Value, &_Output[0], 7);
@@ -110,7 +110,7 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
     case 14: return "";                                           break;
     case 15: return "";                                           break;
     default: {
-        byte i = ValueID - 15;                                  //Remove the amount above from the counter, so the next are of the Dispensers
+        byte i = ValueID - 16;                                  //Remove the amount above from the counter, so the next are of the Dispensers
         if (i < Dispensers_Amount) {
           String Output = String(Dispensers[i].Type) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].LocationZ) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].TimeMSoff) + "," + String(Dispensers[i].IngredientID);
           return String(Output);
