@@ -10,6 +10,8 @@ import {serveDir} from "https://deno.land/std@0.145.0/http/file_server.ts";
 import {Server} from "https://deno.land/std@0.145.0/http/server.ts";
 import {resolve, fromFileUrl, dirname} from "https://deno.land/std@0.145.0/path/mod.ts";
 import {generateTypes} from "https://deno.land/x/deno_tsc_helper@v0.0.3/mod.js";
+import {setCwd} from "https://deno.land/x/chdir_anywhere@v0.0.2/mod.js";
+setCwd();
 
 await generateTypes({
 	outputDir: "../.denoTypes",
@@ -18,6 +20,34 @@ await generateTypes({
 		"https://esm.sh/clean-css@5.3.0?pin=v87",
 	],
 });
+
+const libs = {
+	"construct-style-sheets-polyfill.js": "https://unpkg.com/construct-style-sheets-polyfill@3.1.0/dist/adoptedStyleSheets.js",
+};
+
+await Deno.mkdir("../lib", {recursive: true});
+/** @type {Promise<void>[]} */
+const libFetchPromises = [];
+for (const [file, url] of Object.entries(libs)) {
+	const promise = (async () => {
+		const path = resolve("../lib", file);
+		let exists = true;
+		try {
+			await Deno.stat(path);
+		} catch (e) {
+			exists = false;
+		}
+		if (!exists) {
+			const response = await fetch(url);
+			if (!response.ok) {
+				throw new Error(`Failed to fetch ${url}`);
+			}
+			await Deno.writeTextFile(path, await response.text());
+		}
+	})();
+	libFetchPromises.push(promise);
+}
+await Promise.all(libFetchPromises);
 
 const dispensers = [];
 for (let i = 0; i < 11; i++) {

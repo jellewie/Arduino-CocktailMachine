@@ -1,3 +1,4 @@
+import "../lib/construct-style-sheets-polyfill.js";
 import { getSelectedDrink, initDrinkSelector, markRecentDrink, setDrinkFilter } from "./drinkSelector.js";
 import { customizeButtonEl, mainMixButtonEl, openDispensersDialogButton, searchEl, settingsButton } from "./globalElements.js";
 import { sendMixRequest } from "./sendMixRequest.js";
