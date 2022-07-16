@@ -17,7 +17,7 @@ async function updateDispensersList() {
 	}
 
 	for (const [i, dispenser] of config.dispensers.entries()) {
-		const settingsItem = new DispenserSettingsItem(dispenser, config.ingredients);
+		const settingsItem = new DispenserSettingsItem(i, dispenser, config.ingredients);
 		dispensersList.appendChild(settingsItem.el);
 		settingsItem.onDispenserChange(async dispenserConfig => {
 			const url = new URL("/set", window.location.href);

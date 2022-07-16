@@ -86,12 +86,18 @@ function createNumberSetting({
 
 export class DispenserSettingsItem {
 	/**
+	 * @param {number} index
 	 * @param {import("../configLoader.js").DispenserConfig} dispenserConfig
 	 * @param {import("../drinksConfig.js").Ingredients[]} availableIngredients
 	 */
-	constructor(dispenserConfig, availableIngredients) {
+	constructor(index, dispenserConfig, availableIngredients) {
 		this.el = document.createElement("li");
 		this.el.classList.add("list-setting-item");
+
+		const numberEl = document.createElement("span");
+		numberEl.textContent = String(index);
+		numberEl.classList.add("dispenser-setting-number");
+		this.el.appendChild(numberEl);
 
 		/** @private @type {Set<OnDispenserChangeCallback>} */
 		this.onDispenserChangeCbs = new Set();
