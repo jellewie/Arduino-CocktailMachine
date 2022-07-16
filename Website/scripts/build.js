@@ -4,37 +4,27 @@
  * Run with `deno task build`.
  */
 
-// @ts-expect-error
-import {rollup} from "https://esm.sh/rollup@2.75.7?pin=v86";
-// @ts-expect-error
-import {importAssertionsPlugin} from "https://esm.sh/rollup-plugin-import-assert@2.1.0?pin=v86"
-// @ts-expect-error
-import replace from "https://esm.sh/@rollup/plugin-replace@4.0.0?pin=v86";
-// @ts-expect-error
-import {importAssertions} from "https://esm.sh/acorn-import-assertions@1.8.0?pin=v86";
-// @ts-expect-error
+import {rollup} from "https://esm.sh/rollup@2.75.7?pin=v87";
+import {importAssertionsPlugin} from "https://esm.sh/rollup-plugin-import-assert@2.1.0?pin=v87"
+import replace from "https://esm.sh/@rollup/plugin-replace@4.0.0?pin=v87";
+import {importAssertions} from "https://esm.sh/acorn-import-assertions@1.8.0?pin=v87";
 import {setCwd} from "https://deno.land/x/chdir_anywhere@v0.0.2/mod.js";
-// @ts-expect-error
 import {resolve, dirname} from "https://deno.land/std@0.146.0/path/mod.ts";
-// @ts-expect-error
 import postcss from "https://deno.land/x/postcss@8.4.13/mod.js";
-// @ts-expect-error
 import * as esbuild from "https://deno.land/x/esbuild@v0.14.48/mod.js"
-// @ts-expect-error
-import CleanCSS from "https://esm.sh/clean-css@5.3.0?pin=v86";
+import CleanCSS from "https://esm.sh/clean-css@5.3.0?pin=v87";
 setCwd();
 
 function postCssInlineUrlsPlugin() {
 	const urlRegex = /url\("?(?!#)(.+)"?\)/d;
-	return {
+	/** @type {import("../.denoTypes/vendor/deno.land/x/postcss@8.4.13/lib/postcss.js").AcceptedPlugin} */
+	const plugin = {
 		postcssPlugin: "postcss-inline-urls",
-		/**
-		 * @param {{value: string}} decl
-		 * @param {{result: {opts: {from: string}}}} param1
-		 * @returns
-		 */
 		async Declaration(decl, {result}) {
 			const from = result.opts.from;
+			if (!from) {
+				throw new Error("Assertion failed, from is undefined");
+			}
 			const match = decl.value.match(urlRegex);
 			if (match && match[1]) {
 				const url = match[1];
@@ -55,6 +45,7 @@ function postCssInlineUrlsPlugin() {
 			}
 		}
 	}
+	return plugin;
 }
 
 function postCssPlugin() {
@@ -111,7 +102,7 @@ const bundle = await rollup({
 		postCssPlugin(),
 		replace({
 			values: {
-				DEBUG_BUILD: false,
+				DEBUG_BUILD: "false",
 			},
 			preventAssignment: true,
 		}),

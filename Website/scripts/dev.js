@@ -9,20 +9,15 @@
 import {serveDir} from "https://deno.land/std@0.145.0/http/file_server.ts";
 import {Server} from "https://deno.land/std@0.145.0/http/server.ts";
 import {resolve, fromFileUrl, dirname} from "https://deno.land/std@0.145.0/path/mod.ts";
-// @ts-expect-error see https://github.com/jespertheend/deno-tsc-helper/issues/2
-import {generateTypes} from "https://deno.land/x/deno_tsc_helper@v0.0.1/generateTypes.js";
+import {generateTypes} from "https://deno.land/x/deno_tsc_helper@v0.0.3/mod.js";
 
-// await generateTypes({
-// 	typeUrls: [
-// 		"https://deno.land/x/deno_tsc_helper@v0.0.1/generateTypes.js",
-// 		"https://deno.land/std@0.145.0/http/file_server.ts",
-// 		"https://deno.land/std@0.145.0/http/server.ts",
-// 		"https://deno.land/std@0.145.0/path/mod.ts",
-// 		"https://esm.sh/rollup@2.75.7?pin=v86",
-// 		"https://deno.land/x/chdir_anywhere@v0.0.2/mod.js",
-// 	],
-// 	outputDir: "../.denoTypes",
-// });
+await generateTypes({
+	outputDir: "../.denoTypes",
+	excludeUrls: [
+		"https://esm.sh/rollup@2.75.7?pin=v87",
+		"https://esm.sh/clean-css@5.3.0?pin=v87",
+	],
+});
 
 const dispensers = [];
 for (let i = 0; i < 11; i++) {
