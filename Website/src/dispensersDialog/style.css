@@ -10,6 +10,7 @@
 #dispensersList > li {
 	display: flex;
 	gap: 4px;
+	align-items: center;
 	width: fit-content;
 	transition: padding 0.2s ease-in-out;
 }
@@ -25,6 +26,9 @@
 
 .dispenser-setting input[type="number"] {
 	width: 50px;
+}
+#dispensersList > li > .text-button {
+	margin: 0;
 }
 
 .dispenser-setting-label-text {

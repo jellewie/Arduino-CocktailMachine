@@ -1,4 +1,5 @@
 import { ingredientNames } from "../drinksConfig.js";
+import { showToastMessage } from "../toastMessages/showToastMessage.js";
 import { DispenserSettingItem } from "./DispenserSettingItem.js";
 
 /** @typedef {(config: import("../configLoader.js").DispenserConfig) => void} OnDispenserChangeCallback */
@@ -177,6 +178,23 @@ export class DispenserSettingsItem {
 		this.el.appendChild(msOffSetting.el);
 		/** @private */
 		this.getMsOffSetting = msOffSetting.getValue;
+
+		const goToButton = document.createElement("button");
+		goToButton.textContent = "Go to";
+		goToButton.classList.add("text-button");
+		goToButton.type = "button";
+		goToButton.addEventListener("click", async () => {
+			const url = new URL("/set", window.location.href);
+			url.searchParams.set("x", String(this.getXSetting()));
+			url.searchParams.set("y", String(this.getYSetting()));
+			const response = await fetch(url);
+			if (response.ok) {
+				showToastMessage("Moving to dispenser...");
+			} else {
+				showToastMessage("Failed to go to dispenser.");
+			}
+		});
+		this.el.appendChild(goToButton);
 	}
 
 	/**
