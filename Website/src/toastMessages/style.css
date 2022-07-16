@@ -1,6 +1,5 @@
 .toast-message {
 	position: absolute;
-	bottom: 30px;
 	left: 50%;
 	padding: 10px;
 	min-width: 200px;
@@ -13,6 +12,15 @@
 	transition: transform 0.2s ease-in-out;
 }
 
-.toast-message.hidden {
+.toast-message.bottom {
+	bottom: 30px;
+}
+.toast-message.bottom.hidden {
 	transform: translateX(-50%) translateY(200%);
+}
+.toast-message.top {
+	top: 30px;
+}
+.toast-message.top.hidden {
+	transform: translateX(-50%) translateY(-200%);
 }

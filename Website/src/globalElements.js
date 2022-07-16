@@ -11,7 +11,9 @@ const mainMixButton = document.getElementById("mainMixButton");
 const mainMixButtonEl = /** @type {HTMLButtonElement} */ (mainMixButton);
 
 const settingsButton = /** @type {HTMLButtonElement} */ (document.getElementById("settingsButton"));
+const settingsDialog = /** @type {HTMLDialogElement} */ (document.getElementById("settingsDialog"));
 const openDispensersDialogButton = /** @type {HTMLButtonElement} */ (document.getElementById("openDispensersDialogButton"));
+const dispensersDialog = /** @type {HTMLDialogElement} */ (document.getElementById("dispensersDialog"));
 
 export {
 	searchEl,
@@ -19,5 +21,7 @@ export {
 	customizeButtonEl,
 	mainMixButtonEl,
 	settingsButton,
+	settingsDialog,
 	openDispensersDialogButton,
+	dispensersDialog,
 }

@@ -1,11 +1,17 @@
 /**
  * @param {string} message
+ * @param {Object} [options]
+ * @param {HTMLElement} [options.parent]
+ * @param {"top" | "bottom"} [options.location]
  */
-export async function showToastMessage(message) {
+export async function showToastMessage(message, {
+	parent = document.body,
+	location = "bottom",
+} = {}) {
 	const el = document.createElement("div");
-	el.classList.add("toast-message", "hidden");
+	el.classList.add("toast-message", "hidden", location);
 	el.textContent = message;
-	document.body.appendChild(el);
+	parent.appendChild(el);
 	// trigger reflow
 	el.offsetHeight;
 	el.classList.remove("hidden");

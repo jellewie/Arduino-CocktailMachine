@@ -1,8 +1,8 @@
 import { getConfig } from "../configLoader.js";
+import { dispensersDialog } from "../globalElements.js";
 import { showToastMessage } from "../toastMessages/showToastMessage.js";
 import { DispenserSettingsItem } from "./DispenserSettingsItem.js";
 
-const dispensersDialog = /** @type {HTMLDialogElement} */ (document.getElementById("dispensersDialog"));
 const dispensersList = /** @type {HTMLUListElement} */ (document.getElementById("dispensersList"));
 
 export function showModal() {
@@ -33,11 +33,11 @@ async function updateDispensersList() {
 			if (ingredientId < 0) ingredientId = 0;
 			url.searchParams.set("dn", String(ingredientId));
 			const response = await fetch(url);
-			if (response.ok) {
-				showToastMessage("Dispenser updated.");
-			} else {
-				showToastMessage("Failed to update dispenser.");
-			}
+			const message = response.ok ? "Dispenser updated." : "Failed to update dispenser.";
+			showToastMessage(message, {
+				parent: dispensersDialog,
+				location: "top",
+			});
 		});
 	}
 }
