@@ -1,4 +1,5 @@
 import { getConfig, onConfigLoaded, refreshConfig } from "../configLoader.js";
+import { showToastMessage } from "../toastMessages/showToastMessage.js";
 
 const drinkCustomizationDialog = /** @type {HTMLDialogElement} */ (document.getElementById("settingsDialog"));
 const settingsListEl = /** @type {HTMLUListElement} */ (document.getElementById("settingsList"));
@@ -76,7 +77,9 @@ async function sendChangeSetting(key, value) {
 	const url = new URL("/set", window.location.href);
 	url.searchParams.set(key, value);
 	const response = await fetch(url);
-	if (!response.ok) {
-		// TODO: Show error notification
+	if (response.ok) {
+		showToastMessage("Setting updated.");
+	} else {
+		showToastMessage("Failed to update setting.");
 	}
 }

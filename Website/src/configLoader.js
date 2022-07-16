@@ -4,6 +4,8 @@
  * This also contains some utility functions for using the data.
  */
 
+import { showToastMessage } from "./toastMessages/showToastMessage.js";
+
 /**
  * @typedef ConfigJson
  * @property {DispenserConfigArr[]} dispensers
@@ -72,7 +74,7 @@ export async function refreshConfig() {
 async function refreshConfigFn() {
 	const response = await fetch("/get");
 	if (!response.ok) {
-		// TODO: show notification
+		showToastMessage("Failed to load config data.");
 	} else {
 		/** @type {ConfigJson} */
 		const data = await response.json();

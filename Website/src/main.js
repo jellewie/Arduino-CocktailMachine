@@ -1,5 +1,10 @@
 import { getSelectedDrink, initDrinkSelector, markRecentDrink, setDrinkFilter } from "./drinkSelector.js";
 import { customizeButtonEl, mainMixButtonEl, openDispensersDialogButton, searchEl, settingsButton } from "./globalElements.js";
+import { sendMixRequest } from "./sendMixRequest.js";
+import { showModal as showDrinkCustomizationModal } from "./drinkCustomizationDialog/dialog.js";
+import { showModal as showSettingsModal } from "./settingsDialog/dialog.js";
+import { showModal as showDispensersModal } from "./dispensersDialog/dialog.js";
+
 // @ts-ignore
 import globalStyleSheet from "./globalStyle.css" assert {type: "css"};
 // @ts-ignore
@@ -10,14 +15,12 @@ import drinkCustomizationDialogSheet from "./drinkCustomizationDialog/style.css"
 import settingsDialogSheet from "./settingsDialog/style.css" assert {type: "css"};
 // @ts-ignore
 import dispensersDialogSheet from "./dispensersDialog/style.css" assert {type: "css"};
-import { sendMixRequest } from "./sendMixRequest.js";
-import { showModal as showDrinkCustomizationModal } from "./drinkCustomizationDialog/dialog.js";
-import { showModal as showSettingsModal } from "./settingsDialog/dialog.js";
-import { showModal as showDispensersModal } from "./dispensersDialog/dialog.js";
+// @ts-ignore
+import toastMessagesSheet from "./toastMessages/style.css" assert {type: "css"};
 
 globalThis["DEBUG_BUILD"] = true;
 
-document.adoptedStyleSheets = [globalStyleSheet, drinkDisplaySheet, drinkCustomizationDialogSheet, settingsDialogSheet, dispensersDialogSheet];
+document.adoptedStyleSheets = [globalStyleSheet, drinkDisplaySheet, drinkCustomizationDialogSheet, settingsDialogSheet, dispensersDialogSheet, toastMessagesSheet];
 
 mainMixButtonEl.addEventListener("click", () => {
 	const selectedDrink = getSelectedDrink();

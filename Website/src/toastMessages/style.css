@@ -1,0 +1,18 @@
+.toast-message {
+	position: absolute;
+	bottom: 30px;
+	left: 50%;
+	padding: 10px;
+	min-width: 200px;
+	z-index: 100;
+	transform: translateX(-50%);
+	background: linear-gradient(#71178b, #5c1072);
+	border-radius: var(--default-border-radius);
+	border-top: 1px solid #b935dc;
+	box-shadow: 0px 15px 20px -6px #0000007d;
+	transition: transform 0.2s ease-in-out;
+}
+
+.toast-message.hidden {
+	transform: translateX(-50%) translateY(200%);
+}

@@ -1,3 +1,5 @@
+import { showToastMessage } from "./toastMessages/showToastMessage.js";
+
 /**
  * @param {Object} options
  * @param {string} options.name The name to display on the device.
@@ -19,7 +21,9 @@ export async function sendMixRequest({
 		}
 	}
 	const response = await fetch(url.href);
-	if (!response.ok) {
-		// TODO: Show error notification
+	if (response.ok) {
+		showToastMessage("Mixing!");
+	} else {
+		showToastMessage("Failed to send mix request");
 	}
 }
