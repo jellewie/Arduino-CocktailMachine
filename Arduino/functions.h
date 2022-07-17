@@ -295,14 +295,30 @@ byte GetDispenserID(byte IngredientID) {
   }
   return 0;
 }
+void DisableSteppers() {
+  Homed = false;
+  Stepper_X.moveTo(Stepper_X.currentPosition());
+  Stepper_Y.moveTo(Stepper_Y.currentPosition());
+  Stepper_Z.moveTo(Stepper_Z.currentPosition());
+  digitalWrite(PDO_Step_enable, HIGH);                          //Disable all stepper drivers
+}
 void CheckEEPROMSave() {
-  if (SaveEEPROMinSeconds == 0) {
-    SaveEEPROMinSeconds -= 1;
-    WiFiManager.WriteEEPROM();                                  //(runtime) If you want to manually save the settings(EEPROM LIMITED WRITES! do not spam)
-  } else if (SaveEEPROMinSeconds >= 0 ) {
+  if (SaveEEPROMinSeconds >= 0) {
     static unsigned long LastTime;
     if (TickEveryXms(&LastTime, 1000)) {
+      if (SaveEEPROMinSeconds == 0)
+        WiFiManager.WriteEEPROM();                                  //(runtime) If you want to manually save the settings(EEPROM LIMITED WRITES! do not spam)
       SaveEEPROMinSeconds -= 1;
+    }
+  }
+}
+void CheckDisableSteppers() {
+  if (DisableSteppersinSeconds >= 0) {
+    static unsigned long LastTime;
+    if (TickEveryXms(&LastTime, 1000)) {
+      if (DisableSteppersinSeconds == 0)
+        DisableSteppers();
+      DisableSteppersinSeconds -= 1;
     }
   }
 }
@@ -320,6 +336,7 @@ String IsTrueToString(bool input) {
 void MyYield() {
   WiFiManager.RunServer();                                      //Do WIFI server stuff if needed
   CheckEEPROMSave();
+  CheckDisableSteppers();
   //FastLED.delay(1);
   yield();
 }
@@ -460,13 +477,6 @@ void MoveTo(int LocationX, int LocationY, int LocationZ) {
   while (Stepper_Z.run()) {//Always move Z after moving XY
     yield();
   }
-}
-void DisableSteppers() {
-  Homed = false;
-  Stepper_X.moveTo(Stepper_X.currentPosition());
-  Stepper_Y.moveTo(Stepper_Y.currentPosition());
-  Stepper_Z.moveTo(Stepper_Z.currentPosition());
-  digitalWrite(PDO_Step_enable, HIGH);                          //Disable all stepper drivers
 }
 String IpAddress2String(const IPAddress& ipAddress) {
   return String(ipAddress[0]) + String(".") + String(ipAddress[1]) + String(".") + String(ipAddress[2]) + String(".") + String(ipAddress[3])  ;

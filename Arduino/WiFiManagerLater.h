@@ -54,7 +54,7 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
         HomedistanceBounce = Value.toInt();       return true;
       } break;
     case 11: {
-        DisableSteppersAfterMixDone = IsTrue(Value); return true;
+        DisableSteppersAfterIdleS = Value.toInt(); return true;
       } break;
     case 12: {
         if (!StringIsDigit(Value))                return false;
@@ -104,13 +104,7 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
     case 8:  return String(ShotDispenserML);                      break;
     case 9:  return String(HomeMAXSpeed);                         break;
     case 10: return String(HomedistanceBounce);                   break;
-    case 11:  {
-        if (Convert) {
-          return IsTrueToString(DisableSteppersAfterMixDone);
-        } else {
-          return String(DisableSteppersAfterMixDone);
-        }
-      } break;
+    case 11: return String(DisableSteppersAfterIdleS);            break;
     case 12: return String(MaxGlassSize);                         break;
     case 13: return "";                                           break;
     case 14: return "";                                           break;

@@ -30,7 +30,6 @@ const byte PDO_Pump[] = {32, 33, 25, 26};
 //const byte I2C_SDA = 21;                                      //I2C can not be moved
 //const byte I2C_SCL = 22;
 
-bool DisableSteppersAfterMixDone = true;
 byte ShotDispenserML = 40;
 byte HomeMAXSpeed = 200;
 unsigned int MotorMAXSpeed = 5500;
@@ -43,7 +42,9 @@ unsigned int Manual_Y = BedSize_Y;
 unsigned int HomedistanceBounce = 200;
 unsigned int HomedistanceBounceZ = HomedistanceBounce * 4;
 unsigned int MaxGlassSize = 300;
+unsigned int DisableSteppersAfterIdleS = 60;
 int SaveEEPROMinSeconds = -1;
+int DisableSteppersinSeconds = -1;
 
 bool Homed = false;
 byte Pump_Amount = sizeof(PDO_Pump) / sizeof(PDO_Pump[0]);      //Why filling this in if we can automate that? :)
@@ -110,6 +111,7 @@ void loop() {
 
 void MakeCocktail(Drink Mix) {
   LcdPrint("Mixing cocktail", Mix.Name);
+  DisableSteppersinSeconds = -1;                               //Make sure the steppers do not auto disable
   if (!Homed) {
     if (!Home(true, true, true)) {
       LcdPrint("Mix not started", "Homing failed");
@@ -130,6 +132,8 @@ void MakeCocktail(Drink Mix) {
   }
   MoveTo(Manual_X, Manual_Y, BedSize_Z);
   LcdPrint("Mixed cocktail", IpAddress2String(WiFi.localIP()));
+  if (DisableSteppersAfterIdleS > 0)
+    DisableSteppersinSeconds = DisableSteppersAfterIdleS;      //Schedule to disable the steppers if needed
 }
 void GetIngredient(Ingredient IN) {
   Serial.println("GetIngredient: ID=" + String(IN.ID) + " Action=" + IN.Action + " ml=" + String(IN.ml) + " from dispenser=" + String(GetDispenserID(IN.ID)));

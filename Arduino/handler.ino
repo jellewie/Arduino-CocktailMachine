@@ -12,7 +12,7 @@
 #define PreFixShotDispenserML "shotdispenserml"
 #define PreFixHomeMAXSpeed "homemaxspeed"
 #define PreFixHomedistanceBounce "homedistancebounce"
-#define PreFixDisableSteppersAfterMixDone "disablesteppersaftermixdone"
+#define PreFixDisableSteppersAfterIdleS "disablesteppersafteridles"
 #define PreFixHome "homed"
 //Dispenser Settings
 #define PreFixSetDispenserID "di"
@@ -136,9 +136,9 @@ void handle_Set() {
       } else {
         SaveEEPROMinSeconds = 30;
       }
-    } else if (ArguName == PreFixDisableSteppersAfterMixDone) {
+    } else if (ArguName == PreFixDisableSteppersAfterIdleS) {
       if (!WiFiManagerUser_Set_Value(11, ArgValue)) {
-        ERRORMSG = "DisableSteppersAfterMixDone Not set";
+        ERRORMSG = "DisableSteppersAfterIdleS Not set";
       } else {
         SaveEEPROMinSeconds = 30;
       }
@@ -338,12 +338,8 @@ void handle_Set() {
     MoveTo(GoTo[0], GoTo[1], GoTo[2]);
 
   //If we need to mix
-  if (Mix.Name != "") {
-    Serial.println("MakeCocktail " + String(Mix.Name));
+  if (Mix.Name != "")
     MakeCocktail(Mix);
-    if (DisableSteppersAfterMixDone)
-      DisableSteppers();
-  }
 }
 void handle_Get() {
   String Json = "{\"dispensers\":[";
@@ -358,7 +354,7 @@ void handle_Get() {
   }
   Json += "],\"settings\":{";
   Json += "\"homed\":" + IsTrueToString(Homed);
-  Json += ",\"disableSteppersAfterMixDone\":" + IsTrueToString(DisableSteppersAfterMixDone);
+  Json += ",\"disablesteppersafteridles\":" + IsTrueToString(DisableSteppersAfterIdleS);
   Json += ",\"bedSizeX\":" + String(BedSize_X);
   Json += ",\"bedSizeY\":" + String(BedSize_Y);
   Json += ",\"bedSizeZ\":" + String(BedSize_Z);
