@@ -78,9 +78,13 @@ void setup() {
   pinMode(PDI_Y_Ref, INPUT_PULLUP);
   pinMode(PDI_Z_Ref, INPUT_PULLUP);
   pinMode(PDI_S, INPUT_PULLUP);
-  Stepper_X.setPinsInverted(false, false, false, false, false); //stepInvert, directionInvert, pin3Invert, pin4Invert, enableInvert
-  Stepper_Y.setPinsInverted(false, false, false, false, false);
-  Stepper_Z.setPinsInverted(false, false, false, false, false);
+  for (byte i = 0; i < Pump_Amount; i++) {
+    pinMode(PDO_Pump[i], OUTPUT);
+    digitalWrite(PDO_Pump[i], LOW);
+  }
+  Stepper_X.setPinsInverted(false, true, false, false, false); //stepInvert, directionInvert, pin3Invert, pin4Invert, enableInvert
+  Stepper_Y.setPinsInverted(false, true, false, false, false);
+  Stepper_Z.setPinsInverted(false, true, false, false, false);
   Stepper_X.setMaxSpeed(MotorMAXSpeed);
   Stepper_Y.setMaxSpeed(MotorMAXSpeed);
   Stepper_Z.setMaxSpeed(MotorMAXSpeed);

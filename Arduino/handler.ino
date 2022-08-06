@@ -413,7 +413,4 @@ void handle_NotFound() {
     Message += server.argName(i) + " = " + server.arg(i);
   }
   server.send(404, "text / plain", Message);
-#ifdef Server_SerialEnabled
-  Serial.println("SV : 404 " + Message);
-#endif //Server_SerialEnabled
 }

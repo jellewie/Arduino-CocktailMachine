@@ -23,7 +23,7 @@ String TypeS[] {"UNSPECIFIED", "SHOTDispenser", "PUMP"};
 byte Ingredient_Amount = sizeof(IngredientS) / sizeof(IngredientS[0]);//Why filling this in if we can automate that? :)
 byte Type_Amount = sizeof(TypeS) / sizeof(TypeS[0]);//Why filling this in if we can automate that? :)
 Dispenser Dispensers[Dispensers_Amount] = {
-  //Type        , X,     Y,   Z  , MSml, MSoff, IngredientID
+  //Type        , X     , Y     , Z    , MSml, MSoff, IngredientID
   {PUMP         , 3000  , 0     , 1    , 500 , 500  , 0},
   {SHOTDispenser, 350   , 0     , 7350 , 100 , 1000 , 1},
   {SHOTDispenser, 4310  , 0     , 7350 , 100 , 1000 , 2},
@@ -204,9 +204,10 @@ void CutVariable(String _Input, String *_Variable, byte _VariableLength) {
   _Variable[_WriteTo] = _Input.substring(_StartAt);
 }
 bool SetDispenser(Dispenser Dis, byte i) {
-  if (i < 0 or i >= Dispensers_Amount)
+  if (i >= Dispensers_Amount)
     return false;
   Dispensers[i] = Dis;
+  return true;
 }
 bool AddDispenser(Dispenser Dis) {
   for (byte i = 0; i < Dispensers_Amount; i++) {

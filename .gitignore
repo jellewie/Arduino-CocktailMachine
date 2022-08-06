@@ -1,8 +1,3 @@
-*.FCStd1
-*.stl
-*.ini
-_Local/*
-
 # Windows thumbnail cache files
 Thumbs.db
 ehthumbs.db
@@ -27,4 +22,11 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 *.log
+
+# Other
+_Local/*
+*.FCStd1
+*.stl
+*.ini
 *.blend1
+*.bin
