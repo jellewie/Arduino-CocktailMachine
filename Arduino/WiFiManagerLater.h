@@ -74,6 +74,7 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
         if (i < Dispensers_Amount) {
           String _Output[7];
           CutVariable(Value, &_Output[0], 7);
+          if (!StringIsDigit(_Output[0]) or !StringIsDigit(_Output[1]) or !StringIsDigit(_Output[2]) or !StringIsDigit(_Output[3]) or !StringIsDigit(_Output[4]) or !StringIsDigit(_Output[5]))       return false;
           Dispenser Dis;
           Dis.Type = _Output[0].toInt();
           Dis.LocationX = _Output[1].toInt();
