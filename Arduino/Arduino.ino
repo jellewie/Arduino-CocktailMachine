@@ -105,7 +105,11 @@ void setup() {
   byte Answer = WiFiManager.Start();                            //Run the wifi startup (and save results)
   WiFiManager.OTA_Enabled = true;                               //(runtime) Turn off/on OTA
   WiFiManager.EnableSetup(true);                                //(runtime) Enable the settings, only enabled in APmode by default
-  LcdPrint("WiFi = " + String(Answer), IpAddress2String(WiFi.localIP()));
+  if (Answer == 1) {
+    LcdPrint("Mixer online!", IpAddress2String(WiFi.localIP()));
+  } else {
+    LcdPrint("WiFi status = " + String(Answer), IpAddress2String(WiFi.localIP()));
+  }
   digitalWrite(LED_BUILTIN, LOW);
 }
 void loop() {
