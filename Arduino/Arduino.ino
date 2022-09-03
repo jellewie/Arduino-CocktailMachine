@@ -149,7 +149,7 @@ void GetIngredient(Ingredient IN) {
     WaitForUser("Waiting on user", String(IN.Action));
   }
   byte DispenserID = GetDispenserID(IN.ID);
-  if (DispenserID != 0) {
+  if (DispenserID != 255) {
     switch (Dispensers[DispenserID].Type) {
       case SHOTDISPENSER: {
           Serial.println("GetIngredient SHOTDispenser IN.ml=" + String(IN.ml) + " ShotDispenserML=" + String(ShotDispenserML));
@@ -191,5 +191,7 @@ void GetIngredient(Ingredient IN) {
         WaitForUser("UNK Dispenser type", String(Dispensers[DispenserID].Type));
         break;
     }
+  } else {
+    WaitForUser("UNK Dispenser ID", String(IN.ID));
   }
 }

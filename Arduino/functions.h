@@ -305,13 +305,13 @@ byte TypeStringToID(String IN) {
 }
 byte GetDispenserID(byte IngredientID) {
   //  Serial.println("GetDispenserID " + String(IngredientID) + "(" + IngredientIDtoString(IngredientID) + ")");
-  if (IngredientID == 0) return 0;
+  if (IngredientID == 0) return 255;
   for (byte i = 0; i <= Ingredient_Amount; i++) {
-    if (Dispensers[i].IngredientID == IngredientID) {           //If the drink is found and avalible
+    if (Dispensers[i].IngredientID == IngredientID) {           //If the drink is found and available
       return i;
     }
   }
-  return 0;
+  return 255;
 }
 void DisableSteppers() {
   Homed = false;
