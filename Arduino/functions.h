@@ -470,7 +470,7 @@ void MoveTo(int LocationX, int LocationY, int LocationZ) {
       return;
     }
   }
-  if ((LocationX != -1 or LocationY != -1 ) and Stepper_Z.currentPosition() != 0 ) {//Always move Z down before moving XY
+  if ((LocationX != -1 or LocationY != -1 ) and Stepper_Z.currentPosition() > 0 ) { //Always move Z down before moving XY
     if (LocationX != Stepper_X.currentPosition() or LocationY != Stepper_Y.currentPosition()) {//Unless we are already at XY
       Stepper_Z.moveTo(0);
       while (Stepper_Z.run()) {
