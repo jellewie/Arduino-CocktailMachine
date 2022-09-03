@@ -191,7 +191,5 @@ void GetIngredient(Ingredient IN) {
         WaitForUser("UNK Dispenser type", String(Dispensers[DispenserID].Type));
         break;
     }
-  } else {
-    WaitForUser("UNK Dispenser ID", String(IN.ID));
   }
 }
