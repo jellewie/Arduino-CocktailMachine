@@ -356,7 +356,7 @@ void handle_Get() {
   }
   Json += "],\"settings\":{";
   Json += "\"homed\":" + IsTrueToString(Homed);
-  Json += ",\"disablesteppersafteridles\":" + IsTrueToString(DisableSteppersAfterIdleS);
+  Json += ",\"disablesteppersafteridles\":" + String(DisableSteppersAfterIdleS);
   Json += ",\"bedSizeX\":" + String(BedSize_X);
   Json += ",\"bedSizeY\":" + String(BedSize_Y);
   Json += ",\"bedSizeZ\":" + String(BedSize_Z);
