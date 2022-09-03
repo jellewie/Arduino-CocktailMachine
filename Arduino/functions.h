@@ -287,8 +287,6 @@ String TypeIDtoString(byte IN) {
   return "UNK";
 }
 byte TypeStringToID(String IN) {
-  Serial.println("TypeStringToID");
-  Serial.println(IN);
   if (StringIsDigit(IN)) {
     if (IN.toInt() < Type_Amount)
       return IN.toInt();
@@ -297,9 +295,8 @@ byte TypeStringToID(String IN) {
   }
   IN.trim();
   IN.toUpperCase();
-  Serial.println(IN);
   for (byte i = 0; i < Type_Amount; i++) {
-    if (IN == TypeS[i]){
+    if (IN == TypeS[i]) {
       Serial.println(i);
       return i;
     }
@@ -354,10 +351,37 @@ String IsTrueToString(bool input) {
     return "true";
   return "false";
 }
+String IpAddress2String(const IPAddress& ipAddress) {
+  return String(ipAddress[0]) + String(".") + String(ipAddress[1]) + String(".") + String(ipAddress[2]) + String(".") + String(ipAddress[3])  ;
+}
+void LcdPrint(String msg = "", String msg2 = "");
+void LcdPrint(String msg, String msg2) {
+  Serial.println("LcdPrint:" + msg + "_" + msg2);
+  if (msg != "") {
+    for (byte i = msg.length(); i < 16; i++) {
+      msg += " ";
+    }
+    lcd.setCursor(1, 0);
+    lcd.print(msg);
+  }
+  if (msg2 != "") {
+    for (byte i = msg2.length(); i < 16; i++) {
+      msg2 += " ";
+    }
+    lcd.setCursor(1, 1);
+    lcd.print(msg2);
+  }
+}
 void MyYield() {
-  WiFiManager.RunServer();                                      //Do WIFI server stuff if needed
+  WiFiManager.CheckAndReconnectIfNeeded(true);
+  WiFiManager.RunServer();                                       //Do WIFI server stuff if needed
   CheckEEPROMSave();
   CheckDisableSteppers();
+  static bool LastButtonState = HIGH;
+  bool ButtonState = digitalRead(PDI_S);
+  if (LastButtonState and !ButtonState)
+    LcdPrint("Mixer ready!", IpAddress2String(WiFi.localIP()));
+  LastButtonState = ButtonState;
   //FastLED.delay(1);
   yield();
 }
@@ -385,24 +409,6 @@ bool MoveWait(AccelStepper Step, byte RefferenceButton, int pos) {
       }
     }
     yield();
-  }
-}
-void LcdPrint(String msg = "", String msg2 = "");
-void LcdPrint(String msg, String msg2) {
-  Serial.println("LcdPrint:" + msg + "_" + msg2);
-  if (msg != "") {
-    for (byte i = msg.length(); i < 16; i++) {
-      msg += " ";
-    }
-    lcd.setCursor(1, 0);
-    lcd.print(msg);
-  }
-  if (msg2 != "") {
-    for (byte i = msg2.length(); i < 16; i++) {
-      msg2 += " ";
-    }
-    lcd.setCursor(1, 1);
-    lcd.print(msg2);
   }
 }
 bool Home(bool X = true, bool Y = true, bool Z = true);
@@ -449,7 +455,7 @@ bool Home(bool X, bool Y, bool Z) {
       Stepper_Y.setMaxSpeed(MotorMAXSpeed);                     //Reset max speed
     }
   }
-  LcdPrint("Homed " + IsTrueToString(Homed) , "X" + String(X) + "," + String(Homed_X) + " Y" + String(Y) + "," + String(Homed_Y) + " Z" + String(Z) + "," + String(Homed_Z));
+  LcdPrint("Homed", "X" + String(X) + "," + String(Homed_X) + " Y" + String(Y) + "," + String(Homed_Y) + " Z" + String(Z) + "," + String(Homed_Z));
   if (X == Homed_X and Y == Homed_Y and Z == Homed_Z) {
     Homed = true;
     return true;
@@ -498,9 +504,6 @@ void MoveTo(int LocationX, int LocationY, int LocationZ) {
   while (Stepper_Z.run()) {//Always move Z after moving XY
     yield();
   }
-}
-String IpAddress2String(const IPAddress& ipAddress) {
-  return String(ipAddress[0]) + String(".") + String(ipAddress[1]) + String(".") + String(ipAddress[2]) + String(".") + String(ipAddress[3])  ;
 }
 #define TimeoutWaitingOnUserMs 5 * 60 * 1000
 void WaitForUser(String msg, String msg2) {

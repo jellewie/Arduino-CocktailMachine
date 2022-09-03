@@ -334,8 +334,10 @@ void handle_Set() {
   }
 
   //If we need to somewhere
-  if (GoTo[0] != -1 or GoTo[1] != -1 or GoTo[2] != -1)
+  if (GoTo[0] != -1 or GoTo[1] != -1 or GoTo[2] != -1) {
+    LcdPrint("Moving to", String(GoTo[0]) + "," + String(GoTo[1]));
     MoveTo(GoTo[0], GoTo[1], GoTo[2]);
+  }
 
   //If we need to mix
   if (Mix.Name != "")

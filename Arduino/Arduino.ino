@@ -139,7 +139,7 @@ void MakeCocktail(Drink Mix) {
     }
   }
   MoveTo(Manual_X, Manual_Y, BedSize_Z);
-  LcdPrint("Mixed cocktail", IpAddress2String(WiFi.localIP()));
+  LcdPrint("Mixed cocktail");
   if (DisableSteppersAfterIdleS > 0)
     DisableSteppersinSeconds = DisableSteppersAfterIdleS;      //Schedule to disable the steppers if needed
 }
