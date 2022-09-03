@@ -151,7 +151,7 @@ void GetIngredient(Ingredient IN) {
   byte DispenserID = GetDispenserID(IN.ID);
   if (DispenserID != 0) {
     switch (Dispensers[DispenserID].Type) {
-      case SHOTDispenser: {
+      case SHOTDISPENSER: {
           Serial.println("GetIngredient SHOTDispenser IN.ml=" + String(IN.ml) + " ShotDispenserML=" + String(ShotDispenserML));
           MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);
           int mlToDo = IN.ml;

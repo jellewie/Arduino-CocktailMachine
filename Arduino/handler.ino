@@ -382,12 +382,12 @@ void handle_Info() {
                    "Switch = " + IsTrueToString(digitalRead(PDI_S)    == LOW) + " " + (digitalRead(PDI_S)     ? "HIGH" : "LOW") + "\n"
 
                    "\nSOFT_SETTINGS\n";
-  for (byte i = 3; i < WiFiManager_Settings + 1; i++)
-    Message += WiFiManager_VariableNames[i - 1] + " = " + WiFiManager.Get_Value(i, false, true) + "\n";
+  for (byte i = 0; i < WiFiManager_Settings - 2; i++)
+    Message += WiFiManager_VariableNames[i + 2] + " = " + WiFiManagerUser_Get_Value(i, false, true) + "\n";
 
   Message += "\nSOFT_SETTINGS raw\n";
-  for (byte i = 3; i < WiFiManager_Settings + 1; i++)
-    Message += WiFiManager_VariableNames[i - 1] + " = " + WiFiManager.Get_Value(i, false, false) + "\n";
+  for (byte i = 0; i < WiFiManager_Settings - 2; i++)
+    Message += WiFiManager_VariableNames[i + 2] + " = " + WiFiManagerUser_Get_Value(i, false, false) + "\n";
 
   server.send(200, "text/plain", Message);
 }
