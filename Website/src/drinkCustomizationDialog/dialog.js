@@ -22,16 +22,6 @@ addIngredientTextOption.selected = true;
 addIngredientTextOption.style.display = "none";
 addIngredientSelect.appendChild(addIngredientTextOption);
 
-const actionsGroup = document.createElement("optgroup");
-actionsGroup.label = "Actions";
-for (const action of actionNames) {
-	const option = document.createElement("option");
-	option.value = action;
-	option.text = action;
-	actionsGroup.appendChild(option);
-}
-addIngredientSelect.appendChild(actionsGroup);
-
 const ingredientsGroup = document.createElement("optgroup");
 ingredientsGroup.label = "Ingredients";
 for (const [id, name] of ingredientNames) {
@@ -41,6 +31,16 @@ for (const [id, name] of ingredientNames) {
 	ingredientsGroup.appendChild(option);
 }
 addIngredientSelect.appendChild(ingredientsGroup);
+
+const actionsGroup = document.createElement("optgroup");
+actionsGroup.label = "Actions";
+for (const action of actionNames) {
+	const option = document.createElement("option");
+	option.value = action;
+	option.text = action;
+	actionsGroup.appendChild(option);
+}
+addIngredientSelect.appendChild(actionsGroup);
 
 addIngredientSelect.addEventListener("change", () => {
 	const castValueAction = /** @type {import("../drinksConfig.js").Actions} */ (addIngredientSelect.value);
