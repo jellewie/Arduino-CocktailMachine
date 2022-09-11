@@ -130,6 +130,7 @@ button {
 	font-size: 14pt;
 	margin: 20px;
 	cursor: pointer;
+	white-space: nowrap;
 }
 .text-button.small {
 	font-size: 10pt;
