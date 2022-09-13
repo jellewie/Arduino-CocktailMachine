@@ -1,6 +1,6 @@
 /**
  * @param {string} message
- * @param {Object} [options]
+ * @param {Object} options
  * @param {HTMLElement} [options.parent]
  * @param {"top" | "bottom"} [options.location]
  */
