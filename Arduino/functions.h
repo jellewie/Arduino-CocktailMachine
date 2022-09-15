@@ -24,19 +24,22 @@ byte Ingredient_Amount = sizeof(IngredientS) / sizeof(IngredientS[0]);//Why fill
 byte Type_Amount = sizeof(TypeS) / sizeof(TypeS[0]);//Why filling this in if we can automate that? :)
 Dispenser Dispensers[Dispensers_Amount] = {
   //Type        , X     , Y     , Z    , MSml, MSoff, IngredientID
-  {PUMP         , 3000  , 0     , 1    , 500 , 500  , 0},
-  {SHOTDispenser, 350   , 0     , 7350 , 100 , 1000 , 1},
-  {SHOTDispenser, 4310  , 0     , 7350 , 100 , 1000 , 2},
-  {SHOTDispenser, 8270  , 0     , 7350 , 100 , 1000 , 3},
-  {SHOTDispenser, 12230 , 0     , 7350 , 100 , 1000 , 4},
-  {SHOTDispenser, 16190 , 0     , 7350 , 100 , 1000 , 5},
-  {SHOTDispenser, 20150 , 0     , 7350 , 100 , 1000 , 6},
-  {SHOTDispenser, 350   , 7250  , 7350 , 100 , 1000 , 7},
-  {SHOTDispenser, 4310  , 7250  , 7350 , 100 , 1000 , 8},
-  {SHOTDispenser, 8270  , 7250  , 7350 , 100 , 1000 , 9},
-  {SHOTDispenser, 12230 , 7250  , 7350 , 100 , 1000 , 10},
-  {SHOTDispenser, 16190 , 7250  , 7350 , 100 , 1000 , 11},
-  {SHOTDispenser, 20150 , 7250  , 7350 , 100 , 1000 , 12}
+  {SHOTDISPENSER, 350   , 0     , 5000 , 100 , 1000 , 1},
+  {SHOTDISPENSER, 4180  , 0     , 5000 , 100 , 1000 , 2},
+  {SHOTDISPENSER, 8160  , 0     , 5000 , 100 , 1000 , 3},
+  {SHOTDISPENSER, 12140 , 0     , 5000 , 100 , 1000 , 4},
+  {SHOTDISPENSER, 16120 , 0     , 5000 , 100 , 1000 , 5},
+  {SHOTDISPENSER, 20150 , 0     , 5000 , 100 , 1000 , 6},
+  {SHOTDISPENSER, 350   , 7250  , 5000 , 100 , 1000 , 7},
+  {SHOTDISPENSER, 4180  , 7250  , 5000 , 100 , 1000 , 8},
+  {SHOTDISPENSER, 8160  , 7250  , 5000 , 100 , 1000 , 9},
+  {SHOTDISPENSER, 12140 , 7250  , 5000 , 100 , 1000 , 10},
+  {SHOTDISPENSER, 16120 , 7250  , 5000 , 100 , 1000 , 11},
+  {SHOTDISPENSER, 20150 , 7250  , 5000 , 100 , 1000 , 12},
+  {PUMP         , 23900 , 0     , 0    , 500 , 500  , 13},
+  {PUMP         , 23900 , 0     , 0    , 500 , 500  , 14},
+  {PUMP         , 23900 , 0     , 0    , 500 , 500  , 15},
+  {PUMP         , 23900 , 0     , 0    , 500 , 500  , 16}
 };
 
 /*
