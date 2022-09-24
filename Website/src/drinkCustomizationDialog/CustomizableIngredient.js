@@ -20,6 +20,11 @@ export class CustomizableIngredient {
 	constructor() {
 		this.el = document.createElement("li");
 
+		/** @type {import("../drinksConfig.js").Actions?} */
+		this.actionId = null;
+		/** @type {import("../drinksConfig.js").Ingredients?} */
+		this.ingredientId = null;
+
 		this.#grabHandleEl = document.createElement("div");
 		this.#grabHandleEl.classList.add("grab-handle");
 		this.el.appendChild(this.#grabHandleEl);

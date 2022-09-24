@@ -70,10 +70,12 @@ const ingredientHeight = 30;
 function addIngredient(action) {
 	const customizableIngredient = new CustomizableIngredient();
 	if ("action" in action) {
+		customizableIngredient.actionId = action.action;
 		customizableIngredient.isAction = true;
 		customizableIngredient.text = action.action;
 	} else {
 		const text = ingredientNames.get(action.ingredient);
+		customizableIngredient.ingredientId = action.ingredient;
 		customizableIngredient.text = text || action.ingredient;
 		customizableIngredient.amount = action.amount;
 	}
@@ -221,12 +223,18 @@ function getCurrentActions() {
 	const actions = [];
 	for (const customizableIngredient of currentCustomizableIngredients) {
 		if (customizableIngredient.isAction) {
+			if (customizableIngredient.actionId == null) {
+				throw new Error("Assertion failed, action doesn't have an id");
+			}
 			actions.push({
-				action: /** @type {import("../drinksConfig.js").Actions} */ (customizableIngredient.text),
+				action: customizableIngredient.actionId,
 			});
 		} else {
+			if (customizableIngredient.ingredientId == null) {
+				throw new Error("Assertion failed, ingredient doesn't have an id");
+			}
 			actions.push({
-				ingredient: /** @type {import("../drinksConfig.js").Ingredients} */ (customizableIngredient.text),
+				ingredient: customizableIngredient.ingredientId,
 				amount: customizableIngredient.amount,
 			});
 		}
