@@ -15,7 +15,7 @@
 #include <LiquidCrystal_I2C.h>                                  //Make sure to install LiquidCrystal_I2C V1.1.2(+) manually https://github.com/johnrickman/LiquidCrystal_I2C/blob/master/LiquidCrystal_I2C.cpp
 
 const byte PDO_Step_enable = 16;
-
+const byte PAO_LED = 13;                                        //To which pin the <LED strip> is connected to
 const byte PDO_X_Dir = 23;
 const byte PDO_Y_Dir = 17;
 const byte PDO_Z_Dir = 18;
@@ -54,7 +54,10 @@ AccelStepper Stepper_X(AccelStepper::DRIVER, PDO_X_Step, PDO_X_Dir);
 AccelStepper Stepper_Y(AccelStepper::DRIVER, PDO_Y_Step, PDO_Y_Dir);
 AccelStepper Stepper_Z(AccelStepper::DRIVER, PDO_Z_Step, PDO_Z_Dir);
 LiquidCrystal_I2C lcd(0x27, 20, 4);                             //Set the LCD address to 0x27 for a 20 chars and 2 line display
-
+#include <FastLED.h>                                            //Include the libary FastLED (If you get a error here, make sure it's installed!)
+const int TotalLEDs = 100;                                       //The total amounts of LEDs in the strip
+CRGB LEDs[TotalLEDs];
+bool UpdateLEDs = false;
 #include "Data.h"
 #include "Functions.h"
 #include "WiFiManagerLater.h"                                   //Define options of WiFiManager (can also be done before), but WiFiManager can also be called here (example for DoRequest included here)
@@ -66,6 +69,19 @@ void setup() {
   LcdPrint("Booting", " ");
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
+  //===========================================================================
+  //Init LED and let them shortly blink
+  //===========================================================================
+  pinMode(PAO_LED, OUTPUT);
+  FastLED.addLeds<WS2812B, PAO_LED, GRB>(LEDs, TotalLEDs);
+  FastLED.setBrightness(1);                                     //Set start brightness to be amost off
+  for (int i = 255; i >= 0; i = i - 255) {                      //Blink on boot
+    fill_solid(&(LEDs[0]), TotalLEDs, CRGB(i, i, i));
+    FastLED.show();                                             //Update
+    FastLED.delay(1);
+  }
+  FastLED.setBrightness(128);                                   //Set brightness
+  //===========================================================================
   pinMode(PDO_Step_enable, OUTPUT);
   DisableSteppers();
   pinMode(PDO_X_Dir, OUTPUT);
@@ -115,9 +131,15 @@ void setup() {
 void loop() {
   MyYield();
   server.handleClient();
+  EVERY_N_MILLISECONDS(40) {
+    LED_Rainbow(0, TotalLEDs, 255 / TotalLEDs); //Show a rainbow to sinal we are done and IDLE
+    UpdateLED(true);
+  }
 }
 
 void MakeCocktail(Drink Mix) {
+  LED_Fill(0, TotalLEDs, CRGB(0, 0, 255));
+  UpdateLED(true);
   LcdPrint("Mixing cocktail", Mix.Name);
   DisableSteppersinSeconds = -1;                               //Make sure the steppers do not auto disable
   if (!Homed) {
@@ -139,17 +161,21 @@ void MakeCocktail(Drink Mix) {
     }
   }
   MoveTo(Manual_X, Manual_Y, BedSize_Z);
-  LcdPrint("Mixed cocktail");
+  LcdPrint("Mixed cocktail", "");
+  FastLED.clear();
+  UpdateLED(true);
   if (DisableSteppersAfterIdleS > 0)
     DisableSteppersinSeconds = DisableSteppersAfterIdleS;      //Schedule to disable the steppers if needed
 }
 void GetIngredient(Ingredient IN) {
   Serial.println("GetIngredient: ID=" + String(IN.ID) + " Action=" + IN.Action + " ml=" + String(IN.ml) + " from dispenser=" + String(GetDispenserID(IN.ID)));
   if (IN.Action != "") {
+    LightSection(Manual_X);
     WaitForUser("Waiting on user", String(IN.Action));
   }
   byte DispenserID = GetDispenserID(IN.ID);
   if (DispenserID != 255) {
+    LightSection(Dispensers[DispenserID].LocationX);
     switch (Dispensers[DispenserID].Type) {
       case SHOTDISPENSER: {
           Serial.println("GetIngredient SHOTDispenser IN.ml=" + String(IN.ml) + " ShotDispenserML=" + String(ShotDispenserML));
@@ -160,14 +186,10 @@ void GetIngredient(Ingredient IN) {
           for (byte i = 1; i <= DoAmount; i++) {
             Stepper_Z.moveTo(Dispensers[DispenserID].LocationZ);
             while (Stepper_Z.run()) yield();
-
             //Do some funny stuff so we can try doing half dispensing
             DoDelay = Dispensers[DispenserID].TimeMSML * (mlToDo > ShotDispenserML ? ShotDispenserML : mlToDo);
             mlToDo -= ShotDispenserML;
-            Serial.println("Wait for dispening " + String(DoDelay) + "ms");
-
             MyDelay(DoDelay);
-
             Stepper_Z.moveTo(0);
             while (Stepper_Z.run()) yield();
             if (DoAmount - i > 0)                               //If another one is required
@@ -179,7 +201,7 @@ void GetIngredient(Ingredient IN) {
           if (Dispensers[DispenserID].LocationZ <= Pump_Amount) {
             MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);
             digitalWrite(PDO_Pump[Dispensers[DispenserID].LocationZ], HIGH);
-            MyDelay(Dispensers[DispenserID].TimeMSML);
+            MyDelay(Dispensers[DispenserID].TimeMSML * IN.ml);
             digitalWrite(PDO_Pump[Dispensers[DispenserID].LocationZ], LOW);
             MyDelay(Dispensers[DispenserID].TimeMSoff);
           } else {
@@ -192,4 +214,13 @@ void GetIngredient(Ingredient IN) {
         break;
     }
   }
+}
+void LightSection(long LocationX) {
+  byte Len = 8;
+  float LEDPos = (LocationX * TotalLEDs ) / (BedSize_X);
+  LEDPos = LEDPos - Len < 0 ? 0 : LEDPos - Len;
+  LEDPos = LEDPos + Len > TotalLEDs ? LEDPos - Len : LEDPos;
+  LED_Fill(0, TotalLEDs, CRGB(0, 0, 0));              //Set base color
+  LED_Fill(LEDPos, Len, CRGB(0, 255, 0));
+  UpdateLED(true);
 }

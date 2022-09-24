@@ -41,13 +41,18 @@ Dispenser Dispensers[Dispensers_Amount] = {
   {PUMP         , 23900 , 0     , 0    , 500 , 500  , 15},
   {PUMP         , 23900 , 0     , 0    , 500 , 500  , 16}
 };
-
-/*
-  //==================================================
-  //Basic universal LED functions. These includes start postion, amount (inc overflow correction and such)
-  //==================================================
-  void LED_Fill(int From, int Amount, CRGB Color, int MaxBound = TotalLEDs);
-  void LED_Fill(int From, int Amount, CRGB Color, int MaxBound) {
+//==================================================
+//Basic universal LED functions. These includes start postion, amount (inc overflow correction and such)
+//==================================================
+void UpdateLED(bool forceUpdate = false);
+void UpdateLED(bool forceUpdate) {
+  if (UpdateLEDs or forceUpdate) {
+    UpdateLEDs = false;
+    FastLED.show();                                             //Update
+  }
+}
+void LED_Fill(int From, int Amount, CRGB Color, int MaxBound = TotalLEDs);
+void LED_Fill(int From, int Amount, CRGB Color, int MaxBound) {
   while (From >= MaxBound) From -= MaxBound;                    //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
   if (Amount > MaxBound) Amount = MaxBound;                     //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
   if (From + Amount > MaxBound) {                               //Overflow protection
@@ -56,9 +61,9 @@ Dispenser Dispensers[Dispensers_Amount] = {
     fill_solid(&(LEDs[0]), Amount - calc1, Color);
   } else
     fill_solid(&(LEDs[From]), Amount, Color);
-  }
-  void LED_Add(int From, int Amount, CRGB Color, int MaxBound = TotalLEDs);
-  void LED_Add(int From, int Amount, CRGB Color, int MaxBound) {
+}
+void LED_Add(int From, int Amount, CRGB Color, int MaxBound = TotalLEDs);
+void LED_Add(int From, int Amount, CRGB Color, int MaxBound) {
   while (From >= MaxBound) From -= MaxBound;                    //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
   if (Amount > MaxBound) Amount = MaxBound;                     //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
   if (From + Amount > MaxBound) {                               //Overflow protection
@@ -70,9 +75,9 @@ Dispenser Dispensers[Dispensers_Amount] = {
   } else
     for (int i = From; i < From + Amount; i++)
       LEDs[i] += Color;
-  }
-  void LED_Move(int From, int Amount, CRGB Color, byte Sets, byte Length, byte *Counter, bool Reverse = false, bool Reset = true, int MaxBound = TotalLEDs);
-  void LED_Move(int From, int Amount, CRGB Color, byte Sets, byte Length, byte *Counter, bool Reverse, bool Reset, int MaxBound) {
+}
+void LED_Move(int From, int Amount, CRGB Color, byte Sets, byte Length, byte *Counter, bool Reverse = false, bool Reset = true, int MaxBound = TotalLEDs);
+void LED_Move(int From, int Amount, CRGB Color, byte Sets, byte Length, byte *Counter, bool Reverse, bool Reset, int MaxBound) {
   //From = The first LED to do the animation on
   //Amount = The amount of LEDS to do the animation on
   //Color = the RGB value to use
@@ -107,21 +112,21 @@ Dispenser Dispensers[Dispensers_Amount] = {
       LED_Fill(From, Length - calc1, Color, MaxBound);          //Fills the LEDs at the beginning of the strip
     }
   }
-   Counter += 1;
+  *Counter += 1;
   if (*Counter >= Amount)
-     Counter = *Counter - Amount;
-  }
-  bool LED_Flash(int From, int Amount, CRGB Color, CRGB Color2 = CRGB(0, 0, 0), int MaxBound = TotalLEDs);
-  bool LED_Flash(int From, int Amount, CRGB Color, CRGB Color2, int MaxBound) {
+    *Counter = *Counter - Amount;
+}
+bool LED_Flash(int From, int Amount, CRGB Color, CRGB Color2 = CRGB(0, 0, 0), int MaxBound = TotalLEDs);
+bool LED_Flash(int From, int Amount, CRGB Color, CRGB Color2, int MaxBound) {
   if (LEDs[From] != Color) {
     LED_Fill(From, Amount, Color, MaxBound);
     return true;
   }
   LED_Fill(From, Amount, Color2, MaxBound);
   return false;
-  }
-  void LED_Rainbow(int From, int Amount, byte DeltaHue, int MaxBound = TotalLEDs);
-  void LED_Rainbow(int From, int Amount, byte DeltaHue, int MaxBound) {
+}
+void LED_Rainbow(int From, int Amount, byte DeltaHue, int MaxBound = TotalLEDs);
+void LED_Rainbow(int From, int Amount, byte DeltaHue, int MaxBound) {
   //byte DeltaHue = Diffrence between each LED in hue
   static byte gHue;
   gHue++;
@@ -133,9 +138,9 @@ Dispenser Dispensers[Dispensers_Amount] = {
     fill_rainbow(&(LEDs[0]), Amount - calc1, gHue, DeltaHue);
   } else
     fill_rainbow(&LEDs[From], Amount, gHue, DeltaHue);
-  }
-  void LED_Wobble(int From, int Amount, CRGB Color, byte Sets, byte Length, int MaxBound = TotalLEDs);
-  void LED_Wobble(int From, int Amount, CRGB Color, byte Sets, byte Length, int MaxBound) {
+}
+void LED_Wobble(int From, int Amount, CRGB Color, byte Sets, byte Length, int MaxBound = TotalLEDs);
+void LED_Wobble(int From, int Amount, CRGB Color, byte Sets, byte Length, int MaxBound) {
   //Sort of a move, but just back and forth between the start en end
   static byte Counter;                                          //this function can only be called once, this 'Counter' is a 1 time counter (could not get the pointer working to attach it to the caller)
   static bool Reverse = false;
@@ -151,9 +156,9 @@ Dispenser Dispensers[Dispensers_Amount] = {
       Counter = Length - 1;
     }
   }
-  }
-  void LED_Blink(int From, int Amount, CRGB rgb, byte AlwaysOn, byte * Counter, bool Reverse = false, bool Reset = true, int MaxBound = TotalLEDs);
-  void LED_Blink(int From, int Amount, CRGB rgb, byte AlwaysOn, byte * Counter, bool Reverse, bool Reset, int MaxBound) {
+}
+void LED_Blink(int From, int Amount, CRGB rgb, byte AlwaysOn, byte * Counter, bool Reverse = false, bool Reset = true, int MaxBound = TotalLEDs);
+void LED_Blink(int From, int Amount, CRGB rgb, byte AlwaysOn, byte * Counter, bool Reverse, bool Reset, int MaxBound) {
   if (Reset)
     LED_Fill(From, Amount, CRGB(0, 0, 0), MaxBound);            //Turn LEDs off
   if (Reverse) {
@@ -163,32 +168,29 @@ Dispenser Dispensers[Dispensers_Amount] = {
     LED_Fill(From, AlwaysOn, rgb, MaxBound);                    //Set some LEDs to be always on
     LED_Fill(From, *Counter, rgb, MaxBound);                    //Set the counter amount of LEDs on (this will increase)
   }
-   Counter += 1;                                                //This will make the blink 1 longer each time
+  *Counter += 1;                                                //This will make the blink 1 longer each time
   if (*Counter > Amount)                                        //If we are at max length
-     Counter = 0;                                               //Reset counter
-  }
-  void LED_BackAndForth(int From, int Amount, CRGB Color, byte *Counter, bool *Direcion, bool Reverse = false, bool Reset = true, int MaxBound = TotalLEDs);
-  void LED_BackAndForth(int From, int Amount, CRGB Color, byte *Counter, bool *Direcion, bool Reverse, bool Reset, int MaxBound) {
+    *Counter = 0;                                               //Reset counter
+}
+void LED_BackAndForth(int From, int Amount, CRGB Color, byte *Counter, bool *Direcion, bool Reverse = false, bool Reset = true, int MaxBound = TotalLEDs);
+void LED_BackAndForth(int From, int Amount, CRGB Color, byte *Counter, bool *Direcion, bool Reverse, bool Reset, int MaxBound) {
   //Fills then emties the range of leds one by one
   if (Reset)
     LED_Fill(From, Amount, CRGB(0, 0, 0), MaxBound);
 
   if (*Direcion)
-     Counter -= 1;                                              //This will make the animation_on 1 shorter each time
+    *Counter -= 1;                                              //This will make the animation_on 1 shorter each time
   else
-     Counter += 1;                                              //This will make the animation_on 1 longer each time
+    *Counter += 1;                                              //This will make the animation_on 1 longer each time
   if (*Counter >= Amount or * Counter == 0)                     //If we are at max length or at the start
-     Direcion = !*Direcion;                                     //Flip direction
+    *Direcion = !*Direcion;                                     //Flip direction
 
   if (Reverse)
     LED_Fill(From + Amount - *Counter, *Counter, Color, MaxBound); //Set the counter amount of LEDs on
   else
     LED_Fill(From, *Counter, Color, MaxBound);                  //Set the counter amount of LEDs on
-  }
-  //==================================================
-
-
-  //*/
+}
+//==================================================
 void CutVariable(String _Input, String *_Variable, byte _VariableLength) {
   //Takes in a string, and cuts them into parts; "test,yes,clock" => {"test","yes","clock"}
   //Returns the output in the same string, for example
@@ -278,6 +280,7 @@ byte IngredientStringToID(String IN) {
   }
   IN.trim();
   IN.toUpperCase();
+  IN.replace(' ', '_');
   for (byte i = 0; i < Ingredient_Amount; i++) {
     if (IN == IngredientS[i])
       return i;
