@@ -43,6 +43,7 @@ unsigned int HomedistanceBounce = 200;
 unsigned int HomedistanceBounceZ = HomedistanceBounce * 4;
 unsigned int MaxGlassSize = 300;
 unsigned int DisableSteppersAfterIdleS = 60;
+byte MaxBrightness = 128;
 int SaveEEPROMinSeconds = -1;
 int DisableSteppersinSeconds = -1;
 
@@ -80,7 +81,7 @@ void setup() {
     FastLED.show();                                             //Update
     FastLED.delay(1);
   }
-  FastLED.setBrightness(128);                                   //Set brightness
+  FastLED.setBrightness(MaxBrightness);                         //Set brightness
   //===========================================================================
   pinMode(PDO_Step_enable, OUTPUT);
   DisableSteppers();
@@ -138,8 +139,6 @@ void loop() {
 }
 
 void MakeCocktail(Drink Mix) {
-  LED_Fill(0, TotalLEDs, CRGB(0, 0, 255));
-  UpdateLED(true);
   LcdPrint("Mixing cocktail", Mix.Name);
   DisableSteppersinSeconds = -1;                               //Make sure the steppers do not auto disable
   if (!Homed) {

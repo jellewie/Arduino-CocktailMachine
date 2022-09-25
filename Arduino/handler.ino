@@ -13,6 +13,7 @@
 #define PreFixHomeMAXSpeed "homemaxspeed"
 #define PreFixHomedistanceBounce "homedistancebounce"
 #define PreFixDisableSteppersAfterIdleS "disablesteppersafteridles"
+#define PreFixMaxBrightness "maxbrightness"
 #define PreFixHome "homed"
 //Dispenser Settings
 #define PreFixSetDispenserID "di"
@@ -142,8 +143,15 @@ void handle_Set() {
       } else {
         SaveEEPROMinSeconds = 30;
       }
+    } else if (ArguName == PreFixMaxBrightness) {
+      if (!WiFiManagerUser_Set_Value(13, ArgValue)) {
+        ERRORMSG = "MaxBrightness Not set";
+      } else {
+        SaveEEPROMinSeconds = 30;
+      }
+      FastLED.setBrightness(MaxBrightness);                     //Set brightness
     } else if (ArguName == PreFixHome) {
-      DoHoming = true;
+      DoHoming = IsTrue(ArgValue);
     } else if (ArguName == PreFix_Mix_Name) {
       Mix.Name = ArgValue;
     } else if (ArguName == PreFix_0_Ingredient) {
@@ -302,6 +310,7 @@ void handle_Set() {
   }
   Serial.println();
 
+  FastLED.setBrightness(MaxBrightness);                         //Set brightness
   //Check if there is a error
   Drink MixEmthy;
   if (makeMix and Mix.Name == "") {
@@ -368,6 +377,7 @@ void handle_Get() {
   Json += ",\"homeMaxSpeed\":" + String(HomeMAXSpeed);
   Json += ",\"homedistanceBounce\":" + String(HomedistanceBounce);
   Json += ",\"maxGlassSize\":" + String(MaxGlassSize);
+  Json += ",\"maxBrightness\":" + String(MaxBrightness);
   Json += "}";
 
   Json += "}";

@@ -420,6 +420,8 @@ bool MoveWait(AccelStepper Step, byte RefferenceButton, int pos) {
 }
 bool Home(bool X = true, bool Y = true, bool Z = true);
 bool Home(bool X, bool Y, bool Z) {
+  LED_Fill(0, TotalLEDs, CRGB(0, 0, 255));
+  UpdateLED(true);
   LcdPrint("Homing", " ");
   digitalWrite(PDO_Step_enable, LOW);                           //Enable all stepper drivers
   bool Homed_X = false, Homed_Y = false, Homed_Z = false;

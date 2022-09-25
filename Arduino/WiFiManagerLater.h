@@ -61,7 +61,10 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
         MaxGlassSize = Value.toInt();             return true;
       } break;
     case 13: {
-        //reserved
+        if (!StringIsDigit(Value))                return false;
+        int Temp = Value.toInt();
+        if (Temp < 0 or Temp > 255)               return false;
+        MaxBrightness = Temp;                     return true;
       } break;
     case 14: {
         //reserved
@@ -114,7 +117,7 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
     case 10: return String(HomedistanceBounce);                   break;
     case 11: return String(DisableSteppersAfterIdleS);            break;
     case 12: return String(MaxGlassSize);                         break;
-    case 13: return "";                                           break;
+    case 13: return String(MaxBrightness);                        break;
     case 14: return "";                                           break;
     case 15: return "";                                           break;
     default: {
