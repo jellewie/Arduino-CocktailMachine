@@ -21,7 +21,7 @@
  * @property {Actions} action
  */
 
-/** @typedef {"VODKA" | "PEACH_TREE" | "ORANGE_JUICE" | "CRANBERRY_JUICE" | "TRIPLE_SEC" | "LIME_JUICE" | "PINEAPPLE_JUICE" | "GIN" | "LEMONADE" | "LEMON_JUICE" | "WHITE_RUM" | "RUM" | "TEQUILA" | "GRENADINE_SYRUP" | "COLA" | "SPRITE"} Ingredients */
+/** @typedef {"VODKA" | "PEACH_TREE" | "ORANGE_JUICE" | "CRANBERRY_JUICE" | "TRIPLE_SEC" | "LIME_JUICE" | "PINEAPPLE_JUICE" | "GIN" | "LEMONADE" | "LEMON_JUICE" | "WHITE_RUM" | "DARK_RUM" | "TEQUILA" | "GRENADINE_SYRUP" | "COLA" | "SPRITE"} Ingredients */
 
 /** @type {Map<Ingredients, string>} */
 export const ingredientNames = new Map([
@@ -36,7 +36,7 @@ export const ingredientNames = new Map([
 	["LEMONADE", "Lemonade"],
 	["LEMON_JUICE", "Lemon juice"],
 	["WHITE_RUM", "White rum"],
-	["RUM", "Rum"],
+	["DARK_RUM", "Dark rum"],
 	["TEQUILA", "Tequila"],
 	["GRENADINE_SYRUP", "Grenadine syrup"],
 	["COLA", "Cola"],
@@ -157,7 +157,7 @@ export const drinksConfig = [
 			{action: "ice"},
 			{ingredient: "VODKA", amount: 30},
 			{ingredient: "GIN", amount: 30},
-			{ingredient: "RUM", amount: 30},
+			{ingredient: "DARK_RUM", amount: 30},
 			{ingredient: "LEMONADE", amount: 60},
 			{ingredient: "CRANBERRY_JUICE", amount: 60},
 			{action: "blend"},
@@ -219,7 +219,7 @@ export const drinksConfig = [
 	}, {
 		name: "Brass Monkey",
 		actions: [
-			{ingredient: "RUM", amount: 15},
+			{ingredient: "DARK_RUM", amount: 15},
 			{ingredient: "VODKA", amount: 15},
 			{action: "stir"},
 			{ingredient: "ORANGE_JUICE", amount: 120},
@@ -231,7 +231,7 @@ export const drinksConfig = [
 			{ingredient: "TEQUILA", amount: 30},
 			{ingredient: "VODKA", amount: 30},
 			{ingredient: "GIN", amount: 30},
-			{ingredient: "RUM", amount: 30},
+			{ingredient: "DARK_RUM", amount: 30},
 			{action: "shake"},
 		],
 	}, {
@@ -323,7 +323,7 @@ export const drinksConfig = [
 		name: "Adam Cocktail",
 		actions: [
 			{action: "ice"},
-			{ingredient: "RUM", amount: 60},
+			{ingredient: "DARK_RUM", amount: 60},
 			{ingredient: "LEMON_JUICE", amount: 30},
 			{ingredient: "GRENADINE_SYRUP", amount: 30},
 			{action: "shake"},
@@ -336,7 +336,7 @@ export const drinksConfig = [
 			{ingredient: "VODKA", amount: 60},
 			{ingredient: "GIN", amount: 30},
 			{ingredient: "TEQUILA", amount: 30},
-			{ingredient: "RUM", amount: 30},
+			{ingredient: "DARK_RUM", amount: 30},
 			{ingredient: "ORANGE_JUICE", amount: 60},
 			{action: "shake"},
 			{action: "strain"},
@@ -345,7 +345,7 @@ export const drinksConfig = [
 		name: "Caribe Cosmopolitan",
 		actions: [
 			{action: "ice"},
-			{ingredient: "RUM", amount: 45},
+			{ingredient: "DARK_RUM", amount: 45},
 			{ingredient: "CRANBERRY_JUICE", amount: 30},
 			{ingredient: "TRIPLE_SEC", amount: 30},
 			{ingredient: "LIME_JUICE", amount: 15},
