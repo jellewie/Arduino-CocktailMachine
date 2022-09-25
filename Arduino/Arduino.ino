@@ -170,7 +170,7 @@ void GetIngredient(Ingredient IN) {
   Serial.println("GetIngredient: ID=" + String(IN.ID) + " Action=" + IN.Action + " ml=" + String(IN.ml) + " from dispenser=" + String(GetDispenserID(IN.ID)));
   if (IN.Action != "") {
     LightSection(Manual_X);
-    WaitForUser("Waiting on user", String(IN.Action));
+    if (WaitForUser("Waiting on user", String(IN.Action))) return;
   }
   byte DispenserID = GetDispenserID(IN.ID);
   if (DispenserID != 255) {
@@ -204,12 +204,12 @@ void GetIngredient(Ingredient IN) {
             digitalWrite(PDO_Pump[Dispensers[DispenserID].LocationZ], LOW);
             MyDelay(Dispensers[DispenserID].TimeMSoff);
           } else {
-            WaitForUser("UNK pump ID", "LocationZ=" + String(Dispensers[DispenserID].LocationZ));
+            if (WaitForUser("UNK pump ID", "LocationZ=" + String(Dispensers[DispenserID].LocationZ))) return;
           }
         }
         break;
       default:
-        WaitForUser("UNK Dispenser type", String(Dispensers[DispenserID].Type));
+        if (WaitForUser("UNK Dispenser type", String(Dispensers[DispenserID].Type))) return;
         break;
     }
   }

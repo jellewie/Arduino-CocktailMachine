@@ -514,18 +514,20 @@ void MoveTo(int LocationX, int LocationY, int LocationZ) {
     yield();
   }
 }
-#define TimeoutWaitingOnUserMs 5 * 60 * 1000
-void WaitForUser(String msg, String msg2) {
+#define TimeoutWaitingOnUserMs 10 * 60 * 1000
+bool WaitForUser(String msg, String msg2) {
   LcdPrint(msg, msg2);
   MoveTo(Manual_X, Manual_Y, BedSize_Z);
-  bool WaitMore = true;
-  while (WaitMore) {
-    if (digitalRead(PDI_S) == LOW)
-      WaitMore = false;
+  while (true) {
+    if (digitalRead(PDI_S) == LOW) {
+      LcdPrint(msg, "User confirmed");
+      return true;
+    }
     static unsigned long LastTime;
-    if (TickEveryXms(&LastTime, TimeoutWaitingOnUserMs))
-      WaitMore = false;
+    if (TickEveryXms(&LastTime, TimeoutWaitingOnUserMs)) {
+      LcdPrint("Wait on user", "timeout");
+      return false;
+    }
     MyYield();
   }
-  LcdPrint(msg, "User confirmed");
 }
