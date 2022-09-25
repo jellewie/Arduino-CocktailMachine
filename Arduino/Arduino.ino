@@ -162,8 +162,6 @@ void MakeCocktail(Drink Mix) {
   LcdPrint("Mixed cocktail", Mix.Name);
   FastLED.clear();
   UpdateLED(true);
-  if (DisableSteppersAfterIdleS > 0)
-    DisableSteppersinSeconds = DisableSteppersAfterIdleS;      //Schedule to disable the steppers if needed
 }
 void GetIngredient(Ingredient IN) {
   Serial.println("GetIngredient: ID=" + String(IN.ID) + " Action=" + IN.Action + " ml=" + String(IN.ml) + " from dispenser=" + String(GetDispenserID(IN.ID)));

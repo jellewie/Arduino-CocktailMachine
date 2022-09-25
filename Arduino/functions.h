@@ -513,6 +513,7 @@ void MoveTo(int LocationX, int LocationY, int LocationZ) {
   while (Stepper_Z.run()) {//Always move Z after moving XY
     yield();
   }
+  DisableSteppersinSeconds = DisableSteppersAfterIdleS;      //Schedule to disable the steppers
 }
 #define TimeoutWaitingOnUserMs 10 * 60 * 1000
 bool WaitForUser(String msg, String msg2) {
