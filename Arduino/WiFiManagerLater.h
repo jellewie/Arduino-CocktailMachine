@@ -52,6 +52,7 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
     case 10: {
         if (!StringIsDigit(Value))                return false;
         HomedistanceBounce = Value.toInt();       return true;
+        HomedistanceBounceZ = HomedistanceBounce * 4;
       } break;
     case 11: {
         DisableSteppersAfterIdleS = Value.toInt(); return true;

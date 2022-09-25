@@ -420,7 +420,7 @@ bool MoveWait(AccelStepper Step, byte RefferenceButton, int pos) {
 }
 bool Home(bool X = true, bool Y = true, bool Z = true);
 bool Home(bool X, bool Y, bool Z) {
-  LED_Fill(0, TotalLEDs, CRGB(0, 0, 255));
+  LED_Fill(0, TotalLEDs, ColorHoming);
   UpdateLED(true);
   LcdPrint("Homing", " ");
   digitalWrite(PDO_Step_enable, LOW);                           //Enable all stepper drivers
@@ -464,11 +464,16 @@ bool Home(bool X, bool Y, bool Z) {
       Stepper_Y.setMaxSpeed(MotorMAXSpeed);                     //Reset max speed
     }
   }
-  LcdPrint("Homed", "X" + String(X) + "," + String(Homed_X) + " Y" + String(Y) + "," + String(Homed_Y) + " Z" + String(Z) + "," + String(Homed_Z));
+  if (!X or !Y or !Z)
+    LcdPrint("Homed", "X" + String(X) + "," + String(Homed_X) + " Y" + String(Y) + "," + String(Homed_Y) + " Z" + String(Z) + "," + String(Homed_Z));
+  else
+    LcdPrint("Homed", "X" + String(Homed_X) + " Y" +  String(Homed_Y) + " Z" + String(Homed_Z));
   if (X == Homed_X and Y == Homed_Y and Z == Homed_Z) {
     Homed = true;
     return true;
   }
+  LED_Fill(0, TotalLEDs, ColorHomeFail);
+  UpdateLED(true);
   return false;
 }
 void MoveTo(int LocationX = -1, int LocationY = -1, int LocationZ = -1);

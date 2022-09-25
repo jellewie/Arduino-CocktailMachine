@@ -13,7 +13,10 @@
 #include <AccelStepper.h>                                       //Make sure to install AccelStepper V1.61.0(+) manually //https://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html#a68942c66e78fb7f7b5f0cdade6eb7f06
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>                                  //Make sure to install LiquidCrystal_I2C V1.1.2(+) manually https://github.com/johnrickman/LiquidCrystal_I2C/blob/master/LiquidCrystal_I2C.cpp
-
+#include <FastLED.h>                                            //Include the libary FastLED (If you get a error here, make sure it's installed!)
+//==============================================================
+//Very custom user settings
+//==============================================================
 const byte PDO_Step_enable = 16;
 const byte PAO_LED = 13;                                        //To which pin the <LED strip> is connected to
 const byte PDO_X_Dir = 23;
@@ -27,9 +30,14 @@ const byte PDI_Y_Ref = 27;
 const byte PDI_Z_Ref = 15;
 const byte PDI_S = 39;
 const byte PDO_Pump[] = {32, 33, 25, 26};
-//const byte I2C_SDA = 21;                                      //I2C can not be moved
-//const byte I2C_SCL = 22;
-
+const int TotalLEDs = 100;                                      //The total amounts of LEDs in the strip
+CRGB ColorHoming     = CRGB(  0,   0, 255);
+CRGB ColorHomeFail   = CRGB(255,   0,   0);
+CRGB ColorMoveBase   = CRGB(  0,   0,   0);
+CRGB ColorMoveActive = CRGB(  0, 255,   0);
+//==============================================================
+//Soft settings (can be changed with the interface)
+//==============================================================
 byte ShotDispenserML = 40;
 byte HomeMAXSpeed = 200;
 unsigned int MotorMAXSpeed = 5500;
@@ -46,19 +54,18 @@ unsigned int DisableSteppersAfterIdleS = 60;
 byte MaxBrightness = 128;
 int SaveEEPROMinSeconds = -1;
 int DisableSteppersinSeconds = -1;
-
 bool Homed = false;
+//==============================================================
+//End of settings
+//==============================================================
+bool UpdateLEDs = false;
 byte Pump_Amount = sizeof(PDO_Pump) / sizeof(PDO_Pump[0]);      //Why filling this in if we can automate that? :)
-const int ErrorLEDHoming = 250;
 const byte Dispensers_Amount = 20;                              //Only 20 are saved in the WiFiManager!!
 AccelStepper Stepper_X(AccelStepper::DRIVER, PDO_X_Step, PDO_X_Dir);
 AccelStepper Stepper_Y(AccelStepper::DRIVER, PDO_Y_Step, PDO_Y_Dir);
 AccelStepper Stepper_Z(AccelStepper::DRIVER, PDO_Z_Step, PDO_Z_Dir);
 LiquidCrystal_I2C lcd(0x27, 20, 4);                             //Set the LCD address to 0x27 for a 20 chars and 2 line display
-#include <FastLED.h>                                            //Include the libary FastLED (If you get a error here, make sure it's installed!)
-const int TotalLEDs = 100;                                       //The total amounts of LEDs in the strip
 CRGB LEDs[TotalLEDs];
-bool UpdateLEDs = false;
 #include "Data.h"
 #include "Functions.h"
 #include "WiFiManagerLater.h"                                   //Define options of WiFiManager (can also be done before), but WiFiManager can also be called here (example for DoRequest included here)
@@ -211,11 +218,11 @@ void GetIngredient(Ingredient IN) {
   }
 }
 void LightSection(long LocationX) {
-  byte Len = 8;
+  byte Len = 15;
   float LEDPos = (LocationX * TotalLEDs ) / (BedSize_X);
   LEDPos = LEDPos - Len < 0 ? 0 : LEDPos - Len;
   LEDPos = LEDPos + Len > TotalLEDs ? LEDPos - Len : LEDPos;
-  LED_Fill(0, TotalLEDs, CRGB(0, 0, 0));              //Set base color
-  LED_Fill(LEDPos, Len, CRGB(0, 255, 0));
+  LED_Fill(0, TotalLEDs, ColorMoveBase);              //Set base color
+  LED_Fill(LEDPos, Len, ColorMoveActive);
   UpdateLED(true);
 }
