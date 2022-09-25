@@ -188,8 +188,7 @@ void GetIngredient(Ingredient IN) {
             MyDelay(DoDelay);
             Stepper_Z.moveTo(0);
             while (Stepper_Z.run()) yield();
-            if (DoAmount - i > 0)                               //If another one is required
-              MyDelay(Dispensers[DispenserID].TimeMSoff);
+            MyDelay(Dispensers[DispenserID].TimeMSoff);
           }
         } break;
       case PUMP: {
