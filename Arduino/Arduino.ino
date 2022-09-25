@@ -152,15 +152,14 @@ void MakeCocktail(Drink Mix) {
     if (Mix.Ingredients[i].ID != 0 or Mix.Ingredients[i].Action != 0) {
       String msg = "";
       if (Mix.Ingredients[i].ID != 0)
-        msg = "Get " + IngredientIDtoString(Mix.Ingredients[i].ID);
+        LcdPrint("Getting", IngredientIDtoString(Mix.Ingredients[i].ID));
       else
-        msg = Mix.Ingredients[i].Action;
-      LcdPrint("Mixing cocktail", msg);
+        LcdPrint("Please add", Mix.Ingredients[i].Action);
       GetIngredient(Mix.Ingredients[i]);
     }
   }
   MoveTo(Manual_X, Manual_Y, BedSize_Z);
-  LcdPrint("Mixed cocktail", "");
+  LcdPrint("Mixed cocktail", Mix.Name);
   FastLED.clear();
   UpdateLED(true);
   if (DisableSteppersAfterIdleS > 0)
