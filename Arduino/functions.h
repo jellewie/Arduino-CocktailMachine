@@ -384,12 +384,15 @@ void MyYield() {
   WiFiManager.RunServer();                                       //Do WIFI server stuff if needed
   CheckEEPROMSave();
   CheckDisableSteppers();
-  static bool LastButtonState = HIGH;
-  bool ButtonState = digitalRead(PDI_S);
-  if (LastButtonState and !ButtonState)
-    LcdPrint("Mixer ready!", IpAddress2String(WiFi.localIP()));
-  LastButtonState = ButtonState;
-  //FastLED.delay(1);
+
+  if (!Running) {
+    static bool LastButtonState = HIGH;
+    bool ButtonState = digitalRead(PDI_S);
+    if (LastButtonState and !ButtonState)
+      LcdPrint("Mixer ready!", IpAddress2String(WiFi.localIP()));
+    LastButtonState = ButtonState;
+  }
+  FastLED.delay(1);
   yield();
 }
 void MyDelay(int DelayMS) {                                     //Just a non-blocking delay

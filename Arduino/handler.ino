@@ -313,9 +313,14 @@ void handle_Set() {
   FastLED.setBrightness(MaxBrightness);                         //Set brightness
   //Check if there is a error
   Drink MixEmthy;
-  if (makeMix and Mix.Name == "") {
-    ERRORMSG += "No mix name given/n";
-  } else if (!makeMix and Mix.Name != "") {
+
+  if (makeMix) {
+    if (Mix.Name == "") {
+      ERRORMSG += "No mix name given/n";
+    } else if (Running) {
+      ERRORMSG += "Mixer already running a job/n";
+    }
+  } else if (Mix.Name != "") {
     ERRORMSG += "No mix ingredients given/n";
   }
 
@@ -392,6 +397,7 @@ void handle_Info() {
                    "Y_Ref = " + IsTrueToString(digitalRead(PDI_Y_Ref) == LOW) + " " + (digitalRead(PDI_Y_Ref) ? "HIGH" : "LOW") + "\n"
                    "Z_Ref = " + IsTrueToString(digitalRead(PDI_Z_Ref) == LOW) + " " + (digitalRead(PDI_Z_Ref) ? "HIGH" : "LOW") + "\n"
                    "Switch = " + IsTrueToString(digitalRead(PDI_S)    == LOW) + " " + (digitalRead(PDI_S)     ? "HIGH" : "LOW") + "\n"
+                   "Running = " + IsTrueToString(digitalRead(PDI_S)    == LOW) + "\n"
 
                    "\nSOFT_SETTINGS\n";
   for (byte i = 0; i < WiFiManager_Settings - 2; i++)

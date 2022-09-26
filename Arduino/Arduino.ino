@@ -40,6 +40,7 @@ CRGB ColorMoveActive = CRGB(  0, 255,   0);
 //==============================================================
 byte ShotDispenserML = 40;
 byte HomeMAXSpeed = 200;
+bool Running = false;
 unsigned int MotorMAXSpeed = 5500;
 unsigned int MotorMAXAccel = 3000;
 unsigned int BedSize_X = 23950;
@@ -146,6 +147,8 @@ void loop() {
 }
 
 void MakeCocktail(Drink Mix) {
+  if (Running) return;
+  Running = true;
   LcdPrint("Mixing cocktail", Mix.Name);
   DisableSteppersinSeconds = -1;                               //Make sure the steppers do not auto disable
   if (!Homed) {
@@ -169,6 +172,7 @@ void MakeCocktail(Drink Mix) {
   LcdPrint("Mixed cocktail", Mix.Name);
   FastLED.clear();
   UpdateLED(true);
+  Running = false;
 }
 void GetIngredient(Ingredient IN) {
   Serial.println("GetIngredient: ID=" + String(IN.ID) + " Action=" + IN.Action + " ml=" + String(IN.ml) + " from dispenser=" + String(GetDispenserID(IN.ID)));
