@@ -141,7 +141,7 @@ void loop() {
   MyYield();
   server.handleClient();
   EVERY_N_MILLISECONDS(40) {
-    LED_Rainbow(0, TotalLEDs, 255 / TotalLEDs); //Show a rainbow to sinal we are done and IDLE
+    LED_Rainbow(0, TotalLEDs, 255 / TotalLEDs);                 //Show a rainbow to sinal we are done and IDLE
     UpdateLED(true);
   }
 }
@@ -150,7 +150,7 @@ void MakeCocktail(Drink Mix) {
   if (Running) return;
   Running = true;
   LcdPrint("Mixing cocktail", Mix.Name);
-  DisableSteppersinSeconds = -1;                               //Make sure the steppers do not auto disable
+  DisableSteppersinSeconds = -1;                                //Make sure the steppers do not auto disable
   if (!Homed) {
     if (!Home(true, true, true)) {
       LcdPrint("Mix not started", "Homing failed");
@@ -222,11 +222,11 @@ void GetIngredient(Ingredient IN) {
   }
 }
 void LightSection(long LocationX) {
-  byte Len = 15;
+  byte Len = 13;
   float LEDPos = (LocationX * TotalLEDs ) / (BedSize_X);
   LEDPos = LEDPos - Len < 0 ? 0 : LEDPos - Len;
   LEDPos = LEDPos + Len > TotalLEDs ? LEDPos - Len : LEDPos;
-  LED_Fill(0, TotalLEDs, ColorMoveBase);              //Set base color
+  LED_Fill(0, TotalLEDs, ColorMoveBase);                        //Set base color
   LED_Fill(LEDPos, Len, ColorMoveActive);
   UpdateLED(true);
 }
