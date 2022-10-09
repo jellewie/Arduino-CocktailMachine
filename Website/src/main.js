@@ -1,6 +1,6 @@
 import "../lib/construct-style-sheets-polyfill.js";
-import { getSelectedDrink, initDrinkSelector, markRecentDrink, setDrinkFilter } from "./drinkSelector.js";
-import { customizeButtonEl, mainMixButtonEl, openDispensersDialogButton, searchEl, settingsButton } from "./globalElements.js";
+import { getSelectedDrink, initDrinkSelector, markRecentDrink, scrollToRandomAvailableDrink, setDrinkFilter } from "./drinkSelector.js";
+import { customizeButtonEl, mainMixButtonEl, openDispensersDialogButton, searchEl, randomDrinkButton, settingsButton } from "./globalElements.js";
 import { sendMixRequest } from "./sendMixRequest.js";
 import { showModal as showDrinkCustomizationModal } from "./drinkCustomizationDialog/dialog.js";
 import { showModal as showSettingsModal } from "./settingsDialog/dialog.js";
@@ -50,4 +50,8 @@ initDrinkSelector();
 
 searchEl.addEventListener("input", () => {
 	setDrinkFilter(searchEl.value);
+});
+
+randomDrinkButton.addEventListener("click", () => {
+	scrollToRandomAvailableDrink();
 });

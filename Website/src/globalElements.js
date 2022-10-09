@@ -12,6 +12,7 @@ const mainMixButtonEl = /** @type {HTMLButtonElement} */ (mainMixButton);
 
 const settingsButton = /** @type {HTMLButtonElement} */ (document.getElementById("settingsButton"));
 const settingsDialog = /** @type {HTMLDialogElement} */ (document.getElementById("settingsDialog"));
+const randomDrinkButton = /** @type {HTMLButtonElement} */ (document.getElementById("randomDrinkButton"));
 const openDispensersDialogButton = /** @type {HTMLButtonElement} */ (document.getElementById("openDispensersDialogButton"));
 const dispensersDialog = /** @type {HTMLDialogElement} */ (document.getElementById("dispensersDialog"));
 
@@ -22,6 +23,7 @@ export {
 	mainMixButtonEl,
 	settingsButton,
 	settingsDialog,
+	randomDrinkButton,
 	openDispensersDialogButton,
 	dispensersDialog,
 }

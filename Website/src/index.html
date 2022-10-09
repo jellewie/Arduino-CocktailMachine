@@ -5,7 +5,10 @@
 		<script type="module" src="./main.js"></script>
 	</head>
 	<body>
-		<input id="search" type="search" placeholder="Search">
+		<div id="searchHeader">
+			<input id="search" type="search" placeholder="Search">
+			<button id="randomDrinkButton" class="icon-button"></button>
+		</div>
 		<main>
 			<div id="drinkSelector"></div>
 			<button id="customizeButton" class="text-button">Customize</button>
@@ -48,7 +51,7 @@
 				</div>
 			</form>
 		</dialog>
-		<button id="settingsButton"></button>
+		<button id="settingsButton" class="icon-button"></button>
 		<svg height="0" style="position: absolute;" xmlns="http://www.w3.org/2000/svg">
 			<filter id="svgNeon" x="-100%" y="-100%" width="300%" height="300%">
 				<feColorMatrix type="saturate" in="SourceGraphic" values="25" result="blur1"/>

@@ -108,3 +108,13 @@ export function randSeed(seed) {
 	const x = Math.sin(seed++) * 10000;
 	return x - Math.floor(x);
 }
+
+/**
+ * returns random item from array
+ * @template T
+ * @param {T[]} array
+ * @returns {T | undefined}
+ */
+export function randFromArray(array) {
+	return array[Math.floor(Math.random() * array.length)];
+}

@@ -2,6 +2,7 @@ import { DrinkDisplay } from "./DrinkDisplay.js";
 import { getAvailableIngredients, getConfig } from "./configLoader.js";
 import { drinksConfig, ingredientNames } from "./drinksConfig.js";
 import { drinkSelectorEl } from "./globalElements.js";
+import { randFromArray } from "./util.js";
 
 /**
  * @typedef DrinkData
@@ -131,9 +132,13 @@ function sortDrinkElements() {
 	}
 }
 
-export function getSelectedDrink() {
+function getSelectorCenter() {
 	const selectorBounds = drinkSelectorEl.getBoundingClientRect();
-	const selectorCenter = selectorBounds.left + selectorBounds.width / 2;
+	return selectorBounds.left + selectorBounds.width / 2;
+}
+
+export function getSelectedDrink() {
+	const selectorCenter = getSelectorCenter();
 
 	let centerDrink = null;
 	let closestCenterDist = Infinity;
@@ -180,4 +185,15 @@ export function markRecentDrink(drinkName) {
 	recentDrinks.push(drinkName);
 	localStorage.recentDrinks = JSON.stringify(recentDrinks);
 	sortDrinkElements();
+}
+
+export function scrollToRandomAvailableDrink() {
+	const availableDrinks = Array.from(createdDrinks.values()).filter(drink => drink.allIngredientsAvailable && !drink.isCustomDrink);
+	const drink = randFromArray(availableDrinks);
+	if (drink) {
+		drink.drinkDisplay.el.scrollIntoView({
+			inline: "center",
+			behavior: "smooth",
+		});
+	}
 }
