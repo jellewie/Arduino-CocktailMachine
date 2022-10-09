@@ -9,16 +9,17 @@
 import {serveDir} from "https://deno.land/std@0.145.0/http/file_server.ts";
 import {Server} from "https://deno.land/std@0.145.0/http/server.ts";
 import {resolve, fromFileUrl, dirname} from "https://deno.land/std@0.145.0/path/mod.ts";
-import {generateTypes} from "https://deno.land/x/deno_tsc_helper@v0.0.3/mod.js";
+import {generateTypes} from "https://deno.land/x/deno_tsc_helper@v0.1.2/mod.js";
 import {setCwd} from "https://deno.land/x/chdir_anywhere@v0.0.2/mod.js";
 setCwd();
 
-await generateTypes({
+generateTypes({
 	outputDir: "../.denoTypes",
 	excludeUrls: [
 		"https://esm.sh/rollup@2.75.7?pin=v87",
 		"https://esm.sh/clean-css@5.3.0?pin=v87",
 	],
+	logLevel: "WARNING",
 });
 
 const libs = {
