@@ -1,7 +1,7 @@
+# **This project is still in development!**
+
 # Cockail Mixer Machine
 A machine that can mix drinks
-
-**This project is still in BETA/development!**
 
 <img src="Images/CAD overview.png" alt="CAD drawing of the machine">
 
@@ -19,7 +19,7 @@ The firmware needs to be flashed once to enable OTA BIN file upload. Either with
 - [Arduino-Button](https://github.com/jellewie/Arduino-Button) (already included).
 - [Arduino-Stable-analog-read](https://github.com/jellewie/Arduino-Stable-analog-read) (already included).
 
-To custom compile with new drinks and such, update the drinks in [Website/src/drinksConfig.js](#Website/src/drinksConfig.js). I use an automated Google Drive sheet for this.
+To custom compile with new drinks and such, update the drinks in [Website/src/drinksConfig.js](Website/src/drinksConfig.js). I use an automated Google Drive sheet for this.
 
 To update the Arduino to use this, run "deno task build" in the command prompt. This will update the client.h, after which you can start Arduino IDE and use it.
 
@@ -27,7 +27,7 @@ To update the Arduino to use this, run "deno task build" in the command prompt. 
 Uploading a BIN file with a cable to the ESP can be done by any [ESP32 BIN file uploader](https://www.espressif.com/en/support/download/other-tools). this step is required for the first flash time.
 
 ## LED status
-In the back of the [desk](#desk-model) model is a LED (below the button). This is also the LED on the PCB of the ESP (LED_BUILDIN) this LED reflects these errors:
+The LED on the ESP (LED_BUILDIN) reflects these errors:
 - **ON** WIFI starts, goes OFF when WIFI setup is successfully completed.
 - **blink 100ms** WIFI setup failed, APmode has started.
 - **blink 500ms** it is connecting to the given WIFI.
