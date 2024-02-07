@@ -32,6 +32,16 @@ The LED on the ESP (LED_BUILDIN) reflects these errors:
 - **blink 100ms** WIFI setup failed, APmode has started.
 - **blink 500ms** it is connecting to the given WIFI.
 
+The LED strip shows different statuses depending on the operational status.
+The LED strip will show the following effects when said action is being performed:
+- Blink on boot
+- Show lighting effect when Homing (ColorHoming)
+- Show lighting effect when Homing Failed (ColorHomeFail)
+- Shows rainbow effect when finished/idle
+- Shows lighting effect on set dispenser when in use (ColorMoveBase + ColorMoveActive)
+- LEDs will be at 25% brightness after being idle for DisableSteppersAfterIdleS
+
+
 ## WIFI page
 The 2 most important pages are the [Setup](#setup) page, where the user can setup the mixer. And the [main landing page](#control) where the fancy UI is.
 Setup is only really needed once during setup of WiFi in Apmode, because in runtime the mixer settings can be adjusted in the main UI.
