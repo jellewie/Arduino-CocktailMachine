@@ -1,6 +1,6 @@
 |Description|Amount|Comments|Link buy|Link info|Piece price|Shipping|Total|
 |---|---|---|---|---|---|---|---|
-|Peristaltic Pump|2|Only needed for carbonated liquids|[link](https://www.banggood.com/500mL-or-min-Large-Flow-Easy-To-Install-Peristaltic-Pump-12V-or-24V-Metering-Vacuum-Pump-Flat-Type-Aquarium-p-1749029.html)|[link](https://youtu.be/AMiXme4bMUk)|22.43|1.62|46.48|
+|Peristaltic Pump|4|Only needed for carbonated liquids|[link](https://www.banggood.com/500mL-or-min-Large-Flow-Easy-To-Install-Peristaltic-Pump-12V-or-24V-Metering-Vacuum-Pump-Flat-Type-Aquarium-p-1749029.html)|[link](https://youtu.be/AMiXme4bMUk)|22.43|1.62|46.48|
 |Pullys|2||[link](https://www.123-3d.nl/123-3D-GT2-Pulley-hoge-resolutie-met-lager-6-mm-riem-20-tanden-5-mm-as-zwart-i2546-t0.html)||7.5|0.71|15.71|
 |Motor pullys|2||[link](https://www.123-3d.nl/123-3D-GT2-Pulley-hoge-resolutie-6-mm-riem-20-tanden-5-mm-as-zwart-400211009-i2547-t0.html)||7.5|0.71|15.71|
 |Reininforced belt 6mm wide|1|2.7m needed|[link](https://www.123-3d.nl/123-3D-GT2-timing-belt-6-mm-5-meter-i6541-t3046.html)||21|0.71|21.71|
@@ -10,7 +10,7 @@
 |Flexibele motor koppeling 5 mm - 8 mm|1||[link](https://www.123-3d.nl/123-3D-Flexibele-motor-koppeling-5-mm-8-mm-i342-t0.html)||4.5|0.71|5.21|
 |Frame end caps 2020 (3d print)|10|Print in black||[link](https://www.thingiverse.com/thing:2393904)|0.02|0|0.2|
 |Drink dispensers (6 way)|2|Spraypaint black|[link](https://www.bol.com/nl/nl/p/white-rhinoceros-drank-dispenser-bar-butler-shots-muurdispenser-voor-6-flessen/9300000007705748/?Referrer=ENTcli_order_confirmation2008093611)||38.95|0|77.9|
-|V frame (black 1500mm)|2|Cut in sizes: 2x750 + 2x353.5 + 2x396.5mm|[link](https://www.ratrig.com/aluminium-profiles/vslot/v-slot-2020-637.html)||12.54|28.52|53.6|
+|V frame 20x20 (black 1500mm)|2|Cut in sizes: 2x750 + 2x353.5 + 2x396.5mm|[link](https://www.ratrig.com/aluminium-profiles/vslot/v-slot-2020-637.html)||12.54|28.52|53.6|
 |Frame corner profiles|20||[link](https://nl.aliexpress.com/item/1005003618509458.html)||0.5|2.43|12.45|
 |Wood|1|2x30x80cm|[link](Gamma)||30.48|0|30.48|
 |16x2 LCD Display I2C|1||[link](https://elektronicavoorjou.nl/product/16x2-lcd-wit-op-blauw-5v-met-i2c/)||9.95|2.99|12.94|
