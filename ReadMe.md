@@ -11,9 +11,9 @@ The firmware needs to be flashed once to enable OTA BIN file upload. Either with
 ### Compile
 - [Arduino sketch](Arduino) The whole sketch is the 'Arduino' folder.
 - [ESP32](https://dl.espressif.com/dl/package_esp32_index.json) must be added as an additional board manager in Arduino IDE.
-- [FastLED](https://github.com/FastLED/FastLED) can be downloaded though the built-in library manager in Arduino IDE.
-- [AccelStepper](https://github.com/waspinator/AccelStepper) can be downloaded though the built-in library manager in Arduino IDE.
-- [LiquidCrystal_I2C](https://github.com/johnrickman/LiquidCrystal_I2C) can be downloaded though the built-in library manager in Arduino IDE.
+- [FastLED](https://github.com/FastLED/FastLED) can be downloaded through the built-in library manager in Arduino IDE.
+- [AccelStepper](https://github.com/waspinator/AccelStepper) can be downloaded through the built-in library manager in Arduino IDE.
+- [LiquidCrystal_I2C](https://github.com/johnrickman/LiquidCrystal_I2C) can be downloaded through the built-in library manager in Arduino IDE.
 - [Deno](https://deno.land/) to re-compile the webpage.
 - [Arduino-WIFIManager](https://github.com/jellewie/Arduino-WiFiManager) (already included).
 - [Arduino-Button](https://github.com/jellewie/Arduino-Button) (already included).
@@ -30,7 +30,7 @@ Uploading a BIN file with a cable to the ESP can be done by any [ESP32 BIN file 
 The LED on the ESP (LED_BUILDIN) reflects these errors:
 - **ON** WIFI starts, goes OFF when WIFI setup is successfully completed.
 - **blink 100ms** WIFI setup failed, APmode has started.
-- **blink 500ms** it is connecting to the given WIFI.
+- **blink 500ms** It is connecting to the given WIFI.
 
 The LED strip shows different statuses depending on the operational status.
 The LED strip will show the following effects when said action is being performed:
@@ -43,14 +43,14 @@ The LED strip will show the following effects when said action is being performe
 
 
 ## WIFI page
-The 2 most important pages are the [Setup](#setup) page, where the user can setup the mixer. And the [main landing page](#control) where the fancy UI is.
-Setup is only really needed once during setup of WiFi in Apmode, because in runtime the mixer settings can be adjusted in the main UI.
+The 2 most important pages are the [Setup](#setup) page, where the user can set up the mixer. And the [main landing page](#control) where the fancy UI is.
+Setup is only really needed once during the setup of WiFi in Apmode, because in runtime the mixer settings can be adjusted in the main UI.
 
 ### Setup
-The setup page will be accessible and shown in APmode, but can also be access by going to [mixer.local/ip](http://mixer.local/ip). 
+The setup page will be accessible and shown in APmode, but can also be accessed by going to [mixer.local/ip](http://mixer.local/ip). 
 The password is replaced with starts, and cannot be received without changing the firmware. 
 Leave fields blank (or for the password leaving only stars) to not update those values upon sending this forum, set on space ' ' to clear them.
-By default the SSID and password is limited to 16 characters by the firmware, and the total bytes that can be stored in memory is limited to 4096. Going over these values results in unexpected behaviour. 
+By default the SSID and password are limited to 16 characters by the firmware, and the total bytes that can be stored in memory is limited to 4096. Going over these values results in unexpected behavior. 
 
 ### Getting it’s IP
 User devices that support mDNS, like Windows and Apple, can use [mixer.local/info](http://mixer.local/info) to obtain its IP.
@@ -60,7 +60,7 @@ Alternatively in a lot of stages (like after boot) the IP will be shown on the d
 ### Control
 The control page is the default landing page the user will land on. Here you select, customize, and mix the selected drink. 
 
-- **customize** Will give a pop-up windows to customize and mix your own drink.
+- **customize** Will give a pop-up window to customize and mix your drink.
 - **MIX** Will start mixing it right away.
 - **Settings button** The gear on the right lower corner will open the settings page.
 
@@ -89,9 +89,9 @@ Note that the character " and TAB (EEPROM_Seperator) cannot be used, these will 
 - **D#** 20 Dispensers with their setup data, saved in the format 'Type,LocationX,LocationY,LocationZ,TimeMSML,TimeMSoff,IngredientID'
 
 ### OTA (Over The Air update)
-This page can be accesed on [mixer.local/ota](http://mixer.local/ota) (or 'IP/ota') and enables you to update firmware over WiFi.
+This page can be accessed on [mixer.local/ota](http://mixer.local/ota) (or 'IP/ota') and enables you to update firmware over WiFi.
 On this page is a 'choose file' button where the new version can be selected. Make sure the right, compatible, most updated file is selected ("Mixer.bin"). This can be downloaded from [releases](https://github.com/jellewie/Arduino-CocktailMachine/releases). 
-After which the 'Upload' button needs to be press for the update process to begin, the unit will automatically update and reboot afterwards.
+After which the 'Upload' button needs to be pressed for the update process to begin, the unit will automatically update and reboot afterward.
 Note that [SoftSettings](#soft-settings) are preserved.
 
 ### Full reset
