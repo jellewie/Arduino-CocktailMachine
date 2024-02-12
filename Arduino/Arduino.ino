@@ -136,7 +136,7 @@ void setup() {
 }
 void loop() {
   MyYield();
-  server.handleClient();
+  WiFiManager.handleClient();
   if (Homed) {
     EVERY_N_MILLISECONDS(40) {
       LED_Rainbow(0, TotalLEDs, 255 / TotalLEDs);                 //Show a rainbow to sinal we are done and IDLE
