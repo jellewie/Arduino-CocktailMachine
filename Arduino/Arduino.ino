@@ -31,6 +31,7 @@ const byte PDI_Z_Ref = 15;
 const byte PDI_S = 39;
 const byte PDO_Pump[] = {32, 33, 25, 26};
 const int TotalLEDs = 100;                                      //The total amounts of LEDs in the strip
+CRGB ColorBoot       = CRGB(255, 128,   0);
 CRGB ColorHoming     = CRGB(  0,   0, 255);
 CRGB ColorHomeFail   = CRGB(255,   0,   0);
 CRGB ColorMoveBase   = CRGB(  0,   0,   0);
@@ -79,17 +80,13 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
   //===========================================================================
-  //Init LED and let them shortly blink
+  //Init LED and set the boot color
   //===========================================================================
   pinMode(PAO_LED, OUTPUT);
   FastLED.addLeds<WS2812B, PAO_LED, GRB>(LEDs, TotalLEDs);
-  FastLED.setBrightness(1);                                     //Set start brightness to be amost off
-  for (int i = 255; i >= 0; i = i - 255) {                      //Blink on boot
-    fill_solid(&(LEDs[0]), TotalLEDs, CRGB(i, i, i));
-    FastLED.show();                                             //Update
-    FastLED.delay(1);
-  }
   FastLED.setBrightness(MaxBrightness);                         //Set brightness
+  LED_Fill(0, TotalLEDs, ColorBoot);
+  FastLED.show();                                               //Update
   //===========================================================================
   pinMode(PDO_Step_enable, OUTPUT);
   DisableSteppers();
@@ -140,9 +137,11 @@ void setup() {
 void loop() {
   MyYield();
   server.handleClient();
-  EVERY_N_MILLISECONDS(40) {
-    LED_Rainbow(0, TotalLEDs, 255 / TotalLEDs);                 //Show a rainbow to sinal we are done and IDLE
-    UpdateLED(true);
+  if (Homed) {
+    EVERY_N_MILLISECONDS(40) {
+      LED_Rainbow(0, TotalLEDs, 255 / TotalLEDs);                 //Show a rainbow to sinal we are done and IDLE
+      UpdateLED(true);
+    }
   }
 }
 

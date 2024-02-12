@@ -34,7 +34,7 @@ The LED on the ESP (LED_BUILDIN) reflects these errors:
 
 The LED strip shows different statuses depending on the operational status.
 The LED strip will show the following effects when said action is being performed:
-- Blink on boot
+- Show lighting effect when just booted (ColorBoot)
 - Show lighting effect when Homing (ColorHoming)
 - Show lighting effect when Homing Failed (ColorHomeFail)
 - Shows rainbow effect when finished/idle
