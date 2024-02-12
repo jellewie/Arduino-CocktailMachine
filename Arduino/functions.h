@@ -379,28 +379,7 @@ void LcdPrint(String msg, String msg2) {
     lcd.print(msg2);
   }
 }
-void MyYield() {
-  WiFiManager.CheckAndReconnectIfNeeded(true);
-  WiFiManager.RunServer();                                       //Do WIFI server stuff if needed
-  CheckEEPROMSave();
-  CheckDisableSteppers();
 
-  if (!Running) {
-    static bool LastButtonState = HIGH;
-    bool ButtonState = digitalRead(PDI_S);
-    if (LastButtonState and !ButtonState)
-      LcdPrint("Mixer ready!", IpAddress2String(WiFi.localIP()));
-    LastButtonState = ButtonState;
-  }
-  FastLED.delay(1);
-  yield();
-}
-void MyDelay(int DelayMS) {                                     //Just a non-blocking delay
-  //DelayMS, delay in ms like in the Arduino Delay() function
-  unsigned long _StartTime = millis();
-  while (millis() < _StartTime + DelayMS)
-    MyYield();
-}
 bool MoveWait(AccelStepper Step, byte RefferenceButton, int pos = 0);
 bool MoveWait(AccelStepper Step, byte RefferenceButton, int pos) {
   Step.moveTo(pos);
@@ -478,6 +457,33 @@ bool Home(bool X, bool Y, bool Z) {
   LED_Fill(0, TotalLEDs, ColorHomeFail);
   UpdateLED(true);
   return false;
+}
+void MyYield() {
+  WiFiManager.CheckAndReconnectIfNeeded(true);
+  WiFiManager.RunServer();                                       //Do WIFI server stuff if needed
+  CheckEEPROMSave();
+  CheckDisableSteppers();
+
+  if (!Running) {
+    static bool LastButtonState = HIGH;
+    bool ButtonState = digitalRead(PDI_S);
+    if (LastButtonState and !ButtonState) {
+      if (!Homed) {
+        if (!Home(true, true, true))
+          FastLED.delay(500);
+      }
+      LcdPrint("Mixer ready!", IpAddress2String(WiFi.localIP()));
+    }
+    LastButtonState = ButtonState;
+  }
+  FastLED.delay(1);
+  yield();
+}
+void MyDelay(int DelayMS) {                                     //Just a non-blocking delay
+  //DelayMS, delay in ms like in the Arduino Delay() function
+  unsigned long _StartTime = millis();
+  while (millis() < _StartTime + DelayMS)
+    MyYield();
 }
 void MoveTo(int LocationX = -1, int LocationY = -1, int LocationZ = -1);
 void MoveTo(int LocationX, int LocationY, int LocationZ) {
