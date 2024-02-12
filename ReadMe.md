@@ -26,6 +26,20 @@ To update the Arduino to use this, run "deno task build" in the command prompt. 
 ### BIN
 Uploading a BIN file with a cable to the ESP can be done by any [ESP32 BIN file uploader](https://www.espressif.com/en/support/download/other-tools). this step is required for the first flash time.
 
+## Webpage
+<img align="right" src="Images/Webpage main.png" alt="The landing webpage of the machine" width=30%>
+The machine makes its own fancy landing page. This page has a lot going for it, First of all, are the items sorted on last used (this is done locally per user device). But the page has also a lot of functions, for example, it has a search bar to search for the name, but it also has a dice function to select a random mix.
+
+After you have chosen your mix, you can directly start mixing, or you can Customize the drink to your liking
+
+<img src="Images/Webpage Customize.png" alt="Customize drink" width=30%>
+It also has a settings page
+
+<img src="Images/Webpage settings.png" alt="Settings.png" width=30%>
+This is also where the dispensers are configured
+
+<img src="Images/Webpage dispensers.png" alt="Settings.png" width=30%>
+
 ## LED status
 The LED on the ESP (LED_BUILDIN) reflects these errors:
 - **ON** WIFI starts, goes OFF when WIFI setup is successfully completed.
@@ -40,7 +54,6 @@ The LED strip will show the following effects when said action is being performe
 - Shows rainbow effect when finished/idle
 - Shows lighting effect on set dispenser when in use (ColorMoveBase + ColorMoveActive)
 - LEDs will be at 25% brightness after being idle for DisableSteppersAfterIdleS
-
 
 ## WIFI page
 The 2 most important pages are the [Setup](#setup) page, where the user can set up the mixer. And the [main landing page](#control) where the fancy UI is.
