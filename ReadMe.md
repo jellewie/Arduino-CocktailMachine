@@ -18,6 +18,8 @@ The firmware needs to be flashed once to enable OTA BIN file upload. Either with
 - [Arduino-WIFIManager](https://github.com/jellewie/Arduino-WiFiManager) (already included).
 - [Arduino-Button](https://github.com/jellewie/Arduino-Button) (already included).
 - [Arduino-Stable-analog-read](https://github.com/jellewie/Arduino-Stable-analog-read) (already included).
+- [FreeCAD] (https://github.com/FreeCAD/FreeCAD) is used for 3D modeling.
+- [A2Plus_Workbench] (https://github.com/kbwbe/A2plus) is used for creating the assembly.
 
 To custom compile with new drinks and such, update the drinks in [Website/src/drinksConfig.js](Website/src/drinksConfig.js). I use an automated Google Drive sheet for this.
 
