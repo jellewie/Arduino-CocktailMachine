@@ -123,7 +123,6 @@ void setup() {
   server.on("/reset",       handle_Reset);
   server.onNotFound(        handle_NotFound);                   //When a client requests an unknown URI
   //server.on("/url", CodeToCall);                              //Example of a url to function caller, These must be declaired before "WiFiManager.Start()"
-  LcdPrint("", "WiFi connecting");
   byte Answer = WiFiManager.Start();                            //Run the wifi startup (and save results)
   WiFiManager.OTA_Enabled = true;                               //(runtime) Turn off/on OTA
   WiFiManager.EnableSetup(true);                                //(runtime) Enable the settings, only enabled in APmode by default
@@ -136,7 +135,7 @@ void setup() {
 }
 void loop() {
   MyYield();
-  WiFiManager.handleClient();
+  server.handleClient();
   if (Homed) {
     EVERY_N_MILLISECONDS(40) {
       LED_Rainbow(0, TotalLEDs, 255 / TotalLEDs);                 //Show a rainbow to sinal we are done and IDLE
