@@ -1,39 +1,13 @@
 /*
   Program written by JelleWho https://github.com/jellewie
   Board: Attiny85
-
-  There multible PCB's with chips
-  1. PRIMARY, This one sends commands to the DISPENSER.
-  2. DISPENSER [This code], Does all the action of dispensing the liquid and such. connected to both PRIMARY to recieve commands from and SLOT to recieve its ID from
-  3. SLOT, this is just a secondary giving the DISPENSER an ID. This ID is used to talk to the PRIMARY
-
-  PCB General rules:
-    The board is designed with SMD parts on only 1 side
-    The board has fiducials so it is PnP compatable
-    The board shoud have labels at each THT pin to make debugging easier
-  PCB DISPENSER:
-    Magnet pins from the SLOT to the DISPENSER are defined as:
-      [24V] [GND] [PRIMARY_RTX] [] [SLOT_TXRX] (This order)
-    The DISPENSER PCB has an ATTiny85 chip that has these Pins
-      [5V] [GND] [Button] [ValveFluid] [PDO_ValveAir] and [SLOT_TXRX] [LED] [PRIMARYTX] [PRIMARYRX]
-    The board converts 24V to 5V for the chip
-    The output to the valves must be done with an transistor or sorts, and will need to be gound switching
-    The button is an SMD internal part, but has jumpoutpins to be external. The button will be debounce by hardware
-    SLOT_TXRX 1M down
-  PCB SLOT:
-    The SLOT PCB has an ATTiny85 chip that has these Pins
-      [5V] [GND] [SLOT_TXRX]
-    The board imports AND exports these pins from other SLOTs/the PRIMARY
-      [24V] [GND] [5V] [PRIMARY_RTX] []
-    SLOT_TXRX  10k up, 660 in line
-  PCB PRIMARY:
-    Exports these pins (Its cheaper to have one 5V power supply, so import this)
-      [24V] [GND] [5V] [PRIMARY_RTX] []
-    PRIMARY_RTX 150 in line, then 10k down
+  DISPENSER
 */
 #include <FastLED.h>  //Include the libary FastLED (If you get a error here, make sure it's installed!)
 #include <EEPROM.h>
 #include <PJONSoftwareBitBang.h>
+
+const byte DeviceID = 1;  //Unique 1-byte ID (change for every dispenser). must be higher than 0
 
 const byte PDI_Button = 14;      //Pull down to trigger
 const byte PDO_ValveFluid = 33;  //LOW=OFF
@@ -48,17 +22,21 @@ CRGB ColorBoot = CRGB(255, 128, 0);
 CRGB ColorGetID = CRGB(255, 0, 0);
 CRGB ColorIdle = CRGB(0, 0, 255);
 CRGB ColorDispencing = CRGB(0, 255, 0);
-byte deviceID = 0;                //Store the received ID
+byte SlotID = 0;                  //Store the received ID
 byte FluidID = 0;                 //Store the fluid of this dispenser
 unsigned long lastPulseTime = 0;  //Time of last revieved pulse from SLOT
 int DelayAir = 100;               //ms to let the air valve open before the fluid valve, to get rid of pressure buildup in the bottle
-enum COMMANDS { DISPENSE,
+enum COMMANDS { UNK,
+                DISPENSE,
                 GETFLUID,
                 CHANGEFLUID,
                 CHANGEDELAY,
                 CHANGECOLOR };
-PJONSoftwareBitBang bus(45);  // Device ID
-
+enum COMMAND { DISPENSERUNK,
+               DISPENSERSTATUS,
+               DISPENSERFLUID,
+               DISPENSERSLOT };
+PJONSoftwareBitBang bus(DeviceID);  //DeviceID
 void setup() {
   Serial.begin(115200);
   pinMode(PDI_Button, INPUT_PULLUP);
@@ -77,9 +55,8 @@ void setup() {
   bus.begin();
   Serial.println("Start done");
 }
-
 void loop() {
-  CheckAndGetDeviceID();  //Try and get the SLOT ID
+  CheckAndGetSlotID();  //Try and get the SLOT ID
 
   //Manual control
   bool button_state = digitalRead(PDI_Button);
@@ -94,32 +71,50 @@ void loop() {
   //Serial.println(".");
 
   //  if (PrimarySerial.available() >= 3) {// Check if data is available to read
-  //    byte SerialdeviceID = PrimarySerial.read();
+  //    byte SerialSlotID = PrimarySerial.read();
   //    byte Serialcmd1 = PrimarySerial.read();
   //    byte Serialcmd2 = PrimarySerial.read();
   //    while (PrimarySerial.available()) PrimarySerial.read();   //Trash all the other commands if there any
-  //    if (SerialdeviceID == deviceID){ //If it is for us
+  //    if (SerialSlotID == SlotID){ //If it is for us
   //      byte answer = triggerAction(Serialcmd1, Serialcmd2)
   //      PrimarySerial.print(answer);
   //    }
   //  }
 }
-
 void error_handler(uint8_t code, uint16_t data, void *custom_pointer) {
-  // Handle errors (optional)
-  Serial.println("Bus error_handler");
+  if (code == PJON_CONNECTION_LOST) {
+    Serial.print("Connection with device ID ");
+    Serial.print(bus.packets[data].content[0], DEC);
+    Serial.println(" is lost.");
+  }
+  if (code == PJON_PACKETS_BUFFER_FULL) {
+    Serial.print("Packet buffer is full, has now a length of ");
+    Serial.println(data, DEC);
+    Serial.println("Possible wrong bus configuration!");
+    Serial.println("higher PJON_MAX_PACKETS if necessary.");
+  }
+  if (code == PJON_CONTENT_TOO_LONG) {
+    Serial.print("Content is too long, length: ");
+    Serial.println(data);
+  }
 }
-
 void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info &packet_info) {
-  Serial.println("Data from primary " + String(payload[0]));
-  digitalWrite(LED_BUILTIN, HIGH);  // Turn on LED
-  int TimeDelay = payload[0] * 10;
-  DispenseStart();
-  delay(TimeDelay);
-  DispenseStop();
-  digitalWrite(LED_BUILTIN, LOW);  // Turn off LED
-}
+  Serial.print("Received: ");
+  for (uint16_t i = 0; i < length; i++)
+    Serial.print(payload[i] + String(" "));
+  Serial.println(); 
 
+  if (length == 2) {
+    digitalWrite(LED_BUILTIN, HIGH);
+    int TimeDelay = payload[1] * 10;
+    DispenseStart();
+    delay(TimeDelay);
+    DispenseStop();
+    byte BusSend[] = { DeviceID, DISPENSERSTATUS, true };  //Tell the Primary we have succes
+    bus.send(0x00, &BusSend, sizeof(BusSend));             //Send 0x01 (success) to 0x00 (Primary)
+    digitalWrite(LED_BUILTIN, LOW);                        //Turn off LED
+  }
+}
 byte triggerAction(byte cmd1, byte cmd2) {
   /*
     DISPENSE, Time_in_ms*10.   
@@ -170,32 +165,31 @@ void DispenseStop() {
   fill_solid(&(LEDs[0]), TotalLEDs, ColorIdle);
   FastLED.show();
 }
-void CheckAndGetDeviceID() {
-  if (deviceID == 0) {
+void CheckAndGetSlotID() {
+  if (SlotID == 0) {
     if (LEDs[0] != ColorGetID and LEDs[0] != ColorDispencing) {  //If not yet desired color, but do not overwrite ColorDispencing
       fill_solid(&(LEDs[0]), TotalLEDs, ColorGetID);
       FastLED.show();
     }
-    byte ID1 = GetDeviceID();
+    byte ID1 = GetSlotID();
     delay(10);
-    byte ID2 = GetDeviceID();
+    byte ID2 = GetSlotID();
     delay(10);
-    byte ID3 = GetDeviceID();
+    byte ID3 = GetSlotID();
     if (ID1 > 0 && ID1 == ID2 && ID2 == ID3) {
-      deviceID = ID1;
+      SlotID = ID1;
       if (LEDs[0] != ColorDispencing) {  //Do not overwrite ColorDispencing
         fill_solid(&(LEDs[0]), TotalLEDs, ColorIdle);
         FastLED.show();
       }
-      Serial.println("deviceID recieved, I am " + String(deviceID));
+      Serial.println("SlotID recieved, I am " + String(SlotID));
     } else {
-      Serial.println("Error in deviceID recieved, ID1=" + String(ID1) + " ID2=" + String(ID2) + " ID3=" + String(ID3));
+      Serial.println("Error in SlotID recieved, ID1=" + String(ID1) + " ID2=" + String(ID2) + " ID3=" + String(ID3));
     }
   }
 }
-
-byte GetDeviceID() {
-  Serial.println(String(millis()) + "GetDeviceID");
+byte GetSlotID() {
+  Serial.println(String(millis()) + "GetSlotID");
   pinMode(PDI_SLOT_TXRX, OUTPUT);
   digitalWrite(PDI_SLOT_TXRX, LOW);
   delay(1);
