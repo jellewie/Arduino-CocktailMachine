@@ -18,15 +18,16 @@ const uint8_t PDIO_buspin = 25;
 
 const uint16_t TotalLEDs = 1;  //The total amounts of LEDs in the strip
 CRGB LEDs[TotalLEDs];
-CRGB ColorBoot = CRGB(255, 128, 0);
-CRGB ColorGetID = CRGB(255, 0, 0);
-CRGB ColorWaitForAdoptionIdle = CRGB(255, 255, 0);
-CRGB ColorIdle = CRGB(0, 0, 255);
-CRGB ColorDispencing = CRGB(0, 255, 0);
+CRGB ColorBoot = CRGB(255, 128, 0);                 //While starting up
+CRGB ColorGetID = CRGB(255, 0, 0);                  //While trying to get an IP
+CRGB ColorWaitForAdoptionIdle = CRGB(255, 255, 0);  //While waiting for Primary to adopt us
+CRGB ColorIdle = CRGB(0, 0, 255);                   //While idle/normal state
+CRGB ColorDispencing = CRGB(0, 255, 0);             //While dispensing
 uint8_t FluidID = 0;                                //Store the fluid of this dispenser
 unsigned long lastPulseTime = 0;                    //Time of last revieved pulse from SLOT
 uint16_t DelayAir = 0;                              //ms to let the air valve open before the fluid valve, to get rid of pressure buildup in the bottle
 bool ImAdopted = false;
+bool LEDmode = 0;
 enum COMMANDS { UNK,
                 DISPENSE,
                 GETFLUID,
@@ -69,6 +70,21 @@ void loop() {
 
   bus.receive(50000);  // Receive messages
   bus.update();        // Handle bus updates
+
+  LEDloop();  //Do the LED update loop if needed, this is for rainbow
+}
+void LEDloop() {
+  EVERY_N_MILLISECONDS(40) {
+    switch (LEDmode) {
+      case 1:
+        static byte gHue;
+        gHue++;
+        fill_rainbow(&LEDs[0], 1, gHue, 1);
+        FastLED.show();
+        break;
+    }
+  }
+}
 void LoadSettings() {
   FluidID = EEPROM.read(0);
   DelayAir = EEPROM.read(1);
@@ -142,12 +158,15 @@ byte triggerAction(byte cmd1, byte cmd2) {
       r = map(r, 0, 3, 0, 255);  //Map the 2-bit value to the range 0-255
       g = map(g, 0, 3, 0, 255);  //Map the 2-bit value to the range 0-255
       b = map(b, 0, 3, 0, 255);  //Map the 2-bit value to the range 0-255
-      Serial.println("r=" + String(r) + " g=" + String(g) + " b=" + String(b));
-      fill_solid(&(LEDs[0]), TotalLEDs, CRGB(r, g, b));
-      FastLED.show();
-      m = cmd2 & 0x03;  //Mask with 0x03 (00000011)
+      m = cmd2 & 0x03;           //Mask with 0x03 (00000011)
       if (m == 0b01) {
+        fill_solid(&(LEDs[0]), TotalLEDs, CRGB(r, g, b));
+        FastLED.show();
       }
+      if (m == 0b10) {
+        LEDmode = 1;
+      }
+      Serial.println("r=" + String(r) + " g=" + String(g) + " b=" + String(b) + " m=" + String(m));
       //TODO, we can define color modes
       //m 00 = Auto
       //m 01 = RGB mode,
@@ -179,6 +198,7 @@ void DispenseStop() {
   SetLEDidleColor();
 }
 void SetLEDidleColor() {
+  LEDmode = 0;
   if (ImAdopted) {
     fill_solid(&(LEDs[0]), TotalLEDs, ColorIdle);
   } else {

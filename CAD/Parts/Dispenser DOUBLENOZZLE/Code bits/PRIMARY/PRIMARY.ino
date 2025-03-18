@@ -29,7 +29,8 @@ enum COMMANDS { UNK,
                 CHANGECOLOR,
                 ADOPT };
 enum COMMAND { DISPENSERUNK,
-               DISPENSERSTATUS,};
+               DISPENSERSTATUS,
+};
 
 void setup() {
   Serial.begin(115200);
@@ -63,6 +64,11 @@ void loop() {
     OLD_button_state = button_state;
     if (button_state == LOW) {  //If button is pressed (LOW due to internal pull-up)
 
+
+      //To send reset color command:
+      uint8_t BusSend1[] = { CHANGECOLOR, 0b00000000 };
+      bus.send_packet(PJON_BROADCAST, BusSend1, sizeof(BusSend1));
+
       uint8_t DispenserID = Dispensers[0];
       uint8_t BusSend[] = { DISPENSE, 100 };
 
@@ -78,6 +84,14 @@ void loop() {
       }
     }
   }
+
+  //To send IDLE Rainbow command:
+  //uint8_t BusSend[] = { CHANGECOLOR, 0b00000010 };
+  //bus.send_packet(PJON_BROADCAST, BusSend, sizeof(BusSend));
+  //
+  //To send reset color command:
+  //uint8_t BusSend[] = { CHANGECOLOR, 0b00000000 };
+  //bus.send_packet(PJON_BROADCAST, BusSend, sizeof(BusSend));
 }
 void pingAll() {
   //bus.send_packet(PJON_BROADCAST, "Message for all connected devices.", 34);
