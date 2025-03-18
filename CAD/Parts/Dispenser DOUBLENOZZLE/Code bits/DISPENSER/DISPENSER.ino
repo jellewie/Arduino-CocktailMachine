@@ -23,9 +23,9 @@ CRGB ColorGetID = CRGB(255, 0, 0);
 CRGB ColorWaitForAdoptionIdle = CRGB(255, 255, 0);
 CRGB ColorIdle = CRGB(0, 0, 255);
 CRGB ColorDispencing = CRGB(0, 255, 0);
-uint8_t FluidID = 0;              //Store the fluid of this dispenser
-unsigned long lastPulseTime = 0;  //Time of last revieved pulse from SLOT
-uint16_t DelayAir = 100;          //ms to let the air valve open before the fluid valve, to get rid of pressure buildup in the bottle
+uint8_t FluidID = 0;                                //Store the fluid of this dispenser
+unsigned long lastPulseTime = 0;                    //Time of last revieved pulse from SLOT
+uint16_t DelayAir = 0;                              //ms to let the air valve open before the fluid valve, to get rid of pressure buildup in the bottle
 bool ImAdopted = false;
 enum COMMANDS { UNK,
                 DISPENSE,
@@ -46,7 +46,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(PDO_ValveFluid, LOW);  //Ensure valve is OFF at start
   digitalWrite(PDO_ValveAir, LOW);    //Ensure valveAir is OFF at start
-  FluidID = EEPROM.read(0);           //Read what our fluid is
+  LoadSettings();
   FastLED.addLeds<WS2812B, PAO_LED, GRB>(LEDs, TotalLEDs);
   fill_solid(&(LEDs[0]), TotalLEDs, ColorBoot);  //RED to show we do not have an ID
   FastLED.show();
@@ -69,6 +69,13 @@ void loop() {
 
   bus.receive(50000);  // Receive messages
   bus.update();        // Handle bus updates
+void LoadSettings() {
+  FluidID = EEPROM.read(0);
+  DelayAir = EEPROM.read(1);
+}
+void SaveSettings() {
+  EEPROM.write(0, FluidID);
+  EEPROM.write(1, DelayAir);
 }
 void error_handler(uint8_t code, uint16_t data, void *custom_pointer) {
   if (code == PJON_CONNECTION_LOST) {
@@ -92,7 +99,6 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
   for (uint16_t i = 0; i < length; i++)
     Serial.print(payload[i] + String(" "));
   Serial.println();
-
   if (length == 2) {
     uint8_t result = triggerAction(payload[0], payload[1]);
     Serial.println("called triggerAction with result=" + String(result));
@@ -103,10 +109,10 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
 }
 byte triggerAction(byte cmd1, byte cmd2) {
   /*
-    1=DISPENSE, Time_in_ms*10.   
-    2=GETFLUID, IGNORED.         
-    3=CHANGEFLUID, New_ID        
-    4=CHANGEDELAY, delay_in_ms between air and fluid   
+    1=DISPENSE, Time_in_ms*10
+    2=GETFLUID, IGNORED
+    3=CHANGEFLUID, New_ID
+    4=CHANGEDELAY, Time_in_ms*5 between air and fluid   
     5=CHANGECOLOR, RRGGBBMM
   */
   byte r, g, b, m;
@@ -122,6 +128,11 @@ byte triggerAction(byte cmd1, byte cmd2) {
       break;
     case CHANGEFLUID:
       FluidID = cmd2;
+      SaveSettings();
+      break;
+    case CHANGEDELAY:
+      DelayAir = cmd2 * 5;
+      SaveSettings();
       break;
     case CHANGECOLOR:
       Serial.println("CHANGECOLOR");
