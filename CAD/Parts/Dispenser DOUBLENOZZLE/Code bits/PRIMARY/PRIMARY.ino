@@ -13,29 +13,31 @@
 //#define SWBB_MAX_ATTEMPTS 20;	//Maximum transmission attempts	Numeric value (20 by default)
 
 const uint8_t PrimaryID = 254;
-PJONSoftwareBitBang bus(PrimaryID);            //Master Device ID
-const uint8_t MAX_Dispensers = 253;            //Maximum possible IDs
-uint8_t Dispensers[MAX_Dispensers] = { 250 };  //Array of available DISPENSER IDs
+PJONSoftwareBitBang bus(PrimaryID);               //Master Device ID
+const uint8_t MAX_Dispensers = 253;               //Maximum possible IDs
+uint8_t Dispensers[MAX_Dispensers] = { 1, 250 };  //Array of available DISPENSER IDs
 bool SlotConnected[MAX_Dispensers];
-uint8_t availableCount = 0;     //Number of detected devices
-const uint8_t PDI_Button = 33;  //Button pin with internal pull-up
+uint8_t availableCount = 0;      //Number of detected devices
+const uint8_t PDI_Button = 33;   //Button pin with internal pull-up
+const uint8_t PDI_Button2 = 32;  //Button pin with internal pull-up
+const uint8_t PDI_Button3 = 26;  //Button pin with internal pull-up
 const uint8_t PDIO_buspin = 25;
 
 enum COMMANDS { UNK,
+                ADOPT,
                 DISPENSE,
-                GETFLUID,
+                CALIBRATEMSPERML,
                 CHANGEFLUID,
                 CHANGEDELAY,
                 CHANGECOLOR,
-                ADOPT };
-enum COMMAND { DISPENSERUNK,
-               DISPENSERSTATUS,
+                DISPENSERSTATUS,
 };
 
 void setup() {
   Serial.begin(115200);
   pinMode(PDI_Button, INPUT_PULLUP);
-
+  pinMode(PDI_Button2, INPUT_PULLUP);
+  pinMode(PDI_Button3, INPUT_PULLUP);
   bus.set_error(error_handler);
   bus.set_receiver(receiver_function);
   bus.strategy.set_pin(PDIO_buspin);
@@ -55,22 +57,18 @@ void loop() {
     */
     Serial.println("ERROR bus.receive " + String(result));
   }
-
   bus.update();  //Handle bus updates
 
   bool button_state = digitalRead(PDI_Button);
   static bool OLD_button_state = button_state;
   if (button_state != OLD_button_state) {  //Only update if state changes
     OLD_button_state = button_state;
-    if (button_state == LOW) {  //If button is pressed (LOW due to internal pull-up)
-
-
-      //To send reset color command:
-      uint8_t BusSend1[] = { CHANGECOLOR, 0b00000000 };
+    if (button_state == LOW) {                           //If button is pressed (LOW due to internal pull-up)
+      uint8_t BusSend1[] = { CHANGECOLOR, 0b00000000 };  //Send reset Rainbow color
       bus.send_packet(PJON_BROADCAST, BusSend1, sizeof(BusSend1));
 
       uint8_t DispenserID = Dispensers[0];
-      uint8_t BusSend[] = { DISPENSE, 100 };
+      uint8_t BusSend[] = { DISPENSE, 30 };
 
       uint16_t result = bus.send_packet_blocking(DispenserID, BusSend, sizeof(BusSend));
       if (result != PJON_ACK) {
@@ -85,13 +83,50 @@ void loop() {
     }
   }
 
+  bool button_state2 = digitalRead(PDI_Button2);
+  static bool OLD_button_state2 = button_state2;
+  if (button_state2 != OLD_button_state2) {  //Only update if state changes
+    OLD_button_state2 = button_state2;
+    if (button_state2 == LOW) {                          //If button is pressed (LOW due to internal pull-up)
+      uint8_t BusSend1[] = { CHANGECOLOR, 0b00000000 };  //Send reset Rainbow color
+      bus.send_packet(PJON_BROADCAST, BusSend1, sizeof(BusSend1));
+
+      uint8_t DispenserID = Dispensers[1];
+      uint8_t BusSend[] = { DISPENSE, 90 };
+
+      uint16_t result = bus.send_packet_blocking(DispenserID, BusSend, sizeof(BusSend));
+    }
+  }
+
+  bool button_state3 = digitalRead(PDI_Button3);
+  static bool OLD_button_state3 = button_state3;
+  if (button_state3 != OLD_button_state3) {  //Only update if state changes
+    OLD_button_state3 = button_state3;
+    if (button_state3 == LOW) {  //If button is pressed (LOW due to internal pull-up)
+    Serial.println("Calling for rainbow");
+      uint8_t BusSend[] = { CHANGECOLOR, 0b00000010 };
+      bus.send_packet(PJON_BROADCAST, BusSend, sizeof(BusSend));
+    }
+  }
+
   //To send IDLE Rainbow command:
   //uint8_t BusSend[] = { CHANGECOLOR, 0b00000010 };
   //bus.send_packet(PJON_BROADCAST, BusSend, sizeof(BusSend));
-  //
-  //To send reset color command:
-  //uint8_t BusSend[] = { CHANGECOLOR, 0b00000000 };
-  //bus.send_packet(PJON_BROADCAST, BusSend, sizeof(BusSend));
+
+  //Example to change fluid to 7 (VODKA)
+  // uint8_t DispenserID = Dispensers[0];
+  // uint8_t BusSend[] = { CHANGEFLUID, 7 };
+  // uint16_t result = bus.send_packet_blocking(DispenserID, BusSend, sizeof(BusSend));
+
+  //Example to calibrate the MSperML to 35 (ms per ml)
+  // uint8_t DispenserID = Dispensers[0];
+  // uint8_t BusSend[] = { CALIBRATEMSPERML, 35 };
+  // uint16_t result = bus.send_packet_blocking(DispenserID, BusSend, sizeof(BusSend));
+
+  //Example to set the delay in x*5ms after the air valve has opened to open the fluid valve (note does not affect MSperML since no ML is flown)
+  // uint8_t DispenserID = Dispensers[0];
+  // uint8_t BusSend[] = { CHANGEDELAY, 100 };  //100*5=500ms
+  // uint16_t result = bus.send_packet_blocking(DispenserID, BusSend, sizeof(BusSend));
 }
 void pingAll() {
   //bus.send_packet(PJON_BROADCAST, "Message for all connected devices.", 34);
@@ -133,6 +168,10 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
     switch (payload[0]) {  // Check first byte as a command ID
       case DISPENSERSTATUS:
         Serial.println("Dispenser " + String(packet_info.tx.id) + " gave command DISPENSERSTATUS=" + String(payload[1]));
+        break;
+      case ADOPT:
+        Serial.println("Dispenser " + String(packet_info.tx.id) + " asked us to scan the whole bus for new dispensers");
+        pingAll();
         break;
       default:
         Serial.print("Which is an unknown Command");
