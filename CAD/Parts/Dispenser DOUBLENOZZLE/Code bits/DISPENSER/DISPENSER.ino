@@ -230,33 +230,29 @@ void SetLEDidleColor() {
 }
 void CheckAndGetSlotID() {
   if (bus.device_id() == PJON_NOT_ASSIGNED) {
-    Serial.println("SlotID unknown (" + String(bus.device_id()) + ")");
     if (LEDs[0] != ColorGetID and LEDs[0] != ColorDispencing) {  //If not yet desired color, but do not overwrite ColorDispencing
       fill_solid(&(LEDs[0]), TotalLEDs, ColorGetID);
       FastLED.show();
     }
+    delay(1);
     uint8_t ID1 = GetSlotID();
-    delay(10);
+    delay(1);
     uint8_t ID2 = GetSlotID();
-    delay(10);
+    delay(1);
     uint8_t ID3 = GetSlotID();
     if (ID1 > 0 && ID1 == ID2 && ID2 == ID3) {
       bus.set_id(ID1);
       if (LEDs[0] != ColorDispencing)  //Do not overwrite ColorDispencing
-        SetLEDidleColor();
-      Serial.println("SlotID recieved, I am " + String(bus.device_id()));
-
+        LEDloop(true);
+      //Serial.println("SlotID recieved, I am " + String(bus.device_id()));
       uint8_t BusSend[] = { ADOPT, bus.device_id() };  //Ask Primary for us to be adopted
       uint16_t result = bus.send(PrimaryID, &BusSend, sizeof(BusSend));
-      if (result == PJON_FAIL) Serial.print("bus request wrong =" + String(result));
-
-    } else {
-      Serial.println("Error in SlotID recieved, ID1=" + String(ID1) + " ID2=" + String(ID2) + " ID3=" + String(ID3));
-    }
+      //if (result == PJON_FAIL) Serial.print("bus request fail =" + String(result));
+    } 
+    //else {Serial.println("Error in SlotID recieved, ID1=" + String(ID1) + " ID2=" + String(ID2) + " ID3=" + String(ID3));}
   }
 }
 uint8_t GetSlotID() {
-  Serial.println(String(millis()) + " GetSlotID");
   pinMode(PDI_SLOT_TXRX, OUTPUT);
   digitalWrite(PDI_SLOT_TXRX, LOW);
   delay(1);
