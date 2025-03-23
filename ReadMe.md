@@ -1,12 +1,17 @@
-# **This project is still in development!**
+# **Cocktail Mixer Machine**  
+_A machine that can mix drinks_
 
-# Cockail Mixer Machine
-A machine that can mix drinks
+> **Note**: This project is still in development!
 
-<img src="Images/CAD overview.png" alt="CAD drawing of the machine">
+![Cocktail Mixer Machine CAD](Images/CAD%20overview.png)
 
-## Firmware
-The firmware needs to be flashed once to enable OTA BIN file upload. Either with Arduino IDE and compile it, or using a BIN uploader of choice.
+## **Firmware**
+
+The firmware needs to be flashed to enable OTA BIN file uploads. You can do this either using the Arduino IDE and compiling it, or by using a BIN uploader of your choice.
+There 3 PCB's with firmware
+- each DISPENSER (ESP32)
+- each SLOT (ATTINY85, required compiling for each ID)
+- PRIMARY (ESP32) the main PCB
 
 ### Compile
 - [Arduino sketch](Arduino) The whole sketch is the 'Arduino' folder.
