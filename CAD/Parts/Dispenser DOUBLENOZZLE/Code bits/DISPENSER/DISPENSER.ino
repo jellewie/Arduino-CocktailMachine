@@ -3,7 +3,7 @@
   Board: Attiny85
   DISPENSER
 */
-#include <FastLED.h>  //Include the libary FastLED (If you get a error here, make sure it's installed!)
+#include <Adafruit_NeoPixel.h>
 #include <EEPROM.h>
 #include <PJONSoftwareBitBang.h>
 #define SWBB_MODE 1  //Should be default, 1=1.97kB/s //https://github.com/gioblu/PJON/blob/master/src/strategies/SoftwareBitBang/README.md#performance
@@ -24,20 +24,21 @@ const uint8_t PDI_SLOT_TXRX = 0;   //The wire from which to get local ID from   
 const uint8_t PAO_LED = 4;         //To which pin the <LED> is connected to
 const uint8_t PDIO_buspin = 1;     //Must be 1/2 for ATtiny85
 #endif
-const uint8_t PrimaryID = 254;                      //Used to request adoption
-const uint16_t TotalLEDs = 1;                       //The total amounts of LEDs in the strip
-CRGB LEDs[TotalLEDs];                               //Array with our status LED
-CRGB ColorBoot = CRGB(255, 128, 0);                 //While starting up
-CRGB ColorGetID = CRGB(255, 0, 0);                  //While trying to get an IP
-CRGB ColorWaitForAdoptionIdle = CRGB(255, 255, 0);  //While waiting for Primary to adopt us
-CRGB ColorIdle = CRGB(0, 0, 255);                   //While idle/normal state
-CRGB ColorDispencing = CRGB(0, 255, 0);             //While dispensing
-uint8_t FluidID = 0;                                //SAVESETTING Store the fluid of this dispenser
-uint8_t MSperML = 40;                               //SAVESETTING ms to let 1 ml go, for example it takes 12s to do 300ml, thats about 40 ms per ml
-uint8_t DelayAir = 0;                               //SAVESETTING ms to let the air valve open before the fluid valve, to get rid of pressure buildup in the bottle
-unsigned long lastPulseTime = 0;                    //Time of last revieved pulse from SLOT
-bool ImAdopted = false;                             //If the primary has seen this dispenser yet
-bool LEDmode = 0;                                   //use to enable rainbow led mode
+const uint8_t PrimaryID = 254;                                      //Used to request adoption
+const uint8_t TotalLEDs = 1;                                        //The total amounts of LEDs in the strip
+Adafruit_NeoPixel strip(TotalLEDs, PAO_LED, NEO_GRB + NEO_KHZ800);  //Array with our status LED
+const uint32_t ColorBoot = 0xFF8000;                                //While starting up
+const uint32_t ColorGetID = 0xFF0000;                               //While trying to get an IP
+const uint32_t ColorWaitForAdoptionIdle = 0xFFFF00;                 //While waiting for Primary to adopt us
+const uint32_t ColorIdle = 0x0000FF;                                //While idle/normal state
+const uint32_t ColorDispencing = 0x00FF00;                          //While dispensing
+
+uint8_t FluidID = 0;              //SAVESETTING Store the fluid of this dispenser
+uint8_t MSperML = 40;             //SAVESETTING ms to let 1 ml go, for example it takes 12s to do 300ml, thats about 40 ms per ml
+uint8_t DelayAir = 0;             //SAVESETTING ms to let the air valve open before the fluid valve, to get rid of pressure buildup in the bottle
+unsigned long lastPulseTime = 0;  //Time of last revieved pulse from SLOT
+bool ImAdopted = false;           //If the primary has seen this dispenser yet
+bool LEDrainbow = false;          //use to enable rainbow led mode
 enum COMMANDS { UNK,
                 ADOPT,
                 DISPENSE,
@@ -59,9 +60,9 @@ void setup() {
   digitalWrite(PDO_ValveFluid, LOW);  //Ensure valve is OFF at start
   digitalWrite(PDO_ValveAir, LOW);    //Ensure valveAir is OFF at start
   LoadSettings();
-  FastLED.addLeds<WS2812B, PAO_LED, GRB>(LEDs, TotalLEDs);
-  fill_solid(&(LEDs[0]), TotalLEDs, ColorBoot);  //RED to show we do not have an ID
-  FastLED.show();
+  strip.setPixelColor(0, ColorBoot);  //RED to show we do not have an ID
+  strip.begin();
+  strip.show();
   bus.set_error(error_handler);
   bus.set_receiver(receiver_function);
   bus.strategy.set_pin(PDIO_buspin);
@@ -175,27 +176,29 @@ uint8_t triggerAction(uint8_t cmd1, uint8_t cmd2) {
       SaveSettings();
       break;
     case CHANGECOLOR:
-      r = (cmd2 >> 6) & 0b11;    // Extract bits 7-6 (RR)
-      g = (cmd2 >> 4) & 0b11;    // Extract bits 5-4 (GG)
-      b = (cmd2 >> 2) & 0b11;    // Extract bits 3-2 (BB)
-      r = map(r, 0, 3, 0, 255);  //Map the 2-bit value to the range 0-255
-      g = map(g, 0, 3, 0, 255);  //Map the 2-bit value to the range 0-255
-      b = map(b, 0, 3, 0, 255);  //Map the 2-bit value to the range 0-255
-      m = cmd2 & 0x03;           //Mask with 0x03 (00000011)
+      // r = (cmd2 >> 6) & 0b11;    // Extract bits 7-6 (RR)
+      // g = (cmd2 >> 4) & 0b11;    // Extract bits 5-4 (GG)
+      // b = (cmd2 >> 2) & 0b11;    // Extract bits 3-2 (BB)
+      // r = map(r, 0, 3, 0, 255);  //Map the 2-bit value to the range 0-255
+      // g = map(g, 0, 3, 0, 255);  //Map the 2-bit value to the range 0-255
+      // b = map(b, 0, 3, 0, 255);  //Map the 2-bit value to the range 0-255
+      m = cmd2 & 0x03;  //Mask with 0x03 (00000011)
       if (m == 0) {
-        LEDmode = 0;
+        LEDrainbow = false;
         LEDloop(true);
       }
-      if (m == 1) {
-        fill_solid(&(LEDs[0]), TotalLEDs, CRGB(r, g, b));
-        FastLED.show();
-      }
+      // if (m == 1) {
+      //   strip.setPixelColor(0, strip.Color(r, g, b));
+      //   strip.show();
+      // }
       if (m == 2)
-        if (LEDs[0] == ColorIdle or LEDmode == 1) {  //Do not overwrite other modes OR if we want to sync the rainbow
-          LEDmode = 1;                               //Set rainbow mode
+        if (strip.getPixelColor(0) == ColorIdle or LEDrainbow == 1) {  //Do not overwrite other modes OR if we want to sync the rainbow
+          LEDrainbow = true;                                           //Set rainbow mode
           LEDloop(true);
         }
-      //Serial.println("r=" + String(r) + " g=" + String(g) + " b=" + String(b) + " m=" + String(m));
+#ifdef ESP32
+      Serial.println("r=" + String(r) + " g=" + String(g) + " b=" + String(b) + " m=" + String(m));
+#endif
       break;
     default:
       return false;
@@ -204,9 +207,9 @@ uint8_t triggerAction(uint8_t cmd1, uint8_t cmd2) {
   return true;
 }
 void DispenseStart() {
-  LEDmode = 0;
-  fill_solid(&(LEDs[0]), TotalLEDs, ColorDispencing);
-  FastLED.show();
+  LEDrainbow = false;
+  strip.setPixelColor(0, ColorDispencing);
+  strip.show();
   digitalWrite(PDO_ValveAir, HIGH);
   delay(DelayAir * 5);
   digitalWrite(PDO_ValveFluid, HIGH);
@@ -217,34 +220,36 @@ void DispenseStop() {
   LEDloop(true);
 }
 void LEDloop(bool init) {
-  static uint8_t gHue;
-  switch (LEDmode) {
-    case 0:
-      if (init) {
-        if (ImAdopted) {
-          fill_solid(&(LEDs[0]), TotalLEDs, ColorIdle);
-        } else {
-          fill_solid(&(LEDs[0]), TotalLEDs, ColorWaitForAdoptionIdle);
-        }
-        FastLED.show();
+  if (LEDrainbow) {
+    static uint8_t gHue;
+    if (init)
+      gHue = 0;                           //Reset gHue offset
+    static unsigned long lastUpdate = 0;  // Every 40 milliseconds, increment the hue to create the rainbow effect
+    if (millis() - lastUpdate >= 40) {
+      lastUpdate = millis();
+      gHue++;  // Increment hue
+
+      // Create rainbow effect by setting color based on the current hue
+      uint32_t color = strip.ColorHSV(gHue * 256);  // Get RGB color from the HSV value
+      strip.setPixelColor(0, color);                // Set the color to the first LED
+      strip.show();                                 // Update the LED strip
+    }
+  } else {
+    if (init) {
+      if (ImAdopted) {
+        strip.setPixelColor(0, ColorIdle);  // Set LED to red
+      } else {
+        strip.setPixelColor(0, ColorWaitForAdoptionIdle);
       }
-      break;
-    case 1:
-      if (init)
-        gHue = 0;  //Reset gHue offset
-      EVERY_N_MILLISECONDS(40) {
-        gHue++;
-        fill_rainbow(&LEDs[0], 1, gHue, 1);
-        FastLED.show();
-      }
-      break;
+      strip.show();
+    }
   }
 }
 void CheckAndGetSlotID() {
   if (bus.device_id() == PJON_NOT_ASSIGNED) {
-    if (LEDs[0] != ColorGetID and LEDs[0] != ColorDispencing) {  //If not yet desired color, but do not overwrite ColorDispencing
-      fill_solid(&(LEDs[0]), TotalLEDs, ColorGetID);
-      FastLED.show();
+    if (strip.getPixelColor(0) != ColorGetID and strip.getPixelColor(0) != ColorDispencing) {  //If not yet desired color, but do not overwrite ColorDispencing
+      strip.setPixelColor(0, ColorGetID);
+      strip.show();
     }
     delay(1);
     uint8_t ID1 = GetSlotID();
@@ -254,14 +259,19 @@ void CheckAndGetSlotID() {
     uint8_t ID3 = GetSlotID();
     if (ID1 > 0 && ID1 == ID2 && ID2 == ID3) {
       bus.set_id(ID1);
-      if (LEDs[0] != ColorDispencing)  //Do not overwrite ColorDispencing
+      if (strip.getPixelColor(0) != ColorDispencing)  //Do not overwrite ColorDispencing
         LEDloop(true);
-      //Serial.println("SlotID recieved, I am " + String(bus.device_id()));
       uint8_t BusSend[] = { ADOPT, bus.device_id() };  //Ask Primary for us to be adopted
       uint16_t result = bus.send(PrimaryID, &BusSend, sizeof(BusSend));
-      //if (result == PJON_FAIL) Serial.print("bus request fail =" + String(result));
+#ifdef ESP32
+      Serial.println("SlotID recieved, I am " + String(bus.device_id()));
+      if (result == PJON_FAIL) Serial.print("bus request fail =" + String(result));
+#endif
     }
-    //else {Serial.println("Error in SlotID recieved, ID1=" + String(ID1) + " ID2=" + String(ID2) + " ID3=" + String(ID3));}
+#ifdef ESP32
+    else
+      Serial.println("Error in SlotID recieved, ID1=" + String(ID1) + " ID2=" + String(ID2) + " ID3=" + String(ID3));
+#endif
   }
 }
 uint8_t GetSlotID() {
