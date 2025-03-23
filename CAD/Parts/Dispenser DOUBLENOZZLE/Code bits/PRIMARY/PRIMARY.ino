@@ -103,7 +103,7 @@ void loop() {
   if (button_state3 != OLD_button_state3) {  //Only update if state changes
     OLD_button_state3 = button_state3;
     if (button_state3 == LOW) {  //If button is pressed (LOW due to internal pull-up)
-    Serial.println("Calling for rainbow");
+      Serial.println("Calling for rainbow");
       uint8_t BusSend[] = { CHANGECOLOR, 0b00000010 };
       bus.send_packet(PJON_BROADCAST, BusSend, sizeof(BusSend));
     }
