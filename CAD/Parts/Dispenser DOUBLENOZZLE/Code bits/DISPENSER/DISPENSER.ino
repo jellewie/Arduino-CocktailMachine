@@ -161,7 +161,7 @@ uint8_t triggerAction(uint8_t cmd1, uint8_t cmd2) {
       SaveSettings();
       break;
     case CHANGEDELAY:
-      DelayAir = cmd2 * 5;
+      DelayAir = cmd2;
       SaveSettings();
       break;
     case CHANGECOLOR:
@@ -199,7 +199,7 @@ void DispenseStart() {
   fill_solid(&(LEDs[0]), TotalLEDs, ColorDispencing);
   FastLED.show();
   digitalWrite(PDO_ValveAir, HIGH);
-  delay(DelayAir);
+  delay(DelayAir * 5);
   digitalWrite(PDO_ValveFluid, HIGH);
 }
 void DispenseStop() {
