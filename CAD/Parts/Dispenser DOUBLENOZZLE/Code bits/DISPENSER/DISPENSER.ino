@@ -9,13 +9,21 @@
 #define SWBB_MODE 1  //Should be default, 1=1.97kB/s //https://github.com/gioblu/PJON/blob/master/src/strategies/SoftwareBitBang/README.md#performance
 //#define SWBB_MAX_ATTEMPTS 20;	//Maximum transmission attempts	Numeric value (20 by default)
 
+#ifdef ESP32
 const uint8_t PDI_Button = 14;      //Pull down to trigger
 const uint8_t PDO_ValveFluid = 33;  //LOW=OFF
 const uint8_t PDO_ValveAir = 32;    //LOW=OFF
 const uint8_t PDI_SLOT_TXRX = 13;   //The wire from which to get local ID from    //must be 2 or 3 on attiny85 I think
 const uint8_t PAO_LED = 26;         //To which pin the <LED> is connected to
-const uint8_t PDIO_buspin = 25;
-
+const uint8_t PDIO_buspin = 25;     //must be 12,25 for ESP32
+#else
+const uint8_t PDI_Button = 3;      //Pull down button to trigger
+const uint8_t PDO_ValveFluid = 2;  //LOW=OFF
+const uint8_t PDO_ValveAir = 5;    //LOW=OFF
+const uint8_t PDI_SLOT_TXRX = 0;   //The wire from which to get local ID from    //must be 2 or 3 on attiny85 I think
+const uint8_t PAO_LED = 4;         //To which pin the <LED> is connected to
+const uint8_t PDIO_buspin = 1;     //Must be 1/2 for ATtiny85
+#endif
 const uint8_t PrimaryID = 254;                      //Used to request adoption
 const uint16_t TotalLEDs = 1;                       //The total amounts of LEDs in the strip
 CRGB LEDs[TotalLEDs];                               //Array with our status LED
@@ -76,20 +84,22 @@ void loop() {
   LEDloop(false);  //Do the LED update loop if needed, this is for rainbow.
 }
 void LoadSettings() {
-  EEPROM.begin(16);  //Needed for ESP32
-  FluidID = EEPROM.read(0);
-  DelayAir = EEPROM.read(1);
-  MSperML = EEPROM.read(2);
 #ifdef ESP32
   for (uint8_t i = 0; i < 3; i++)
     Serial.println("LoadedSetting " + String(i) + "=" + EEPROM.read(i));
+  EEPROM.begin(16);  //Needed for ESP32
 #endif
+  FluidID = EEPROM.read(0);
+  DelayAir = EEPROM.read(1);
+  MSperML = EEPROM.read(2);
 }
 void SaveSettings() {
   EEPROM.write(0, FluidID);
   EEPROM.write(1, DelayAir);
   EEPROM.write(2, MSperML);
+#ifdef ESP32
   EEPROM.commit();  //Needed for ESP32
+#endif
 }
 void error_handler(uint8_t code, uint16_t data, void *custom_pointer) {
 #ifdef ESP32
@@ -185,7 +195,7 @@ uint8_t triggerAction(uint8_t cmd1, uint8_t cmd2) {
           LEDmode = 1;                               //Set rainbow mode
           LEDloop(true);
         }
-      Serial.println("r=" + String(r) + " g=" + String(g) + " b=" + String(b) + " m=" + String(m));
+      //Serial.println("r=" + String(r) + " g=" + String(g) + " b=" + String(b) + " m=" + String(m));
       break;
     default:
       return false;
@@ -195,7 +205,6 @@ uint8_t triggerAction(uint8_t cmd1, uint8_t cmd2) {
 }
 void DispenseStart() {
   LEDmode = 0;
-  Serial.println("DispenseStart");
   fill_solid(&(LEDs[0]), TotalLEDs, ColorDispencing);
   FastLED.show();
   digitalWrite(PDO_ValveAir, HIGH);
@@ -203,7 +212,6 @@ void DispenseStart() {
   digitalWrite(PDO_ValveFluid, HIGH);
 }
 void DispenseStop() {
-  Serial.println("DispenseStop");
   digitalWrite(PDO_ValveAir, LOW);
   digitalWrite(PDO_ValveFluid, LOW);
   LEDloop(true);
