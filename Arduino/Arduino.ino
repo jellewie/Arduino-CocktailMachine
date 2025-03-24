@@ -21,13 +21,10 @@ const byte PDO_Step_enable = 16;
 const byte PAO_LED = 13;  //To which pin the <LED strip> is connected to
 const byte PDO_X_Dir = 23;
 const byte PDO_Y_Dir = 17;
-const byte PDO_Z_Dir = 18;
 const byte PDO_X_Step = 4;
 const byte PDO_Y_Step = 12;
-const byte PDO_Z_Step = 19;
 const byte PDI_X_Ref = 5;  //LOW = TRIGGERED
 const byte PDI_Y_Ref = 27;
-const byte PDI_Z_Ref = 15;
 const byte PDI_S = 39;
 const byte PDO_Pump[] = { 32, 33, 25, 26 };
 const int TotalLEDs = 100;  //The total amounts of LEDs in the strip
@@ -46,11 +43,9 @@ unsigned int MotorMAXSpeed = 5500;
 unsigned int MotorMAXAccel = 3000;
 unsigned int BedSize_X = 23950;
 unsigned int BedSize_Y = 7100;
-unsigned int BedSize_Z = 5000;
 unsigned int Manual_X = BedSize_X;
 unsigned int Manual_Y = BedSize_Y;
 unsigned int HomedistanceBounce = 200;
-unsigned int HomedistanceBounceZ = HomedistanceBounce * 4;
 unsigned int MaxGlassSize = 300;
 unsigned int DisableSteppersAfterIdleS = 60;
 byte MaxBrightness = 128;
@@ -65,7 +60,6 @@ byte Pump_Amount = sizeof(PDO_Pump) / sizeof(PDO_Pump[0]);  //Why filling this i
 const byte Dispensers_Amount = 20;                          //Only 20 are saved in the WiFiManager!!
 AccelStepper Stepper_X(AccelStepper::DRIVER, PDO_X_Step, PDO_X_Dir);
 AccelStepper Stepper_Y(AccelStepper::DRIVER, PDO_Y_Step, PDO_Y_Dir);
-AccelStepper Stepper_Z(AccelStepper::DRIVER, PDO_Z_Step, PDO_Z_Dir);
 LiquidCrystal_I2C lcd(0x27, 20, 4);  //Set the LCD address to 0x27 for a 20 chars and 2 line display
 CRGB LEDs[TotalLEDs];
 #include "Data.h"
@@ -92,13 +86,10 @@ void setup() {
   DisableSteppers();
   pinMode(PDO_X_Dir, OUTPUT);
   pinMode(PDO_Y_Dir, OUTPUT);
-  pinMode(PDO_Z_Dir, OUTPUT);
   pinMode(PDO_X_Step, OUTPUT);
   pinMode(PDO_Y_Step, OUTPUT);
-  pinMode(PDO_Z_Step, OUTPUT);
   pinMode(PDI_X_Ref, INPUT_PULLUP);
   pinMode(PDI_Y_Ref, INPUT_PULLUP);
-  pinMode(PDI_Z_Ref, INPUT_PULLUP);
   pinMode(PDI_S, INPUT_PULLUP);
   for (byte i = 0; i < Pump_Amount; i++) {
     pinMode(PDO_Pump[i], OUTPUT);
@@ -106,13 +97,10 @@ void setup() {
   }
   Stepper_X.setPinsInverted(false, true, false, false, false);  //stepInvert, directionInvert, pin3Invert, pin4Invert, enableInvert
   Stepper_Y.setPinsInverted(false, true, false, false, false);
-  Stepper_Z.setPinsInverted(false, true, false, false, false);
   Stepper_X.setMaxSpeed(MotorMAXSpeed);
   Stepper_Y.setMaxSpeed(MotorMAXSpeed);
-  Stepper_Z.setMaxSpeed(MotorMAXSpeed);
   Stepper_X.setAcceleration(MotorMAXAccel);
   Stepper_Y.setAcceleration(MotorMAXAccel);
-  Stepper_Z.setAcceleration(MotorMAXAccel);
   //===========================================================================
   //Set up all server UrlRequest stuff
   //===========================================================================
@@ -150,7 +138,7 @@ void MakeCocktail(Drink Mix) {
   LcdPrint("Mixing cocktail", Mix.Name);
   DisableSteppersinSeconds = -1;  //Make sure the steppers do not auto disable
   if (!Homed) {
-    if (!Home(true, true, true)) {
+    if (!Home(true, true)) {
       LcdPrint("Mix not started", "Homing failed");
       return;
     }
@@ -166,7 +154,7 @@ void MakeCocktail(Drink Mix) {
       GetIngredient(Mix.Ingredients[i]);
     }
   }
-  MoveTo(Manual_X, Manual_Y, BedSize_Z);
+  MoveTo(Manual_X, Manual_Y);
   LcdPrint("Mixed cocktail", Mix.Name);
   FastLED.clear();
   UpdateLED(true);
@@ -181,45 +169,9 @@ void GetIngredient(Ingredient IN) {
   byte DispenserID = GetDispenserID(IN.ID);
   if (DispenserID != 255) {
     LightSection(Dispensers[DispenserID].LocationX);
-    switch (Dispensers[DispenserID].Type) {
-      case SHOTDISPENSER:
-        {
-          Serial.println("GetIngredient SHOTDispenser IN.ml=" + String(IN.ml) + " ShotDispenserML=" + String(ShotDispenserML));
-          MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);
-          int mlToDo = IN.ml;
-          float DoDelay = 0;
-          byte DoAmount = ceil((float)IN.ml / ShotDispenserML);
-          for (byte i = 1; i <= DoAmount; i++) {
-            Stepper_Z.moveTo(Dispensers[DispenserID].LocationZ);
-            while (Stepper_Z.run()) yield();
-            //Do some funny stuff so we can try doing half dispensing
-            DoDelay = Dispensers[DispenserID].TimeMSML * (mlToDo > ShotDispenserML ? ShotDispenserML : mlToDo);
-            mlToDo -= ShotDispenserML;
-            MyDelay(DoDelay);
-            Stepper_Z.moveTo(0);
-            while (Stepper_Z.run()) yield();
-            MyDelay(Dispensers[DispenserID].TimeMSoff);
-          }
-        }
-        break;
-      case PUMP:
-        {
-          Serial.println("GetIngredient from Pump ID=" + String(Dispensers[DispenserID].LocationZ));
-          if (Dispensers[DispenserID].LocationZ <= Pump_Amount) {
-            MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);
-            digitalWrite(PDO_Pump[Dispensers[DispenserID].LocationZ], HIGH);
-            MyDelay(Dispensers[DispenserID].TimeMSML * IN.ml);
-            digitalWrite(PDO_Pump[Dispensers[DispenserID].LocationZ], LOW);
-            MyDelay(Dispensers[DispenserID].TimeMSoff);
-          } else {
-            if (WaitForUser("UNK pump ID", "LocationZ=" + String(Dispensers[DispenserID].LocationZ))) return;
-          }
-        }
-        break;
-      default:
-        if (WaitForUser("UNK Dispenser type", String(Dispensers[DispenserID].Type))) return;
-        break;
-    }
+
+    Serial.println("GetIngredient SHOTDispenser TYPE= " + String(Dispensers[DispenserID].Type) + "IN.ml=" + String(IN.ml) + " ShotDispenserML=" + String(ShotDispenserML));
+
   }
 }
 void LightSection(long LocationX) {

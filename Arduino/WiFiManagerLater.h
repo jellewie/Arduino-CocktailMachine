@@ -29,8 +29,7 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
         BedSize_Y = Value.toInt();                return true;
       } break;
     case 5: {
-        if (!StringIsDigit(Value))                return false;
-        BedSize_Z = Value.toInt();                return true;
+        return false;
       } break;
     case 6: {
         if (!StringIsDigit(Value))                return false;
@@ -53,7 +52,6 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
     case 10: {
         if (!StringIsDigit(Value))                return false;
         HomedistanceBounce = Value.toInt();       return true;
-        HomedistanceBounceZ = HomedistanceBounce * 4;
       } break;
     case 11: {
         DisableSteppersAfterIdleS = Value.toInt(); return true;
@@ -78,23 +76,21 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
         byte i = ValueID - 16;                                  //Remove the amount above from the counter, so the next are of the Dispensers
         if (i < Dispensers_Amount) {
           String _Output[7];
-          CutVariable(Value, &_Output[0], 7);
+          CutVariable(Value, &_Output[0], 6);
           _Output[0] = TypeStringToID(_Output[0]);
           _Output[1].replace("X=", "");
           _Output[2].replace("Y=", "");
-          _Output[3].replace("ZI=", "");
-          _Output[4].replace("MSML", "");
-          _Output[5].replace("MSoff", "");
-          _Output[6] = IngredientStringToID(_Output[6]);
+          _Output[3].replace("MSML", "");
+          _Output[4].replace("MSoff", "");
+          _Output[5] = IngredientStringToID(_Output[6]);
           if (!StringIsDigit(_Output[0]) or !StringIsDigit(_Output[1]) or !StringIsDigit(_Output[2]) or !StringIsDigit(_Output[3]) or !StringIsDigit(_Output[4]) or !StringIsDigit(_Output[5]) or !StringIsDigit(_Output[6]))       return false;
           Dispenser Dis;
           Dis.Type = _Output[0].toInt();
           Dis.LocationX = _Output[1].toInt();
           Dis.LocationY = _Output[2].toInt();
-          Dis.LocationZ = _Output[3].toInt();
-          Dis.TimeMSML = _Output[4].toInt();
-          Dis.TimeMSoff = _Output[5].toInt();
-          Dis.IngredientID = IngredientStringToID(_Output[6]);
+          Dis.TimeMSML = _Output[3].toInt();
+          Dis.TimeMSoff = _Output[4].toInt();
+          Dis.IngredientID = IngredientStringToID(_Output[5]);
           SetDispenser(Dis, i);
           return true;
         }
@@ -111,7 +107,7 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
     case 2:  return String(MotorMAXAccel);                        break;
     case 3:  return String(BedSize_X);                            break;
     case 4:  return String(BedSize_Y);                            break;
-    case 5:  return String(BedSize_Z);                            break;
+    case 5:  return "NULL";                            break;
     case 6:  return String(Manual_X);                             break;
     case 7:  return String(Manual_Y);                             break;
     case 8:  return String(ShotDispenserML);                      break;
@@ -127,9 +123,9 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
         if (i < Dispensers_Amount) {
           String Output = "";
           if (Convert) {
-            Output = TypeIDtoString(Dispensers[i].Type) + ",X=" + String(Dispensers[i].LocationX) + ",Y=" + String(Dispensers[i].LocationY) + ",ZI=" + String(Dispensers[i].LocationZ) + "," + String(Dispensers[i].TimeMSML) + "MSML," + String(Dispensers[i].TimeMSoff) + "MSoff," + IngredientIDtoString(Dispensers[i].IngredientID);
+            Output = TypeIDtoString(Dispensers[i].Type) + ",X=" + String(Dispensers[i].LocationX) + ",Y=" + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "MSML," + String(Dispensers[i].TimeMSoff) + "MSoff," + IngredientIDtoString(Dispensers[i].IngredientID);
           } else {
-            Output = String(Dispensers[i].Type) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].LocationZ) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].TimeMSoff) + "," + String(Dispensers[i].IngredientID);
+            Output = String(Dispensers[i].Type) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].TimeMSoff) + "," + String(Dispensers[i].IngredientID);
           }
           return String(Output);
         }

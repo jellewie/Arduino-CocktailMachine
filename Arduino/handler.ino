@@ -6,7 +6,6 @@
 #define PreFixMotorMAXAccel "motormaxaccel"
 #define PreFixBedSize_X "bedsizex"
 #define PreFixBedSize_Y "bedsizey"
-#define PreFixBedSize_Z "bedsizez"
 #define PreFixManual_X "manualx"
 #define PreFixManual_Y "manualy"
 #define PreFixShotDispenserML "shotdispenserml"
@@ -20,7 +19,6 @@
 #define PreFixSetDispenserType "dt"
 #define PreFixSetDispenserX "dx"
 #define PreFixSetDispenserY "dy"
-#define PreFixSetDispenserZ "dz"
 #define PreFixSetDispenserMSml "dl"
 #define PreFixSetDispenserMSoff "do"
 #define PreFixSetDispenserIngredientID "dn"
@@ -53,7 +51,6 @@
 //Debug, move to XYZ
 #define PreFix_X         "x"
 #define PreFix_Y         "y"
-#define PreFix_Z         "z"
 
 #include "client.h"
 
@@ -63,13 +60,13 @@ void handle_Set() {
   bool makeMix = false;
   int8_t DoHoming = -1;
   Drink Mix;
-  int GoTo[3] = { -1, -1, -1};
+  int GoTo[3] = { -1, -1};
   for (byte i = 0; i < 8; i++) {
     Mix.Ingredients[i].ID = 0;
     Mix.Ingredients[i].Action = "";
     Mix.Ingredients[i].ml = 0;
   }
-  Dispenser Dis = {0, 0, 0, 0, 0, 0, 0};
+  Dispenser Dis = {0, 0, 0, 0, 0, 0};
   int8_t DisID = -1;
   for (int i = 0; i < server.args(); i++) {
     String ArguName = server.argName(i);
@@ -98,12 +95,6 @@ void handle_Set() {
     } else if (ArguName == PreFixBedSize_Y) {
       if (!WiFiManagerUser_Set_Value(4, ArgValue)) {
         ERRORMSG = "BedSize_Y Not set";
-      } else {
-        SaveEEPROMinSeconds = 30;
-      }
-    } else if (ArguName == PreFixBedSize_Z) {
-      if (!WiFiManagerUser_Set_Value(5, ArgValue)) {
-        ERRORMSG = "BedSize_Z Not set";
       } else {
         SaveEEPROMinSeconds = 30;
       }
@@ -230,8 +221,6 @@ void handle_Set() {
       GoTo[0] = ArgValue.toInt();
     } else if (ArguName == PreFix_Y) {
       GoTo[1] = ArgValue.toInt();
-    } else if (ArguName == PreFix_Z) {
-      GoTo[2] = ArgValue.toInt();
     } else if (ArguName == PreFixSetDispenserID) {
       if (!StringIsDigit(ArgValue)) {
         ERRORMSG = "SetDispenserID not a value";
@@ -270,16 +259,6 @@ void handle_Set() {
           ERRORMSG = "SetDispenserY out of valid range";
         } else {
           Dis.LocationY = ArgValue.toInt();
-        }
-      }
-    } else if (ArguName == PreFixSetDispenserZ) {
-      if (!StringIsDigit(ArgValue)) {
-        ERRORMSG = "SetDispenserZ not a value";
-      } else {
-        if (ArgValue.toInt() < 0) {
-          ERRORMSG = "SetDispenserZ out of valid range";
-        } else {
-          Dis.LocationZ = ArgValue.toInt();
         }
       }
     } else if (ArguName == PreFixSetDispenserMSml) {
@@ -325,7 +304,7 @@ void handle_Set() {
   }
 
   //Process the dispenser update
-  if (DisID != -1 or Dis.Type != 0 or Dis.LocationX != 0 or Dis.LocationY != 0 or Dis.LocationZ != 0 or Dis.TimeMSML != 0 or Dis.TimeMSoff != 0 or Dis.IngredientID != 0) {
+  if (DisID != -1 or Dis.Type != 0 or Dis.LocationX != 0 or Dis.LocationY != 0 or Dis.TimeMSML != 0 or Dis.TimeMSoff != 0 or Dis.IngredientID != 0) {
     if (DisID >= 0) {
       SetDispenser(Dis, DisID);
     } else {
@@ -361,7 +340,7 @@ void handle_Get() {
   String Json = "{\"dispensers\":[";
   for (byte i = 0; i < Dispensers_Amount; i++) {
     if (i != 0) Json += ",";
-    Json += "[" + String(Dispensers[i].Type) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].LocationZ) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].TimeMSoff) + "," + String(Dispensers[i].IngredientID) + "]";
+    Json += "[" + String(Dispensers[i].Type) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].TimeMSoff) + "," + String(Dispensers[i].IngredientID) + "]";
   }
   Json += "],\"ingredients\":[";
   for (byte i = 0; i < Ingredient_Amount; i++) {
@@ -373,7 +352,6 @@ void handle_Get() {
   Json += ",\"disablesteppersafteridles\":" + String(DisableSteppersAfterIdleS);
   Json += ",\"bedSizeX\":" + String(BedSize_X);
   Json += ",\"bedSizeY\":" + String(BedSize_Y);
-  Json += ",\"bedSizeZ\":" + String(BedSize_Z);
   Json += ",\"manualX\":" + String(Manual_X);
   Json += ",\"manualY\":" + String(Manual_Y);
   Json += ",\"motorMaxSpeed\":" + String(MotorMAXSpeed);
@@ -395,7 +373,6 @@ void handle_Info() {
                    "IP adress = " + IpAddress2String(WiFi.localIP()) + "\n"
                    "X_Ref = " + IsTrueToString(digitalRead(PDI_X_Ref) == LOW) + " " + (digitalRead(PDI_X_Ref) ? "HIGH" : "LOW") + "\n"
                    "Y_Ref = " + IsTrueToString(digitalRead(PDI_Y_Ref) == LOW) + " " + (digitalRead(PDI_Y_Ref) ? "HIGH" : "LOW") + "\n"
-                   "Z_Ref = " + IsTrueToString(digitalRead(PDI_Z_Ref) == LOW) + " " + (digitalRead(PDI_Z_Ref) ? "HIGH" : "LOW") + "\n"
                    "Switch = " + IsTrueToString(digitalRead(PDI_S)    == LOW) + " " + (digitalRead(PDI_S)     ? "HIGH" : "LOW") + "\n"
                    "Running = " + IsTrueToString(digitalRead(PDI_S)    == LOW) + "\n"
 

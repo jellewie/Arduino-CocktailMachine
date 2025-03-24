@@ -12,7 +12,6 @@ struct Dispenser {
   byte Type;
   unsigned int LocationX;
   unsigned int LocationY;
-  unsigned int LocationZ;                                                //Used for Pump_ID for PUMP
   unsigned int TimeMSML;                                                 //Timer per ms for each mL
   unsigned int TimeMSoff;                                                //Delay in MS to wait after
   byte IngredientID;
@@ -23,23 +22,23 @@ String TypeS[] {"UNSPECIFIED", "SHOTDISPENSER", "PUMP"};
 byte Ingredient_Amount = sizeof(IngredientS) / sizeof(IngredientS[0]);//Why filling this in if we can automate that? :)
 byte Type_Amount = sizeof(TypeS) / sizeof(TypeS[0]);//Why filling this in if we can automate that? :)
 Dispenser Dispensers[Dispensers_Amount] = {
-  //Type        , X     , Y     , Z    , MSml, MSoff, IngredientID
-  {SHOTDISPENSER, 280   , 0     , 4500 , 100 , 1000 , 1},
-  {SHOTDISPENSER, 4180  , 0     , 4500 , 100 , 1000 , 2},
-  {SHOTDISPENSER, 8160  , 0     , 4500 , 100 , 1000 , 3},
-  {SHOTDISPENSER, 12100 , 0     , 4500 , 100 , 1000 , 4},
-  {SHOTDISPENSER, 16120 , 0     , 4500 , 100 , 1000 , 5},
-  {SHOTDISPENSER, 20050 , 0     , 4500 , 100 , 1000 , 6},
-  {SHOTDISPENSER, 220   , 7250  , 4500 , 100 , 1000 , 7},
-  {SHOTDISPENSER, 4180  , 7250  , 4500 , 100 , 1000 , 8},
-  {SHOTDISPENSER, 8160  , 7250  , 4500 , 100 , 1000 , 9},
-  {SHOTDISPENSER, 12140 , 7250  , 4500 , 100 , 1000 , 10},
-  {SHOTDISPENSER, 16000 , 7250  , 4500 , 100 , 1000 , 11},
-  {SHOTDISPENSER, 20150 , 7250  , 4500 , 100 , 1000 , 12},
-  {PUMP         , 23900 , 0     , 0    , 135 , 500  , 13},
-  {PUMP         , 23900 , 0     , 1    , 135 , 500  , 14},
-  {PUMP         , 23900 , 0     , 2    , 135 , 500  , 15},
-  {PUMP         , 23900 , 0     , 3    , 135 , 500  , 16}
+  //Type        , X     , Y     , MSml, MSoff, IngredientID
+  {SHOTDISPENSER, 280   , 0     , 100 , 1000 , 1},
+  {SHOTDISPENSER, 4180  , 0     , 100 , 1000 , 2},
+  {SHOTDISPENSER, 8160  , 0     , 100 , 1000 , 3},
+  {SHOTDISPENSER, 12100 , 0     , 100 , 1000 , 4},
+  {SHOTDISPENSER, 16120 , 0     , 100 , 1000 , 5},
+  {SHOTDISPENSER, 20050 , 0     , 100 , 1000 , 6},
+  {SHOTDISPENSER, 220   , 7250  , 100 , 1000 , 7},
+  {SHOTDISPENSER, 4180  , 7250  , 100 , 1000 , 8},
+  {SHOTDISPENSER, 8160  , 7250  , 100 , 1000 , 9},
+  {SHOTDISPENSER, 12140 , 7250  , 100 , 1000 , 10},
+  {SHOTDISPENSER, 16000 , 7250  , 100 , 1000 , 11},
+  {SHOTDISPENSER, 20150 , 7250  , 100 , 1000 , 12},
+  {PUMP         , 23900 , 0     , 135 , 500  , 13},
+  {PUMP         , 23900 , 0     , 135 , 500  , 14},
+  {PUMP         , 23900 , 0     , 135 , 500  , 15},
+  {PUMP         , 23900 , 0     , 135 , 500  , 16}
 };
 //==================================================
 //Basic universal LED functions. These includes start postion, amount (inc overflow correction and such)
@@ -324,7 +323,6 @@ void DisableSteppers() {
   Homed = false;
   Stepper_X.moveTo(Stepper_X.currentPosition());
   Stepper_Y.moveTo(Stepper_Y.currentPosition());
-  Stepper_Z.moveTo(Stepper_Z.currentPosition());
   digitalWrite(PDO_Step_enable, HIGH);                          //Disable all stepper drivers
 }
 void CheckEEPROMSave() {
@@ -400,26 +398,13 @@ bool MoveWait(AccelStepper Step, byte RefferenceButton, int pos) {
     yield();
   }
 }
-bool Home(bool X = true, bool Y = true, bool Z = true);
-bool Home(bool X, bool Y, bool Z) {
+bool Home(bool X = true, bool Y = true);
+bool Home(bool X, bool Y) {
   LED_Fill(0, TotalLEDs, ColorHoming);
   UpdateLED(true);
   LcdPrint("Homing", " ");
   digitalWrite(PDO_Step_enable, LOW);                           //Enable all stepper drivers
-  bool Homed_X = false, Homed_Y = false, Homed_Z = false;
-  if (Z) {
-    LcdPrint("", "Z");
-    Stepper_Z.setCurrentPosition(0);
-    if (MoveWait(Stepper_Z, PDI_Z_Ref, BedSize_Z * -1.1)) {  //If the switch is touched
-      Stepper_Z.moveTo(HomedistanceBounceZ);
-      while (Stepper_Z.run())
-        yield();
-      Stepper_Z.setMaxSpeed(HomeMAXSpeed);
-      Homed_Z = MoveWait(Stepper_Z, PDI_Z_Ref, -(BedSize_Z / 20));
-      Stepper_Z.setCurrentPosition(0);                          //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
-      Stepper_Z.setMaxSpeed(MotorMAXSpeed);                     //Reset max speed
-    }
-  }
+  bool Homed_X = false, Homed_Y = false;
   if (X) {
     LcdPrint("", "X");
     Stepper_X.setCurrentPosition(0);
@@ -446,11 +431,11 @@ bool Home(bool X, bool Y, bool Z) {
       Stepper_Y.setMaxSpeed(MotorMAXSpeed);                     //Reset max speed
     }
   }
-  if (!X or !Y or !Z)
-    LcdPrint("Homed", "X" + String(X) + "," + String(Homed_X) + " Y" + String(Y) + "," + String(Homed_Y) + " Z" + String(Z) + "," + String(Homed_Z));
+  if (!X or !Y)
+    LcdPrint("Homed", "X" + String(X) + "," + String(Homed_X) + " Y" + String(Y) + "," + String(Homed_Y));
   else
-    LcdPrint("Homed", "X" + String(Homed_X) + " Y" +  String(Homed_Y) + " Z" + String(Homed_Z));
-  if (X == Homed_X and Y == Homed_Y and Z == Homed_Z) {
+    LcdPrint("Homed", "X" + String(Homed_X) + " Y" +  String(Homed_Y));
+  if (X == Homed_X and Y == Homed_Y) {
     Homed = true;
     return true;
   }
@@ -469,7 +454,7 @@ void MyYield() {
     bool ButtonState = digitalRead(PDI_S);
     if (LastButtonState and !ButtonState) {
       if (!Homed) {
-        if (!Home(true, true, true))
+        if (!Home(true, true))
           FastLED.delay(500);
       }
       LcdPrint("Mixer ready!", IpAddress2String(WiFi.localIP()));
@@ -489,16 +474,8 @@ void MoveTo(int LocationX = -1, int LocationY = -1, int LocationZ = -1);
 void MoveTo(int LocationX, int LocationY, int LocationZ) {
   Serial.println("MoveTo " + String(LocationX) + " , " + String(LocationY) + " , " + String(LocationZ));
   if (!Homed) {
-    if (!Home(true, true, true)) {
+    if (!Home(true, true)) {
       return;
-    }
-  }
-  if ((LocationX != -1 or LocationY != -1 ) and Stepper_Z.currentPosition() > 0 ) { //Always move Z down before moving XY
-    if (LocationX != Stepper_X.currentPosition() or LocationY != Stepper_Y.currentPosition()) {//Unless we are already at XY
-      Stepper_Z.moveTo(0);
-      while (Stepper_Z.run()) {
-        yield();
-      }
     }
   }
   if (LocationX >= 0 and LocationX < BedSize_X * 10) {
@@ -511,11 +488,6 @@ void MoveTo(int LocationX, int LocationY, int LocationZ) {
       LocationY = BedSize_Y;
     Stepper_Y.moveTo(LocationY);
   }
-  if (LocationZ >= 0 and LocationZ < BedSize_Z * 10) {
-    if (LocationZ > BedSize_Z)
-      LocationZ = BedSize_Z;
-    Stepper_Z.moveTo(LocationZ);
-  }
   bool WaitMore = true;
   while (WaitMore) {
     Stepper_X.run();
@@ -524,15 +496,12 @@ void MoveTo(int LocationX, int LocationY, int LocationZ) {
       WaitMore = false;
     yield();
   }
-  while (Stepper_Z.run()) {//Always move Z after moving XY
-    yield();
-  }
   DisableSteppersinSeconds = DisableSteppersAfterIdleS;      //Schedule to disable the steppers
 }
 #define TimeoutWaitingOnUserMs 10 * 60 * 1000
 bool WaitForUser(String msg, String msg2) {
   LcdPrint(msg, msg2);
-  MoveTo(Manual_X, Manual_Y, BedSize_Z);
+  MoveTo(Manual_X, Manual_Y);
   while (true) {
     if (digitalRead(PDI_S) == LOW) {
       LcdPrint(msg, "User confirmed");
