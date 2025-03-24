@@ -1,7 +1,7 @@
 struct Ingredient {
-  byte ID;
-  String Action;                                                //If given, prompt the message and wait for user confirmation first
-  byte ml;
+  byte ID;        //ID of the fluid
+  String Action;  //If given, prompt the message and wait for user confirmation first
+  byte ml;        //ml of the fluid
 };
 struct Drink {
   String Name;
@@ -9,36 +9,39 @@ struct Drink {
   Ingredient Ingredients[8];
 };
 struct Dispenser {
-  byte Type;
-  unsigned int LocationX;
-  unsigned int LocationY;
-  unsigned int TimeMSML;                                                 //Timer per ms for each mL
-  unsigned int TimeMSoff;                                                //Delay in MS to wait after
-  byte IngredientID;
+  byte Type;               //Type of dispenser
+  unsigned int LocationX;  //X location of the dispenser
+  unsigned int LocationY;  //Y location of the dispenser
+  unsigned int ExtraData;  //Used for Pump_ID for PUMP
+  unsigned int TimeMSML;   //Timer per ms for each mL
+  unsigned int TimeMSoff;  //Delay in MS to wait after
+  byte IngredientID;       //The fluid in this dispenser
 };
-enum TypeE {UNSPECIFIED, SHOTDISPENSER, PUMP};
-String TypeS[] {"UNSPECIFIED", "SHOTDISPENSER", "PUMP"};
+enum TypeE { UNSPECIFIED,
+             DOUBLENOZZLE,
+             PUMP };
+String TypeS[]{ "UNSPECIFIED", "DOUBLENOZZLE", "PUMP" };
 
-byte Ingredient_Amount = sizeof(IngredientS) / sizeof(IngredientS[0]);//Why filling this in if we can automate that? :)
-byte Type_Amount = sizeof(TypeS) / sizeof(TypeS[0]);//Why filling this in if we can automate that? :)
+byte Ingredient_Amount = sizeof(IngredientS) / sizeof(IngredientS[0]);  //Why filling this in if we can automate that? :)
+byte Type_Amount = sizeof(TypeS) / sizeof(TypeS[0]);                    //Why filling this in if we can automate that? :)
 Dispenser Dispensers[Dispensers_Amount] = {
   //Type        , X     , Y     , MSml, MSoff, IngredientID
-  {SHOTDISPENSER, 280   , 0     , 100 , 1000 , 1},
-  {SHOTDISPENSER, 4180  , 0     , 100 , 1000 , 2},
-  {SHOTDISPENSER, 8160  , 0     , 100 , 1000 , 3},
-  {SHOTDISPENSER, 12100 , 0     , 100 , 1000 , 4},
-  {SHOTDISPENSER, 16120 , 0     , 100 , 1000 , 5},
-  {SHOTDISPENSER, 20050 , 0     , 100 , 1000 , 6},
-  {SHOTDISPENSER, 220   , 7250  , 100 , 1000 , 7},
-  {SHOTDISPENSER, 4180  , 7250  , 100 , 1000 , 8},
-  {SHOTDISPENSER, 8160  , 7250  , 100 , 1000 , 9},
-  {SHOTDISPENSER, 12140 , 7250  , 100 , 1000 , 10},
-  {SHOTDISPENSER, 16000 , 7250  , 100 , 1000 , 11},
-  {SHOTDISPENSER, 20150 , 7250  , 100 , 1000 , 12},
-  {PUMP         , 23900 , 0     , 135 , 500  , 13},
-  {PUMP         , 23900 , 0     , 135 , 500  , 14},
-  {PUMP         , 23900 , 0     , 135 , 500  , 15},
-  {PUMP         , 23900 , 0     , 135 , 500  , 16}
+  { DOUBLENOZZLE, 280, 0, 100, 1000, 1 },
+  { DOUBLENOZZLE, 4180, 0, 100, 1000, 2 },
+  { DOUBLENOZZLE, 8160, 0, 100, 1000, 3 },
+  { DOUBLENOZZLE, 12100, 0, 100, 1000, 4 },
+  { DOUBLENOZZLE, 16120, 0, 100, 1000, 5 },
+  { DOUBLENOZZLE, 20050, 0, 100, 1000, 6 },
+  { DOUBLENOZZLE, 220, 7250, 100, 1000, 7 },
+  { DOUBLENOZZLE, 4180, 7250, 100, 1000, 8 },
+  { DOUBLENOZZLE, 8160, 7250, 100, 1000, 9 },
+  { DOUBLENOZZLE, 12140, 7250, 100, 1000, 10 },
+  { DOUBLENOZZLE, 16000, 7250, 100, 1000, 11 },
+  { DOUBLENOZZLE, 20150, 7250, 100, 1000, 12 },
+  { PUMP, 23900, 0, 135, 500, 13 },
+  { PUMP, 23900, 0, 135, 500, 14 },
+  { PUMP, 23900, 0, 135, 500, 15 },
+  { PUMP, 23900, 0, 135, 500, 16 }
 };
 //==================================================
 //Basic universal LED functions. These includes start postion, amount (inc overflow correction and such)
@@ -47,15 +50,15 @@ void UpdateLED(bool forceUpdate = false);
 void UpdateLED(bool forceUpdate) {
   if (UpdateLEDs or forceUpdate) {
     UpdateLEDs = false;
-    FastLED.show();                                             //Update
+    FastLED.show();  //Update
   }
 }
 void LED_Fill(int From, int Amount, CRGB Color, int MaxBound = TotalLEDs);
 void LED_Fill(int From, int Amount, CRGB Color, int MaxBound) {
-  while (From >= MaxBound) From -= MaxBound;                    //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
-  if (Amount > MaxBound) Amount = MaxBound;                     //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
-  if (From + Amount > MaxBound) {                               //Overflow protection
-    byte calc1 = MaxBound - From;                               //Calculates the amount of LEDs which need to on on the end of the strip
+  while (From >= MaxBound) From -= MaxBound;  //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
+  if (Amount > MaxBound) Amount = MaxBound;   //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
+  if (From + Amount > MaxBound) {             //Overflow protection
+    byte calc1 = MaxBound - From;             //Calculates the amount of LEDs which need to on on the end of the strip
     fill_solid(&(LEDs[From]), calc1, Color);
     fill_solid(&(LEDs[0]), Amount - calc1, Color);
   } else
@@ -63,10 +66,10 @@ void LED_Fill(int From, int Amount, CRGB Color, int MaxBound) {
 }
 void LED_Add(int From, int Amount, CRGB Color, int MaxBound = TotalLEDs);
 void LED_Add(int From, int Amount, CRGB Color, int MaxBound) {
-  while (From >= MaxBound) From -= MaxBound;                    //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
-  if (Amount > MaxBound) Amount = MaxBound;                     //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
-  if (From + Amount > MaxBound) {                               //Overflow protection
-    byte calc1 = MaxBound - From;                               //Calculates the amount of LEDs which need to on on the end of the strip
+  while (From >= MaxBound) From -= MaxBound;  //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
+  if (Amount > MaxBound) Amount = MaxBound;   //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
+  if (From + Amount > MaxBound) {             //Overflow protection
+    byte calc1 = MaxBound - From;             //Calculates the amount of LEDs which need to on on the end of the strip
     for (int i = From; i < From + calc1; i++)
       LEDs[i] += Color;
     for (int i = 0; i < Amount - calc1; i++)
@@ -94,21 +97,21 @@ void LED_Move(int From, int Amount, CRGB Color, byte Sets, byte Length, byte *Co
     Count = Amount - Count - 1;
   if (Reset)
     LED_Fill(From, Amount, CRGB(0, 0, 0), MaxBound);
-  byte poss[Sets];                                              //Array for saving the positions of the sections
-  for (byte i = 0; i < Sets; i++) {                             //Beginning of the loop which will send each position and length
-    poss[i] = Count + Amount * i / Sets;                        //This will calculate each position by adding the offset times the position number to the first position
-    byte posX;                                                  //This is the variable which will be used for sending position start. (this can overflow above TotalLEDs, but this will be fixed by the Fill command)
-    if (poss[i] >= Amount) {                                    //To see if the position is to bigger than the total amount
-      posX = From + poss[i] - Amount;                           //Subtract the total amount of LEDs from the position number
-    } else {                                                    //Otherwise it will just use the position data without modifying it
-      posX = From + poss[i];                                    //Just use the position number
+  byte poss[Sets];                        //Array for saving the positions of the sections
+  for (byte i = 0; i < Sets; i++) {       //Beginning of the loop which will send each position and length
+    poss[i] = Count + Amount * i / Sets;  //This will calculate each position by adding the offset times the position number to the first position
+    byte posX;                            //This is the variable which will be used for sending position start. (this can overflow above TotalLEDs, but this will be fixed by the Fill command)
+    if (poss[i] >= Amount) {              //To see if the position is to bigger than the total amount
+      posX = From + poss[i] - Amount;     //Subtract the total amount of LEDs from the position number
+    } else {                              //Otherwise it will just use the position data without modifying it
+      posX = From + poss[i];              //Just use the position number
     }
-    if (posX <= From + Amount - Length) {                       //If the whole section ends before the total amount is reached it will just us the normal way of setting the LEDs
-      LED_Fill(posX, Length, Color, MaxBound);                  //With the standard fill solid command from FastLED, LEDs[posX] PosX stands for beginning position, Amount will stand for the size of the sections and the last one is the color
+    if (posX <= From + Amount - Length) {       //If the whole section ends before the total amount is reached it will just us the normal way of setting the LEDs
+      LED_Fill(posX, Length, Color, MaxBound);  //With the standard fill solid command from FastLED, LEDs[posX] PosX stands for beginning position, Amount will stand for the size of the sections and the last one is the color
     } else {
-      byte calc1 = (From + Amount) - posX;                      //Calculates the amount of LEDs which need to be set from the beginning
-      LED_Fill(posX, calc1, Color, MaxBound);                   //Fills the LEDs at the end of the strip
-      LED_Fill(From, Length - calc1, Color, MaxBound);          //Fills the LEDs at the beginning of the strip
+      byte calc1 = (From + Amount) - posX;              //Calculates the amount of LEDs which need to be set from the beginning
+      LED_Fill(posX, calc1, Color, MaxBound);           //Fills the LEDs at the end of the strip
+      LED_Fill(From, Length - calc1, Color, MaxBound);  //Fills the LEDs at the beginning of the strip
     }
   }
   *Counter += 1;
@@ -129,10 +132,10 @@ void LED_Rainbow(int From, int Amount, byte DeltaHue, int MaxBound) {
   //byte DeltaHue = Diffrence between each LED in hue
   static byte gHue;
   gHue++;
-  while (From >= MaxBound) From -= MaxBound;                    //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
-  if (Amount > MaxBound) Amount = MaxBound;                     //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
-  if (From + Amount > MaxBound) {                               //Overflow protection
-    byte calc1 = MaxBound - From;                               //Calculates the amount of LEDs which need to on on the end of the strip
+  while (From >= MaxBound) From -= MaxBound;  //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
+  if (Amount > MaxBound) Amount = MaxBound;   //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
+  if (From + Amount > MaxBound) {             //Overflow protection
+    byte calc1 = MaxBound - From;             //Calculates the amount of LEDs which need to on on the end of the strip
     fill_rainbow(&(LEDs[From]), calc1, gHue, DeltaHue);
     fill_rainbow(&(LEDs[0]), Amount - calc1, gHue, DeltaHue);
   } else
@@ -141,7 +144,7 @@ void LED_Rainbow(int From, int Amount, byte DeltaHue, int MaxBound) {
 void LED_Wobble(int From, int Amount, CRGB Color, byte Sets, byte Length, int MaxBound = TotalLEDs);
 void LED_Wobble(int From, int Amount, CRGB Color, byte Sets, byte Length, int MaxBound) {
   //Sort of a move, but just back and forth between the start en end
-  static byte Counter;                                          //this function can only be called once, this 'Counter' is a 1 time counter (could not get the pointer working to attach it to the caller)
+  static byte Counter;  //this function can only be called once, this 'Counter' is a 1 time counter (could not get the pointer working to attach it to the caller)
   static bool Reverse = false;
   LED_Move(From, Amount, Color, Sets, Length, &Counter, Reverse, MaxBound);
   if (Reverse) {
@@ -156,20 +159,20 @@ void LED_Wobble(int From, int Amount, CRGB Color, byte Sets, byte Length, int Ma
     }
   }
 }
-void LED_Blink(int From, int Amount, CRGB rgb, byte AlwaysOn, byte * Counter, bool Reverse = false, bool Reset = true, int MaxBound = TotalLEDs);
-void LED_Blink(int From, int Amount, CRGB rgb, byte AlwaysOn, byte * Counter, bool Reverse, bool Reset, int MaxBound) {
+void LED_Blink(int From, int Amount, CRGB rgb, byte AlwaysOn, byte *Counter, bool Reverse = false, bool Reset = true, int MaxBound = TotalLEDs);
+void LED_Blink(int From, int Amount, CRGB rgb, byte AlwaysOn, byte *Counter, bool Reverse, bool Reset, int MaxBound) {
   if (Reset)
-    LED_Fill(From, Amount, CRGB(0, 0, 0), MaxBound);            //Turn LEDs off
+    LED_Fill(From, Amount, CRGB(0, 0, 0), MaxBound);  //Turn LEDs off
   if (Reverse) {
-    LED_Fill(From + Amount - AlwaysOn, AlwaysOn, rgb, MaxBound); //Set some LEDs to be always on
-    LED_Fill(From + Amount - *Counter, *Counter, rgb, MaxBound); //Set the counter amount of LEDs on (this will increase)
+    LED_Fill(From + Amount - AlwaysOn, AlwaysOn, rgb, MaxBound);  //Set some LEDs to be always on
+    LED_Fill(From + Amount - *Counter, *Counter, rgb, MaxBound);  //Set the counter amount of LEDs on (this will increase)
   } else {
-    LED_Fill(From, AlwaysOn, rgb, MaxBound);                    //Set some LEDs to be always on
-    LED_Fill(From, *Counter, rgb, MaxBound);                    //Set the counter amount of LEDs on (this will increase)
+    LED_Fill(From, AlwaysOn, rgb, MaxBound);  //Set some LEDs to be always on
+    LED_Fill(From, *Counter, rgb, MaxBound);  //Set the counter amount of LEDs on (this will increase)
   }
-  *Counter += 1;                                                //This will make the blink 1 longer each time
-  if (*Counter > Amount)                                        //If we are at max length
-    *Counter = 0;                                               //Reset counter
+  *Counter += 1;          //This will make the blink 1 longer each time
+  if (*Counter > Amount)  //If we are at max length
+    *Counter = 0;         //Reset counter
 }
 void LED_BackAndForth(int From, int Amount, CRGB Color, byte *Counter, bool *Direcion, bool Reverse = false, bool Reset = true, int MaxBound = TotalLEDs);
 void LED_BackAndForth(int From, int Amount, CRGB Color, byte *Counter, bool *Direcion, bool Reverse, bool Reset, int MaxBound) {
@@ -178,16 +181,16 @@ void LED_BackAndForth(int From, int Amount, CRGB Color, byte *Counter, bool *Dir
     LED_Fill(From, Amount, CRGB(0, 0, 0), MaxBound);
 
   if (*Direcion)
-    *Counter -= 1;                                              //This will make the animation_on 1 shorter each time
+    *Counter -= 1;  //This will make the animation_on 1 shorter each time
   else
-    *Counter += 1;                                              //This will make the animation_on 1 longer each time
-  if (*Counter >= Amount or * Counter == 0)                     //If we are at max length or at the start
-    *Direcion = !*Direcion;                                     //Flip direction
+    *Counter += 1;                          //This will make the animation_on 1 longer each time
+  if (*Counter >= Amount or *Counter == 0)  //If we are at max length or at the start
+    *Direcion = !*Direcion;                 //Flip direction
 
   if (Reverse)
-    LED_Fill(From + Amount - *Counter, *Counter, Color, MaxBound); //Set the counter amount of LEDs on
+    LED_Fill(From + Amount - *Counter, *Counter, Color, MaxBound);  //Set the counter amount of LEDs on
   else
-    LED_Fill(From, *Counter, Color, MaxBound);                  //Set the counter amount of LEDs on
+    LED_Fill(From, *Counter, Color, MaxBound);  //Set the counter amount of LEDs on
 }
 //==================================================
 void CutVariable(String _Input, String *_Variable, byte _VariableLength) {
@@ -197,20 +200,20 @@ void CutVariable(String _Input, String *_Variable, byte _VariableLength) {
   //  CutVariable(_Input, &_Output[0], 6);
   //  Serial.println(String(_Output[0]) + "_" + String(_Output[1]) + "_" + String(_Output[2]));
   byte _StartAt = 0, _WriteTo = 0;
-  for (byte i = 0; i <= _Input.length(); i++) {                 //For each character in the input string
+  for (byte i = 0; i <= _Input.length(); i++) {  //For each character in the input string
     if (_Input.charAt(i) == ',') {
       _Variable[_WriteTo] = _Input.substring(_StartAt, i);
-      _WriteTo ++;
+      _WriteTo++;
       _StartAt = i + 1;
-      if (_WriteTo >= _VariableLength - 1) break;               //If last one
+      if (_WriteTo >= _VariableLength - 1) break;  //If last one
     }
   }
   _Variable[_WriteTo] = _Input.substring(_StartAt);
 }
-bool SetDispenser(Dispenser Dis, byte i) {
-  if (i >= Dispensers_Amount)
+bool SetDispenser(Dispenser Dis, byte DispenserID) {
+  if (DispenserID >= Dispensers_Amount)
     return false;
-  Dispensers[i] = Dis;
+  Dispensers[DispenserID] = Dis;
   return true;
 }
 bool AddDispenser(Dispenser Dis) {
@@ -221,6 +224,12 @@ bool AddDispenser(Dispenser Dis) {
     }
   }
   return false;
+}
+bool SetFluidInDispenser(byte DispenserID, byte IngredientID) {
+  if (DispenserID >= Dispensers_Amount)
+    return false;
+  Dispensers[DispenserID].IngredientID = IngredientID;
+  return true;
 }
 //bool RemoveDispenser(byte IngredientID) {
 //  for (byte i = 0; i < Dispensers_Amount; i++) {
@@ -244,10 +253,10 @@ bool TickEveryXms(unsigned long *_LastTime, unsigned long _Delay) {
   //With overflow, can be adjusted, no overshoot correction, true when (Now < _LastTime + _Delay)
   /* Example:   static unsigned long LastTime;
                 if (TickEveryXms(&LastTime, 1000)) {//Code to run}    */
-  static unsigned long _Middle = -1;                            //We just need a really big number, if more than 0 and less than this amount of ms is passed, return true)
-  if (_Middle == -1) _Middle = _Middle / 2;                     //Somehow declairing middle on 1 line does not work
-  if (millis() - (*_LastTime + _Delay) <= _Middle) {            //If it's time to update (keep brackets for overflow protection). If diffrence between Now (millis) and Nextupdate (*_LastTime + _Delay) is smaller than a big number (_Middle) then update. Note that all negative values loop around and will be really big (for example -1 = 4,294,967,295)
-    *_LastTime = millis();                                      //Set new LastTime updated
+  static unsigned long _Middle = -1;                  //We just need a really big number, if more than 0 and less than this amount of ms is passed, return true)
+  if (_Middle == -1) _Middle = _Middle / 2;           //Somehow declairing middle on 1 line does not work
+  if (millis() - (*_LastTime + _Delay) <= _Middle) {  //If it's time to update (keep brackets for overflow protection). If diffrence between Now (millis) and Nextupdate (*_LastTime + _Delay) is smaller than a big number (_Middle) then update. Note that all negative values loop around and will be really big (for example -1 = 4,294,967,295)
+    *_LastTime = millis();                            //Set new LastTime updated
     return true;
   }
   return false;
@@ -256,9 +265,9 @@ bool StringIsDigit(String IN, char IgnoreCharA = '0', char IgnoreCharB = '0');
 bool StringIsDigit(String IN, char IgnoreCharA, char IgnoreCharB) {
   //IgnoreChar can be used to ignore ',' or '.' or '-'
   for (byte i = 0; i < IN.length(); i++) {
-    if (isDigit(IN.charAt(i))) {                                //If it is a digit, do nothing
-    } else if (IN.charAt(i) == IgnoreCharA) {                   //If it is IgnoreCharA, do nothing
-    } else if (IN.charAt(i) == IgnoreCharB) {                   //If it is IgnoreCharB, do nothing
+    if (isDigit(IN.charAt(i))) {               //If it is a digit, do nothing
+    } else if (IN.charAt(i) == IgnoreCharA) {  //If it is IgnoreCharA, do nothing
+    } else if (IN.charAt(i) == IgnoreCharB) {  //If it is IgnoreCharB, do nothing
     } else {
       return false;
     }
@@ -312,25 +321,25 @@ byte GetDispenserID(byte IngredientID) {
   //  Serial.println("GetDispenserID " + String(IngredientID) + "(" + IngredientIDtoString(IngredientID) + ")");
   if (IngredientID == 0) return 255;
   for (byte i = 0; i <= Ingredient_Amount; i++) {
-    if (Dispensers[i].IngredientID == IngredientID) {           //If the drink is found and available
+    if (Dispensers[i].IngredientID == IngredientID) {  //If the drink is found and available
       return i;
     }
   }
   return 255;
 }
 void DisableSteppers() {
-  FastLED.setBrightness(MaxBrightness / 4);                     //Set brightness to be 25%
+  FastLED.setBrightness(MaxBrightness / 4);  //Set brightness to be 25%
   Homed = false;
   Stepper_X.moveTo(Stepper_X.currentPosition());
   Stepper_Y.moveTo(Stepper_Y.currentPosition());
-  digitalWrite(PDO_Step_enable, HIGH);                          //Disable all stepper drivers
+  digitalWrite(PDO_Step_enable, HIGH);  //Disable all stepper drivers
 }
 void CheckEEPROMSave() {
   if (SaveEEPROMinSeconds >= 0) {
     static unsigned long LastTime;
     if (TickEveryXms(&LastTime, 1000)) {
       if (SaveEEPROMinSeconds == 0)
-        WiFiManager.WriteEEPROM();                                  //(runtime) If you want to manually save the settings(EEPROM LIMITED WRITES! do not spam)
+        WiFiManager.WriteEEPROM();  //(runtime) If you want to manually save the settings(EEPROM LIMITED WRITES! do not spam)
       SaveEEPROMinSeconds -= 1;
     }
   }
@@ -356,8 +365,8 @@ String IsTrueToString(bool input) {
     return "true";
   return "false";
 }
-String IpAddress2String(const IPAddress& ipAddress) {
-  return String(ipAddress[0]) + String(".") + String(ipAddress[1]) + String(".") + String(ipAddress[2]) + String(".") + String(ipAddress[3])  ;
+String IpAddress2String(const IPAddress &ipAddress) {
+  return String(ipAddress[0]) + String(".") + String(ipAddress[1]) + String(".") + String(ipAddress[2]) + String(".") + String(ipAddress[3]);
 }
 void LcdPrint(String msg = "", String msg2 = "");
 void LcdPrint(String msg, String msg2) {
@@ -384,12 +393,12 @@ bool MoveWait(AccelStepper Step, byte RefferenceButton, int pos) {
   Serial.println("MW: " + String(pos) + " b=" + String(RefferenceButton) + "=" + String(digitalRead(RefferenceButton)));
   while (true) {
     Step.run();
-    if (not Step.isRunning()) {                                 //If we have done all steps
+    if (not Step.isRunning()) {  //If we have done all steps
       Step.setCurrentPosition(0);
       Serial.println("MW: End of steps");
       return false;
     } else {
-      if (digitalRead(RefferenceButton) == LOW) {          //If we have hit the switch
+      if (digitalRead(RefferenceButton) == LOW) {  //If we have hit the switch
         Step.setCurrentPosition(0);
         Serial.println("MW: Switch reached");
         return true;
@@ -403,19 +412,19 @@ bool Home(bool X, bool Y) {
   LED_Fill(0, TotalLEDs, ColorHoming);
   UpdateLED(true);
   LcdPrint("Homing", " ");
-  digitalWrite(PDO_Step_enable, LOW);                           //Enable all stepper drivers
+  digitalWrite(PDO_Step_enable, LOW);  //Enable all stepper drivers
   bool Homed_X = false, Homed_Y = false;
   if (X) {
     LcdPrint("", "X");
     Stepper_X.setCurrentPosition(0);
-    if (MoveWait(Stepper_X, PDI_X_Ref, BedSize_X  * -1.1)) {     //If the switch is touched
+    if (MoveWait(Stepper_X, PDI_X_Ref, BedSize_X * -1.1)) {  //If the switch is touched
       Stepper_X.moveTo(HomedistanceBounce);
       while (Stepper_X.run())
         yield();
       Stepper_X.setMaxSpeed(HomeMAXSpeed);
       Homed_X = MoveWait(Stepper_X, PDI_X_Ref, -(BedSize_X / 20));
-      Stepper_X.setCurrentPosition(0);                          //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
-      Stepper_X.setMaxSpeed(MotorMAXSpeed);                     //Reset max speed
+      Stepper_X.setCurrentPosition(0);       //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
+      Stepper_X.setMaxSpeed(MotorMAXSpeed);  //Reset max speed
     }
   }
   if (Y) {
@@ -427,14 +436,14 @@ bool Home(bool X, bool Y) {
         yield();
       Stepper_Y.setMaxSpeed(HomeMAXSpeed);
       Homed_Y = MoveWait(Stepper_Y, PDI_Y_Ref, -(BedSize_Y / 20));
-      Stepper_Y.setCurrentPosition(0);                          //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
-      Stepper_Y.setMaxSpeed(MotorMAXSpeed);                     //Reset max speed
+      Stepper_Y.setCurrentPosition(0);       //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
+      Stepper_Y.setMaxSpeed(MotorMAXSpeed);  //Reset max speed
     }
   }
   if (!X or !Y)
     LcdPrint("Homed", "X" + String(X) + "," + String(Homed_X) + " Y" + String(Y) + "," + String(Homed_Y));
   else
-    LcdPrint("Homed", "X" + String(Homed_X) + " Y" +  String(Homed_Y));
+    LcdPrint("Homed", "X" + String(Homed_X) + " Y" + String(Homed_Y));
   if (X == Homed_X and Y == Homed_Y) {
     Homed = true;
     return true;
@@ -445,7 +454,7 @@ bool Home(bool X, bool Y) {
 }
 void MyYield() {
   WiFiManager.CheckAndReconnectIfNeeded(true);
-  WiFiManager.RunServer();                                       //Do WIFI server stuff if needed
+  WiFiManager.RunServer();  //Do WIFI server stuff if needed
   CheckEEPROMSave();
   CheckDisableSteppers();
 
@@ -464,7 +473,7 @@ void MyYield() {
   FastLED.delay(1);
   yield();
 }
-void MyDelay(int DelayMS) {                                     //Just a non-blocking delay
+void MyDelay(int DelayMS) {  //Just a non-blocking delay
   //DelayMS, delay in ms like in the Arduino Delay() function
   unsigned long _StartTime = millis();
   while (millis() < _StartTime + DelayMS)
@@ -496,7 +505,7 @@ void MoveTo(int LocationX, int LocationY, int LocationZ) {
       WaitMore = false;
     yield();
   }
-  DisableSteppersinSeconds = DisableSteppersAfterIdleS;      //Schedule to disable the steppers
+  DisableSteppersinSeconds = DisableSteppersAfterIdleS;  //Schedule to disable the steppers
 }
 #define TimeoutWaitingOnUserMs 10 * 60 * 1000
 bool WaitForUser(String msg, String msg2) {

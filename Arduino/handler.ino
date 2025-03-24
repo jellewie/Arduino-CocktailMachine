@@ -23,50 +23,50 @@
 #define PreFixSetDispenserMSoff "do"
 #define PreFixSetDispenserIngredientID "dn"
 //Create a mix (max 8 ingredient)
-#define PreFix_Mix_Name     "m"            //this one MUST be set (=!"") to start creating a mix 
+#define PreFix_Mix_Name "m"  //this one MUST be set (=!"") to start creating a mix
 #define PreFix_0_Ingredient "i0"
-#define PreFix_0_Action     "a0"
-#define PreFix_0_Ml         "m0"
+#define PreFix_0_Action "a0"
+#define PreFix_0_Ml "m0"
 #define PreFix_1_Ingredient "i1"
-#define PreFix_1_Action     "a1"
-#define PreFix_1_Ml         "m1"
+#define PreFix_1_Action "a1"
+#define PreFix_1_Ml "m1"
 #define PreFix_2_Ingredient "i2"
-#define PreFix_2_Action     "a2"
-#define PreFix_2_Ml         "m2"
+#define PreFix_2_Action "a2"
+#define PreFix_2_Ml "m2"
 #define PreFix_3_Ingredient "i3"
-#define PreFix_3_Action     "a3"
-#define PreFix_3_Ml         "m3"
+#define PreFix_3_Action "a3"
+#define PreFix_3_Ml "m3"
 #define PreFix_4_Ingredient "i4"
-#define PreFix_4_Action     "a4"
-#define PreFix_4_Ml         "m4"
+#define PreFix_4_Action "a4"
+#define PreFix_4_Ml "m4"
 #define PreFix_5_Ingredient "i5"
-#define PreFix_5_Action     "a5"
-#define PreFix_5_Ml         "m5"
+#define PreFix_5_Action "a5"
+#define PreFix_5_Ml "m5"
 #define PreFix_6_Ingredient "i6"
-#define PreFix_6_Action     "a6"
-#define PreFix_6_Ml         "m6"
+#define PreFix_6_Action "a6"
+#define PreFix_6_Ml "m6"
 #define PreFix_7_Ingredient "i7"
-#define PreFix_7_Action     "a7"
-#define PreFix_7_Ml         "m7"
+#define PreFix_7_Action "a7"
+#define PreFix_7_Ml "m7"
 //Debug, move to XYZ
-#define PreFix_X         "x"
-#define PreFix_Y         "y"
+#define PreFix_X "x"
+#define PreFix_Y "y"
 
-#include "client.h"
+#include "clienthtml.h"
 
 void handle_Set() {
   Serial.print("SV: /SET?");
-  String ERRORMSG;                                              //emthy=no error
+  String ERRORMSG;  //emthy=no error
   bool makeMix = false;
   int8_t DoHoming = -1;
   Drink Mix;
-  int GoTo[3] = { -1, -1};
+  int GoTo[3] = { -1, -1 };
   for (byte i = 0; i < 8; i++) {
     Mix.Ingredients[i].ID = 0;
     Mix.Ingredients[i].Action = "";
     Mix.Ingredients[i].ml = 0;
   }
-  Dispenser Dis = {0, 0, 0, 0, 0, 0};
+  Dispenser Dis = { 0, 0, 0, 0, 0, 0 };
   int8_t DisID = -1;
   for (int i = 0; i < server.args(); i++) {
     String ArguName = server.argName(i);
@@ -140,7 +140,7 @@ void handle_Set() {
       } else {
         SaveEEPROMinSeconds = 30;
       }
-      FastLED.setBrightness(MaxBrightness);                     //Set brightness
+      FastLED.setBrightness(MaxBrightness);  //Set brightness
     } else if (ArguName == PreFixHome) {
       DoHoming = IsTrue(ArgValue);
     } else if (ArguName == PreFix_Mix_Name) {
@@ -288,11 +288,9 @@ void handle_Set() {
     }
   }
   Serial.println();
-
-  FastLED.setBrightness(MaxBrightness);                         //Set brightness
+  FastLED.setBrightness(MaxBrightness);  //Set brightness
   //Check if there is a error
   Drink MixEmthy;
-
   if (makeMix) {
     if (Mix.Name == "") {
       ERRORMSG += "No mix name given/n";
@@ -302,7 +300,6 @@ void handle_Set() {
   } else if (Mix.Name != "") {
     ERRORMSG += "No mix ingredients given/n";
   }
-
   //Process the dispenser update
   if (DisID != -1 or Dis.Type != 0 or Dis.LocationX != 0 or Dis.LocationY != 0 or Dis.TimeMSML != 0 or Dis.TimeMSoff != 0 or Dis.IngredientID != 0) {
     if (DisID >= 0) {
@@ -312,26 +309,22 @@ void handle_Set() {
         ERRORMSG += "No more space for a new dispenser";
     }
   }
-
   if (ERRORMSG == "") {
     server.send(200, "text/plain", "OK");
   } else {
     server.send(400, "application/json", ERRORMSG);
   }
-
   //If we need to home
   if (DoHoming == 0) {
     DisableSteppers();
   } else if (DoHoming == 1) {
     Home();
   }
-
   //If we need to somewhere
   if (GoTo[0] != -1 or GoTo[1] != -1 or GoTo[2] != -1) {
     LcdPrint("Moving to", String(GoTo[0]) + "," + String(GoTo[1]));
     MoveTo(GoTo[0], GoTo[1], GoTo[2]);
   }
-
   //If we need to mix
   if (Mix.Name != "")
     MakeCocktail(Mix);
@@ -340,7 +333,7 @@ void handle_Get() {
   String Json = "{\"dispensers\":[";
   for (byte i = 0; i < Dispensers_Amount; i++) {
     if (i != 0) Json += ",";
-    Json += "[" + String(Dispensers[i].Type) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].TimeMSoff) + "," + String(Dispensers[i].IngredientID) + "]";
+    Json += "[" + String(Dispensers[i].Type) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].ExtraData) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].TimeMSoff) + "," + String(Dispensers[i].IngredientID) + "]";
   }
   Json += "],\"ingredients\":[";
   for (byte i = 0; i < Ingredient_Amount; i++) {
@@ -356,13 +349,11 @@ void handle_Get() {
   Json += ",\"manualY\":" + String(Manual_Y);
   Json += ",\"motorMaxSpeed\":" + String(MotorMAXSpeed);
   Json += ",\"motorMaxAccel\":" + String(MotorMAXAccel);
-  Json += ",\"shotDispenserMl\":" + String(ShotDispenserML);
   Json += ",\"homeMaxSpeed\":" + String(HomeMAXSpeed);
   Json += ",\"homedistanceBounce\":" + String(HomedistanceBounce);
   Json += ",\"maxGlassSize\":" + String(MaxGlassSize);
   Json += ",\"maxBrightness\":" + String(MaxBrightness);
   Json += "}";
-
   Json += "}";
   server.send(200, "text/html", Json);
 }
@@ -375,15 +366,12 @@ void handle_Info() {
                    "Y_Ref = " + IsTrueToString(digitalRead(PDI_Y_Ref) == LOW) + " " + (digitalRead(PDI_Y_Ref) ? "HIGH" : "LOW") + "\n"
                    "Switch = " + IsTrueToString(digitalRead(PDI_S)    == LOW) + " " + (digitalRead(PDI_S)     ? "HIGH" : "LOW") + "\n"
                    "Running = " + IsTrueToString(digitalRead(PDI_S)    == LOW) + "\n"
-
                    "\nSOFT_SETTINGS\n";
   for (byte i = 0; i < WiFiManager_Settings - 2; i++)
     Message += WiFiManager_VariableNames[i + 2] + " = " + WiFiManagerUser_Get_Value(i, false, true) + "\n";
-
   Message += "\nSOFT_SETTINGS raw\n";
   for (byte i = 0; i < WiFiManager_Settings - 2; i++)
     Message += WiFiManager_VariableNames[i + 2] + " = " + WiFiManagerUser_Get_Value(i, false, false) + "\n";
-
   server.send(200, "text/plain", Message);
 }
 void handle_OnConnect() {
@@ -393,7 +381,7 @@ void handle_Reset() {
   if (WiFiManager.ClearEEPROM()) {
     server.send(200, "text/plain", "EEPROM cleared");
     MyDelay(10);
-    ESP.restart();                                              //Restart the ESP
+    ESP.restart();  //Restart the ESP
   }
   server.send(400, "text/plain", "Error trying to clear EEPROM");
 }

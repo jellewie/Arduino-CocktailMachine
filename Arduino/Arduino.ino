@@ -2,18 +2,16 @@
   Program written by JelleWho https://github.com/jellewie
   Board: https://dl.espressif.com/dl/package_esp32_index.json
 */
-//==============================================================//Note spacer
 #if !defined(ESP32)
 #error "Please check if the 'DOIT ESP32 DEVKIT V1' board is selected, which can be downloaded at https://dl.espressif.com/dl/package_esp32_index.json"
 #endif
-
+#include <WiFi.h>                     //Arduino IDe 2.3.4 requires this here for some reason
 #include "WiFiManagerBefore.h"        //Define what options to use/include or to hook into WiFiManager
 #include "WiFiManager/WiFiManager.h"  //Includes <WiFi> and <WebServer.h> and setups up 'WebServer server(80)' if needed
-//#include FastLED>
-#include <AccelStepper.h>  //Make sure to install AccelStepper V1.61.0(+) manually //https://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html#a68942c66e78fb7f7b5f0cdade6eb7f06
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>  //Make sure to install LiquidCrystal_I2C V1.1.2(+) manually https://github.com/johnrickman/LiquidCrystal_I2C/blob/master/LiquidCrystal_I2C.cpp
-#include <FastLED.h>            //Include the libary FastLED (If you get a error here, make sure it's installed!)
+#include <AccelStepper.h>             //Make sure to install AccelStepper V1.61.0(+) manually //https://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html#a68942c66e78fb7f7b5f0cdade6eb7f06
+#include <Wire.h>                     //used by LiquidCrystal_I2C
+#include <LiquidCrystal_I2C.h>        //Make sure to install LiquidCrystal_I2C V1.1.2(+) manually https://github.com/johnrickman/LiquidCrystal_I2C/blob/master/LiquidCrystal_I2C.cpp
+#include <FastLED.h>                  //Include the libary FastLED (If you get a error here, make sure it's installed!)
 //==============================================================
 //Very custom user settings
 //==============================================================
@@ -36,7 +34,6 @@ CRGB ColorMoveActive = CRGB(0, 255, 0);
 //==============================================================
 //Soft settings (can be changed with the interface)
 //==============================================================
-byte ShotDispenserML = 40;
 byte HomeMAXSpeed = 200;
 bool Running = false;
 unsigned int MotorMAXSpeed = 5500;
@@ -110,10 +107,9 @@ void setup() {
   server.on("/info", handle_Info);
   server.on("/reset", handle_Reset);
   server.onNotFound(handle_NotFound);  //When a client requests an unknown URI
-  //server.on("/url", CodeToCall);                              //Example of a url to function caller, These must be declaired before "WiFiManager.Start()"
-  byte Answer = WiFiManager.Start();  //Run the wifi startup (and save results)
-  WiFiManager.OTA_Enabled = true;     //(runtime) Turn off/on OTA
-  WiFiManager.EnableSetup(true);      //(runtime) Enable the settings, only enabled in APmode by default
+  byte Answer = WiFiManager.Start();   //Run the wifi startup (and save results)
+  WiFiManager.OTA_Enabled = true;      //(runtime) Turn off/on OTA
+  WiFiManager.EnableSetup(true);       //(runtime) Enable the settings, only enabled in APmode by default
   if (Answer == 1) {
     LcdPrint("Mixer online!", IpAddress2String(WiFi.localIP()));
   } else {
@@ -169,9 +165,38 @@ void GetIngredient(Ingredient IN) {
   byte DispenserID = GetDispenserID(IN.ID);
   if (DispenserID != 255) {
     LightSection(Dispensers[DispenserID].LocationX);
+    switch (Dispensers[DispenserID].Type) {
+      case DOUBLENOZZLE:
+        {
+          Serial.println("GetIngredient DOUBLENOZZLE IN.ml=" + String(IN.ml));
+          MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);
 
-    Serial.println("GetIngredient SHOTDispenser TYPE= " + String(Dispensers[DispenserID].Type) + "IN.ml=" + String(IN.ml) + " ShotDispenserML=" + String(ShotDispenserML));
+          //IN.ml; ID of the dispenser
+          //IN.Action; If given, prompt the message and wait for user confirmation first
+          //IN.ID; ml of the fluid
 
+          //Code for the action to dispense liquid should be put here
+
+
+        break;
+      case PUMP:
+        {
+          Serial.println("GetIngredient from Pump ID=" + String(Dispensers[DispenserID].ExtraData));
+          if (Dispensers[DispenserID].ExtraData <= Pump_Amount) {
+            MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);
+            digitalWrite(PDO_Pump[Dispensers[DispenserID].ExtraData], HIGH);
+            MyDelay(Dispensers[DispenserID].TimeMSML * IN.ml);
+            digitalWrite(PDO_Pump[Dispensers[DispenserID].ExtraData], LOW);
+            MyDelay(Dispensers[DispenserID].TimeMSoff);
+          } else {
+            if (WaitForUser("UNK pump ID", "ExtraData=" + String(Dispensers[DispenserID].ExtraData))) return;
+          }
+        }
+        break;
+      default:
+        if (WaitForUser("UNK Dispenser type", String(Dispensers[DispenserID].Type))) return;
+        break;
+    }
   }
 }
 void LightSection(long LocationX) {
