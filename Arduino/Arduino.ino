@@ -62,8 +62,8 @@ AccelStepper Stepper_X(AccelStepper::DRIVER, PDO_X_Step, PDO_X_Dir);
 AccelStepper Stepper_Y(AccelStepper::DRIVER, PDO_Y_Step, PDO_Y_Dir);
 LiquidCrystal_I2C lcd(0x27, 20, 4);  //Set the LCD address to 0x27 for a 20 chars and 2 line display
 CRGB LEDs[TotalLEDs];
-#include "Data.h"
-#include "Functions.h"
+#include "data.h"
+#include "functions.h"
 #include "WiFiManagerLater.h"  //Define options of WiFiManager (can also be done before), but WiFiManager can also be called here (example for DoRequest included here)
 
 void setup() {
