@@ -4,9 +4,9 @@
 //===========================================================================
 // Things that can/need to be defined after including "WiFiManager.h"
 //===========================================================================
-const byte Pin_LED = LED_BUILTIN;  //Just here for some examples, It's the LED to give feedback on (like blink on error)
+const uint8_t Pin_LED = LED_BUILTIN;  //Just here for some examples, It's the LED to give feedback on (like blink on error)
 bool ApStarted = false;
-bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
+bool WiFiManagerUser_Set_Value(uint8_t ValueID, String Value) {
   switch (ValueID) {  //Note the numbers are shifted from what is in memory, 0 is the first user value
     case 0:
       {
@@ -97,7 +97,7 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
     case 13:
       {
         if (!StringIsDigit(Value)) return false;
-        int Temp = Value.toInt();
+        uint16_t Temp = Value.toInt();
         if (Temp < 0 or Temp > 255) return false;
         MaxBrightness = Temp;
         return true;
@@ -115,23 +115,21 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
       break;
     default:
       {
-        byte i = ValueID - 16;  //Remove the amount above from the counter, so the next are of the Dispensers
+        uint8_t i = ValueID - 16;  //Remove the amount above from the counter, so the next are of the Dispensers
         if (i < Dispensers_Amount) {
-          String _Output[7];
-          CutVariable(Value, &_Output[0], 6);
-          _Output[0] = TypeStringToID(_Output[0]);
-          _Output[1].replace("X=", "");
-          _Output[2].replace("Y=", "");
-          _Output[3].replace("MSML", "");
-          _Output[4].replace("MSoff", "");
-          _Output[5] = IngredientStringToID(_Output[6]);
-          if (!StringIsDigit(_Output[0]) or !StringIsDigit(_Output[1]) or !StringIsDigit(_Output[2]) or !StringIsDigit(_Output[3]) or !StringIsDigit(_Output[4]) or !StringIsDigit(_Output[5]) or !StringIsDigit(_Output[6])) return false;
+          String _Output[5];
+          CutVariable(Value, &_Output[0], 5);
+          _Output[0].replace("X=", "");
+          _Output[1].replace("Y=", "");
+          _Output[2].replace("MSML", "");
+          _Output[3].replace("MSoff", "");
+          _Output[4] = IngredientStringToID(_Output[6]);
+          if (!StringIsDigit(_Output[0]) or !StringIsDigit(_Output[1]) or !StringIsDigit(_Output[2]) or !StringIsDigit(_Output[3]) or !StringIsDigit(_Output[4])) return false;
           Dispenser Dis;
-          Dis.Type = _Output[0].toInt();
-          Dis.LocationX = _Output[1].toInt();
-          Dis.LocationY = _Output[2].toInt();
-          Dis.TimeMSML = _Output[3].toInt();
-          Dis.TimeMSoff = _Output[4].toInt();
+          Dis.LocationX = _Output[0].toInt();
+          Dis.LocationY = _Output[1].toInt();
+          Dis.TimeMSML = _Output[2].toInt();
+          Dis.TimeMSoff = _Output[3].toInt();
           Dis.IngredientID = IngredientStringToID(_Output[5]);
           SetDispenser(Dis, i);
           return true;
@@ -140,7 +138,7 @@ bool WiFiManagerUser_Set_Value(byte ValueID, String Value) {
   }
   return false;  //Report back that the ValueID is unknown, and we could not set it
 }
-String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
+String WiFiManagerUser_Get_Value(uint8_t ValueID, bool Safe, bool Convert) {
   //if its 'Safe' to return the real value (for example the password will return '****' or '1234')
   //'Convert' the value to a readable string for the user (bool '0/1' to 'FALSE/TRUE')
   switch (ValueID) {  //Note the numbers are shifted from what is in memory, 0 is the first user value
@@ -162,13 +160,13 @@ String WiFiManagerUser_Get_Value(byte ValueID, bool Safe, bool Convert) {
     case 15: return ""; break;
     default:
       {
-        byte i = ValueID - 16;  //Remove the amount above from the counter, so the next are of the Dispensers
+        uint8_t i = ValueID - 16;  //Remove the amount above from the counter, so the next are of the Dispensers
         if (i < Dispensers_Amount) {
           String Output = "";
           if (Convert) {
-            Output = TypeIDtoString(Dispensers[i].Type) + ",X=" + String(Dispensers[i].LocationX) + ",Y=" + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "MSML," + String(Dispensers[i].TimeMSoff) + "MSoff," + IngredientIDtoString(Dispensers[i].IngredientID);
+            Output = String(i) + ",X=" + String(Dispensers[i].LocationX) + ",Y=" + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "MSML," + String(Dispensers[i].TimeMSoff) + "MSoff," + IngredientIDtoString(Dispensers[i].IngredientID);
           } else {
-            Output = String(Dispensers[i].Type) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].TimeMSoff) + "," + String(Dispensers[i].IngredientID);
+            Output = String(i) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].TimeMSoff) + "," + String(Dispensers[i].IngredientID);
           }
           return String(Output);
         }

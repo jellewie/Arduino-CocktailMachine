@@ -1,47 +1,41 @@
 struct Ingredient {
-  byte ID;        //ID of the fluid
+  uint8_t ID;     //ID of the fluid
   String Action;  //If given, prompt the message and wait for user confirmation first
-  byte ml;        //ml of the fluid
+  uint8_t ml;     //ml of the fluid
 };
 struct Drink {
   String Name;
-  int Color;
+  uint16_t Color;
   Ingredient Ingredients[8];
 };
 struct Dispenser {
-  byte Type;               //Type of dispenser
-  unsigned int LocationX;  //X location of the dispenser
-  unsigned int LocationY;  //Y location of the dispenser
-  unsigned int ExtraData;  //Used for Pump_ID for PUMP
-  unsigned int TimeMSML;   //Timer per ms for each mL
-  unsigned int TimeMSoff;  //Delay in MS to wait after
-  byte IngredientID;       //The fluid in this dispenser
+  uint16_t LocationX;    //X location of the dispenser
+  uint16_t LocationY;    //Y location of the dispenser
+  uint16_t TimeMSML;     //Timer per ms for each mL
+  uint16_t TimeMSoff;    //Delay in MS to wait after
+  uint8_t IngredientID;  //The fluid in this dispenser
 };
-enum TypeE { UNSPECIFIED,
-             DOUBLENOZZLE,
-             PUMP };
-String TypeS[]{ "UNSPECIFIED", "DOUBLENOZZLE", "PUMP" };
 
-byte Ingredient_Amount = sizeof(IngredientS) / sizeof(IngredientS[0]);  //Why filling this in if we can automate that? :)
-byte Type_Amount = sizeof(TypeS) / sizeof(TypeS[0]);                    //Why filling this in if we can automate that? :)
+uint8_t Ingredient_Amount = sizeof(IngredientS) / sizeof(IngredientS[0]);  //Why filling this in if we can automate that? :)
+
 Dispenser Dispensers[Dispensers_Amount] = {
-  //Type        , X     , Y     , MSml, MSoff, IngredientID
-  { DOUBLENOZZLE, 280, 0, 100, 1000, 1 },
-  { DOUBLENOZZLE, 4180, 0, 100, 1000, 2 },
-  { DOUBLENOZZLE, 8160, 0, 100, 1000, 3 },
-  { DOUBLENOZZLE, 12100, 0, 100, 1000, 4 },
-  { DOUBLENOZZLE, 16120, 0, 100, 1000, 5 },
-  { DOUBLENOZZLE, 20050, 0, 100, 1000, 6 },
-  { DOUBLENOZZLE, 220, 7250, 100, 1000, 7 },
-  { DOUBLENOZZLE, 4180, 7250, 100, 1000, 8 },
-  { DOUBLENOZZLE, 8160, 7250, 100, 1000, 9 },
-  { DOUBLENOZZLE, 12140, 7250, 100, 1000, 10 },
-  { DOUBLENOZZLE, 16000, 7250, 100, 1000, 11 },
-  { DOUBLENOZZLE, 20150, 7250, 100, 1000, 12 },
-  { PUMP, 23900, 0, 135, 500, 13 },
-  { PUMP, 23900, 0, 135, 500, 14 },
-  { PUMP, 23900, 0, 135, 500, 15 },
-  { PUMP, 23900, 0, 135, 500, 16 }
+  //X, Y, MSml, MSoff, IngredientID
+  { 280, 0, 100, 1000, 1 },
+  { 4180, 0, 100, 1000, 2 },
+  { 8160, 0, 100, 1000, 3 },
+  { 12100, 0, 100, 1000, 4 },
+  { 16120, 0, 100, 1000, 5 },
+  { 20050, 0, 100, 1000, 6 },
+  { 220, 7250, 100, 1000, 7 },
+  { 4180, 7250, 100, 1000, 8 },
+  { 8160, 7250, 100, 1000, 9 },
+  { 12140, 7250, 100, 1000, 10 },
+  { 16000, 7250, 100, 1000, 11 },
+  { 20150, 7250, 100, 1000, 12 },
+  { 23900, 0, 135, 500, 13 },
+  { 23900, 0, 135, 500, 14 },
+  { 23900, 0, 135, 500, 15 },
+  { 23900, 0, 135, 500, 16 }
 };
 //==================================================
 //Basic universal LED functions. These includes start postion, amount (inc overflow correction and such)
@@ -53,33 +47,33 @@ void UpdateLED(bool forceUpdate) {
     FastLED.show();  //Update
   }
 }
-void LED_Fill(int From, int Amount, CRGB Color, int MaxBound = TotalLEDs);
-void LED_Fill(int From, int Amount, CRGB Color, int MaxBound) {
+void LED_Fill(uint16_t From, uint16_t Amount, CRGB Color, uint16_t MaxBound = TotalLEDs);
+void LED_Fill(uint16_t From, uint16_t Amount, CRGB Color, uint16_t MaxBound) {
   while (From >= MaxBound) From -= MaxBound;  //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
   if (Amount > MaxBound) Amount = MaxBound;   //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
   if (From + Amount > MaxBound) {             //Overflow protection
-    byte calc1 = MaxBound - From;             //Calculates the amount of LEDs which need to on on the end of the strip
+    uint8_t calc1 = MaxBound - From;          //Calculates the amount of LEDs which need to on on the end of the strip
     fill_solid(&(LEDs[From]), calc1, Color);
     fill_solid(&(LEDs[0]), Amount - calc1, Color);
   } else
     fill_solid(&(LEDs[From]), Amount, Color);
 }
-void LED_Add(int From, int Amount, CRGB Color, int MaxBound = TotalLEDs);
-void LED_Add(int From, int Amount, CRGB Color, int MaxBound) {
+void LED_Add(uint16_t From, uint16_t Amount, CRGB Color, uint16_t MaxBound = TotalLEDs);
+void LED_Add(uint16_t From, uint16_t Amount, CRGB Color, uint16_t MaxBound) {
   while (From >= MaxBound) From -= MaxBound;  //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
   if (Amount > MaxBound) Amount = MaxBound;   //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
   if (From + Amount > MaxBound) {             //Overflow protection
-    byte calc1 = MaxBound - From;             //Calculates the amount of LEDs which need to on on the end of the strip
-    for (int i = From; i < From + calc1; i++)
+    uint8_t calc1 = MaxBound - From;          //Calculates the amount of LEDs which need to on on the end of the strip
+    for (uint16_t i = From; i < From + calc1; i++)
       LEDs[i] += Color;
-    for (int i = 0; i < Amount - calc1; i++)
+    for (uint16_t i = 0; i < Amount - calc1; i++)
       LEDs[i] += Color;
   } else
-    for (int i = From; i < From + Amount; i++)
+    for (uint16_t i = From; i < From + Amount; i++)
       LEDs[i] += Color;
 }
-void LED_Move(int From, int Amount, CRGB Color, byte Sets, byte Length, byte *Counter, bool Reverse = false, bool Reset = true, int MaxBound = TotalLEDs);
-void LED_Move(int From, int Amount, CRGB Color, byte Sets, byte Length, byte *Counter, bool Reverse, bool Reset, int MaxBound) {
+void LED_Move(uint16_t From, uint16_t Amount, CRGB Color, uint8_t Sets, uint8_t Length, uint8_t *Counter, bool Reverse = false, bool Reset = true, uint16_t MaxBound = TotalLEDs);
+void LED_Move(uint16_t From, uint16_t Amount, CRGB Color, uint8_t Sets, uint8_t Length, uint8_t *Counter, bool Reverse, bool Reset, uint16_t MaxBound) {
   //From = The first LED to do the animation on
   //Amount = The amount of LEDS to do the animation on
   //Color = the RGB value to use
@@ -89,18 +83,18 @@ void LED_Move(int From, int Amount, CRGB Color, byte Sets, byte Length, byte *Co
   //Reverse = Reverse the animation direction
   //Reset = reset the LED color with every call (do not use if using overlapping moves)
   //Example:
-  //  static byte counter;
+  //  static uint8_t counter;
   //  Move(5, 10, CRGB(0, 1, 0), 2, 2, &counter);
 
-  byte Count = *Counter;
+  uint8_t Count = *Counter;
   if (Reverse)
     Count = Amount - Count - 1;
   if (Reset)
     LED_Fill(From, Amount, CRGB(0, 0, 0), MaxBound);
-  byte poss[Sets];                        //Array for saving the positions of the sections
-  for (byte i = 0; i < Sets; i++) {       //Beginning of the loop which will send each position and length
+  uint8_t poss[Sets];                     //Array for saving the positions of the sections
+  for (uint8_t i = 0; i < Sets; i++) {    //Beginning of the loop which will send each position and length
     poss[i] = Count + Amount * i / Sets;  //This will calculate each position by adding the offset times the position number to the first position
-    byte posX;                            //This is the variable which will be used for sending position start. (this can overflow above TotalLEDs, but this will be fixed by the Fill command)
+    uint8_t posX;                         //This is the variable which will be used for sending position start. (this can overflow above TotalLEDs, but this will be fixed by the Fill command)
     if (poss[i] >= Amount) {              //To see if the position is to bigger than the total amount
       posX = From + poss[i] - Amount;     //Subtract the total amount of LEDs from the position number
     } else {                              //Otherwise it will just use the position data without modifying it
@@ -109,7 +103,7 @@ void LED_Move(int From, int Amount, CRGB Color, byte Sets, byte Length, byte *Co
     if (posX <= From + Amount - Length) {       //If the whole section ends before the total amount is reached it will just us the normal way of setting the LEDs
       LED_Fill(posX, Length, Color, MaxBound);  //With the standard fill solid command from FastLED, LEDs[posX] PosX stands for beginning position, Amount will stand for the size of the sections and the last one is the color
     } else {
-      byte calc1 = (From + Amount) - posX;              //Calculates the amount of LEDs which need to be set from the beginning
+      uint8_t calc1 = (From + Amount) - posX;           //Calculates the amount of LEDs which need to be set from the beginning
       LED_Fill(posX, calc1, Color, MaxBound);           //Fills the LEDs at the end of the strip
       LED_Fill(From, Length - calc1, Color, MaxBound);  //Fills the LEDs at the beginning of the strip
     }
@@ -118,8 +112,8 @@ void LED_Move(int From, int Amount, CRGB Color, byte Sets, byte Length, byte *Co
   if (*Counter >= Amount)
     *Counter = *Counter - Amount;
 }
-bool LED_Flash(int From, int Amount, CRGB Color, CRGB Color2 = CRGB(0, 0, 0), int MaxBound = TotalLEDs);
-bool LED_Flash(int From, int Amount, CRGB Color, CRGB Color2, int MaxBound) {
+bool LED_Flash(uint16_t From, uint16_t Amount, CRGB Color, CRGB Color2 = CRGB(0, 0, 0), uint16_t MaxBound = TotalLEDs);
+bool LED_Flash(uint16_t From, uint16_t Amount, CRGB Color, CRGB Color2, uint16_t MaxBound) {
   if (LEDs[From] != Color) {
     LED_Fill(From, Amount, Color, MaxBound);
     return true;
@@ -127,24 +121,24 @@ bool LED_Flash(int From, int Amount, CRGB Color, CRGB Color2, int MaxBound) {
   LED_Fill(From, Amount, Color2, MaxBound);
   return false;
 }
-void LED_Rainbow(int From, int Amount, byte DeltaHue, int MaxBound = TotalLEDs);
-void LED_Rainbow(int From, int Amount, byte DeltaHue, int MaxBound) {
-  //byte DeltaHue = Diffrence between each LED in hue
-  static byte gHue;
+void LED_Rainbow(uint16_t From, uint16_t Amount, uint8_t DeltaHue, uint16_t MaxBound = TotalLEDs);
+void LED_Rainbow(uint16_t From, uint16_t Amount, uint8_t DeltaHue, uint16_t MaxBound) {
+  //uint8_t DeltaHue = Diffrence between each LED in hue
+  static uint8_t gHue;
   gHue++;
   while (From >= MaxBound) From -= MaxBound;  //(Protection out of array bounds) Loop the LEDs around (TotalLEDs+1 is the same as LED 1)
   if (Amount > MaxBound) Amount = MaxBound;   //(Protection out of array bounds) if more LEDs are given than there are in the array, set the amount to all LEDs
   if (From + Amount > MaxBound) {             //Overflow protection
-    byte calc1 = MaxBound - From;             //Calculates the amount of LEDs which need to on on the end of the strip
+    uint8_t calc1 = MaxBound - From;          //Calculates the amount of LEDs which need to on on the end of the strip
     fill_rainbow(&(LEDs[From]), calc1, gHue, DeltaHue);
     fill_rainbow(&(LEDs[0]), Amount - calc1, gHue, DeltaHue);
   } else
     fill_rainbow(&LEDs[From], Amount, gHue, DeltaHue);
 }
-void LED_Wobble(int From, int Amount, CRGB Color, byte Sets, byte Length, int MaxBound = TotalLEDs);
-void LED_Wobble(int From, int Amount, CRGB Color, byte Sets, byte Length, int MaxBound) {
+void LED_Wobble(uint16_t From, uint16_t Amount, CRGB Color, uint8_t Sets, uint8_t Length, uint16_t MaxBound = TotalLEDs);
+void LED_Wobble(uint16_t From, uint16_t Amount, CRGB Color, uint8_t Sets, uint8_t Length, uint16_t MaxBound) {
   //Sort of a move, but just back and forth between the start en end
-  static byte Counter;  //this function can only be called once, this 'Counter' is a 1 time counter (could not get the pointer working to attach it to the caller)
+  static uint8_t Counter;  //this function can only be called once, this 'Counter' is a 1 time counter (could not get the pointer working to attach it to the caller)
   static bool Reverse = false;
   LED_Move(From, Amount, Color, Sets, Length, &Counter, Reverse, MaxBound);
   if (Reverse) {
@@ -159,8 +153,8 @@ void LED_Wobble(int From, int Amount, CRGB Color, byte Sets, byte Length, int Ma
     }
   }
 }
-void LED_Blink(int From, int Amount, CRGB rgb, byte AlwaysOn, byte *Counter, bool Reverse = false, bool Reset = true, int MaxBound = TotalLEDs);
-void LED_Blink(int From, int Amount, CRGB rgb, byte AlwaysOn, byte *Counter, bool Reverse, bool Reset, int MaxBound) {
+void LED_Blink(uint16_t From, uint16_t Amount, CRGB rgb, uint8_t AlwaysOn, uint8_t *Counter, bool Reverse = false, bool Reset = true, uint16_t MaxBound = TotalLEDs);
+void LED_Blink(uint16_t From, uint16_t Amount, CRGB rgb, uint8_t AlwaysOn, uint8_t *Counter, bool Reverse, bool Reset, uint16_t MaxBound) {
   if (Reset)
     LED_Fill(From, Amount, CRGB(0, 0, 0), MaxBound);  //Turn LEDs off
   if (Reverse) {
@@ -174,8 +168,8 @@ void LED_Blink(int From, int Amount, CRGB rgb, byte AlwaysOn, byte *Counter, boo
   if (*Counter > Amount)  //If we are at max length
     *Counter = 0;         //Reset counter
 }
-void LED_BackAndForth(int From, int Amount, CRGB Color, byte *Counter, bool *Direcion, bool Reverse = false, bool Reset = true, int MaxBound = TotalLEDs);
-void LED_BackAndForth(int From, int Amount, CRGB Color, byte *Counter, bool *Direcion, bool Reverse, bool Reset, int MaxBound) {
+void LED_BackAndForth(uint16_t From, uint16_t Amount, CRGB Color, uint8_t *Counter, bool *Direcion, bool Reverse = false, bool Reset = true, uint16_t MaxBound = TotalLEDs);
+void LED_BackAndForth(uint16_t From, uint16_t Amount, CRGB Color, uint8_t *Counter, bool *Direcion, bool Reverse, bool Reset, uint16_t MaxBound) {
   //Fills then emties the range of leds one by one
   if (Reset)
     LED_Fill(From, Amount, CRGB(0, 0, 0), MaxBound);
@@ -193,14 +187,14 @@ void LED_BackAndForth(int From, int Amount, CRGB Color, byte *Counter, bool *Dir
     LED_Fill(From, *Counter, Color, MaxBound);  //Set the counter amount of LEDs on
 }
 //==================================================
-void CutVariable(String _Input, String *_Variable, byte _VariableLength) {
+void CutVariable(String _Input, String *_Variable, uint8_t _VariableLength) {
   //Takes in a string, and cuts them into parts; "test,yes,clock" => {"test","yes","clock"}
   //Returns the output in the same string, for example
   //  String _Output[6], _Input = "boop,boobs,good,no,wait,what";
   //  CutVariable(_Input, &_Output[0], 6);
   //  Serial.println(String(_Output[0]) + "_" + String(_Output[1]) + "_" + String(_Output[2]));
-  byte _StartAt = 0, _WriteTo = 0;
-  for (byte i = 0; i <= _Input.length(); i++) {  //For each character in the input string
+  uint8_t _StartAt = 0, _WriteTo = 0;
+  for (uint8_t i = 0; i <= _Input.length(); i++) {  //For each character in the input string
     if (_Input.charAt(i) == ',') {
       _Variable[_WriteTo] = _Input.substring(_StartAt, i);
       _WriteTo++;
@@ -210,45 +204,27 @@ void CutVariable(String _Input, String *_Variable, byte _VariableLength) {
   }
   _Variable[_WriteTo] = _Input.substring(_StartAt);
 }
-bool SetDispenser(Dispenser Dis, byte DispenserID) {
+bool SetDispenser(Dispenser Dis, uint8_t DispenserID) {
   if (DispenserID >= Dispensers_Amount)
     return false;
   Dispensers[DispenserID] = Dis;
   return true;
 }
 bool AddDispenser(Dispenser Dis) {
-  for (byte i = 0; i < Dispensers_Amount; i++) {
-    if (Dispensers[i].Type != UNSPECIFIED) {
+  for (uint8_t i = 0; i < Dispensers_Amount; i++) {
+    if (Dispensers[i].LocationX != 0) {
       Dispensers[i] = Dis;
       return true;
     }
   }
   return false;
 }
-bool SetFluidInDispenser(byte DispenserID, byte IngredientID) {
+bool SetFluidInDispenser(uint8_t DispenserID, uint8_t IngredientID) {
   if (DispenserID >= Dispensers_Amount)
     return false;
   Dispensers[DispenserID].IngredientID = IngredientID;
   return true;
 }
-//bool RemoveDispenser(byte IngredientID) {
-//  for (byte i = 0; i < Dispensers_Amount; i++) {
-//    if (Dispensers[i].IngredientID == IngredientID) {
-//      if (i != 0) {                                             //If this is the first one (needs to be ocupied)
-//        Dispensers[i].Type = UNSPECIFIED;
-//      } else {
-//        for (byte j = 1; j < Dispensers_Amount; j++) {
-//          if (Dispensers[j].Type != UNSPECIFIED) {
-//            Dispensers[i] = Dispensers[j];
-//            Dispensers[j].Type = UNSPECIFIED;
-//          }
-//        }
-//      }
-//      return true;
-//    }
-//  }
-//  return false;
-//}
 bool TickEveryXms(unsigned long *_LastTime, unsigned long _Delay) {
   //With overflow, can be adjusted, no overshoot correction, true when (Now < _LastTime + _Delay)
   /* Example:   static unsigned long LastTime;
@@ -264,7 +240,7 @@ bool TickEveryXms(unsigned long *_LastTime, unsigned long _Delay) {
 bool StringIsDigit(String IN, char IgnoreCharA = '0', char IgnoreCharB = '0');
 bool StringIsDigit(String IN, char IgnoreCharA, char IgnoreCharB) {
   //IgnoreChar can be used to ignore ',' or '.' or '-'
-  for (byte i = 0; i < IN.length(); i++) {
+  for (uint8_t i = 0; i < IN.length(); i++) {
     if (isDigit(IN.charAt(i))) {               //If it is a digit, do nothing
     } else if (IN.charAt(i) == IgnoreCharA) {  //If it is IgnoreCharA, do nothing
     } else if (IN.charAt(i) == IgnoreCharB) {  //If it is IgnoreCharB, do nothing
@@ -274,12 +250,12 @@ bool StringIsDigit(String IN, char IgnoreCharA, char IgnoreCharB) {
   }
   return true;
 }
-String IngredientIDtoString(byte IN) {
+String IngredientIDtoString(uint8_t IN) {
   if (IN <= Ingredient_Amount)
     return IngredientS[IN];
   return "UNK";
 }
-byte IngredientStringToID(String IN) {
+uint8_t IngredientStringToID(String IN) {
   if (StringIsDigit(IN)) {
     if (IN.toInt() < Ingredient_Amount)
       return IN.toInt();
@@ -289,38 +265,16 @@ byte IngredientStringToID(String IN) {
   IN.trim();
   IN.toUpperCase();
   IN.replace(' ', '_');
-  for (byte i = 0; i < Ingredient_Amount; i++) {
+  for (uint8_t i = 0; i < Ingredient_Amount; i++) {
     if (IN == IngredientS[i])
       return i;
   }
   return 0;
 }
-String TypeIDtoString(byte IN) {
-  if (IN <= Type_Amount)
-    return TypeS[IN];
-  return "UNK";
-}
-byte TypeStringToID(String IN) {
-  if (StringIsDigit(IN)) {
-    if (IN.toInt() < Type_Amount)
-      return IN.toInt();
-    else
-      return 0;
-  }
-  IN.trim();
-  IN.toUpperCase();
-  for (byte i = 0; i < Type_Amount; i++) {
-    if (IN == TypeS[i]) {
-      Serial.println(i);
-      return i;
-    }
-  }
-  return 0;
-}
-byte GetDispenserID(byte IngredientID) {
+uint8_t GetDispenserID(uint8_t IngredientID) {
   //  Serial.println("GetDispenserID " + String(IngredientID) + "(" + IngredientIDtoString(IngredientID) + ")");
   if (IngredientID == 0) return 255;
-  for (byte i = 0; i <= Ingredient_Amount; i++) {
+  for (uint8_t i = 0; i <= Ingredient_Amount; i++) {
     if (Dispensers[i].IngredientID == IngredientID) {  //If the drink is found and available
       return i;
     }
@@ -368,27 +322,35 @@ String IsTrueToString(bool input) {
 String IpAddress2String(const IPAddress &ipAddress) {
   return String(ipAddress[0]) + String(".") + String(ipAddress[1]) + String(".") + String(ipAddress[2]) + String(".") + String(ipAddress[3]);
 }
+String PJONresultToString(uint8_t id) {
+  switch (id) {
+    case 6: return "PJON_ACK";
+    case 21: return "PJON_NAK";
+    case 666: return "PJON_BUSY";
+    case 65535: return "PJON_FAIL";
+  }
+  return String(id);
+}
 void LcdPrint(String msg = "", String msg2 = "");
 void LcdPrint(String msg, String msg2) {
   Serial.println("LcdPrint:" + msg + "_" + msg2);
   if (msg != "") {
-    for (byte i = msg.length(); i < 16; i++) {
+    for (uint8_t i = msg.length(); i < 16; i++) {
       msg += " ";
     }
     lcd.setCursor(1, 0);
     lcd.print(msg);
   }
   if (msg2 != "") {
-    for (byte i = msg2.length(); i < 16; i++) {
+    for (uint8_t i = msg2.length(); i < 16; i++) {
       msg2 += " ";
     }
     lcd.setCursor(1, 1);
     lcd.print(msg2);
   }
 }
-
-bool MoveWait(AccelStepper Step, byte RefferenceButton, int pos = 0);
-bool MoveWait(AccelStepper Step, byte RefferenceButton, int pos) {
+bool MoveWait(AccelStepper Step, uint8_t RefferenceButton, uint16_t pos = 0);
+bool MoveWait(AccelStepper Step, uint8_t RefferenceButton, uint16_t pos) {
   Step.moveTo(pos);
   Serial.println("MW: " + String(pos) + " b=" + String(RefferenceButton) + "=" + String(digitalRead(RefferenceButton)));
   while (true) {
@@ -457,7 +419,6 @@ void MyYield() {
   WiFiManager.RunServer();  //Do WIFI server stuff if needed
   CheckEEPROMSave();
   CheckDisableSteppers();
-
   if (!Running) {
     static bool LastButtonState = HIGH;
     bool ButtonState = digitalRead(PDI_S);
@@ -471,16 +432,20 @@ void MyYield() {
     LastButtonState = ButtonState;
   }
   FastLED.delay(1);
+  uint16_t result = bus.receive(1000);  //Stop and receive commands for x microseconds (1000 micro = 1ms)
+  if (result != PJON_ACK and result != PJON_FAIL) {
+    LcdPrint("Bus error!", PJONresultToString(result));
+  }
   yield();
 }
-void MyDelay(int DelayMS) {  //Just a non-blocking delay
+void MyDelay(uint16_t DelayMS) {  //Just a non-blocking delay
   //DelayMS, delay in ms like in the Arduino Delay() function
   unsigned long _StartTime = millis();
   while (millis() < _StartTime + DelayMS)
     MyYield();
 }
-void MoveTo(int LocationX = -1, int LocationY = -1, int LocationZ = -1);
-void MoveTo(int LocationX, int LocationY, int LocationZ) {
+void MoveTo(uint16_t LocationX = -1, uint16_t LocationY = -1, uint16_t LocationZ = -1);
+void MoveTo(uint16_t LocationX, uint16_t LocationY, uint16_t LocationZ) {
   Serial.println("MoveTo " + String(LocationX) + " , " + String(LocationY) + " , " + String(LocationZ));
   if (!Homed) {
     if (!Home(true, true)) {

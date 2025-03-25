@@ -16,7 +16,6 @@
 #define PreFixHome "homed"
 //Dispenser Settings
 #define PreFixSetDispenserID "di"
-#define PreFixSetDispenserType "dt"
 #define PreFixSetDispenserX "dx"
 #define PreFixSetDispenserY "dy"
 #define PreFixSetDispenserMSml "dl"
@@ -60,15 +59,15 @@ void handle_Set() {
   bool makeMix = false;
   int8_t DoHoming = -1;
   Drink Mix;
-  int GoTo[3] = { -1, -1 };
-  for (byte i = 0; i < 8; i++) {
+  uint16_t GoTo[3] = { -1, -1 };
+  for (uint8_t i = 0; i < 8; i++) {
     Mix.Ingredients[i].ID = 0;
     Mix.Ingredients[i].Action = "";
     Mix.Ingredients[i].ml = 0;
   }
-  Dispenser Dis = { 0, 0, 0, 0, 0, 0 };
+  Dispenser Dis = { 0, 0, 0, 0, 0 };
   int8_t DisID = -1;
-  for (int i = 0; i < server.args(); i++) {
+  for (uint16_t i = 0; i < server.args(); i++) {
     String ArguName = server.argName(i);
     ArguName.toLowerCase();
     String ArgValue = server.arg(i);
@@ -231,16 +230,6 @@ void handle_Set() {
           DisID = ArgValue.toInt();
         }
       }
-    } else if (ArguName == PreFixSetDispenserType) {
-      if (!StringIsDigit(ArgValue)) {
-        ERRORMSG = "SetDispenserType not a value";
-      } else {
-        if (ArgValue.toInt() < 0 or ArgValue.toInt() > 2) {
-          ERRORMSG = "SetDispenserType out of valid range";
-        } else {
-          Dis.Type = ArgValue.toInt();
-        }
-      }
     } else if (ArguName == PreFixSetDispenserX) {
       if (!StringIsDigit(ArgValue)) {
         ERRORMSG = "SetDispenserX not a value";
@@ -301,7 +290,7 @@ void handle_Set() {
     ERRORMSG += "No mix ingredients given/n";
   }
   //Process the dispenser update
-  if (DisID != -1 or Dis.Type != 0 or Dis.LocationX != 0 or Dis.LocationY != 0 or Dis.TimeMSML != 0 or Dis.TimeMSoff != 0 or Dis.IngredientID != 0) {
+  if (DisID != -1 or Dis.LocationX != 0 or Dis.LocationY != 0 or Dis.TimeMSML != 0 or Dis.TimeMSoff != 0 or Dis.IngredientID != 0) {
     if (DisID >= 0) {
       SetDispenser(Dis, DisID);
     } else {
@@ -331,12 +320,12 @@ void handle_Set() {
 }
 void handle_Get() {
   String Json = "{\"dispensers\":[";
-  for (byte i = 0; i < Dispensers_Amount; i++) {
+  for (uint8_t i = 0; i < Dispensers_Amount; i++) {
     if (i != 0) Json += ",";
-    Json += "[" + String(Dispensers[i].Type) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].ExtraData) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].TimeMSoff) + "," + String(Dispensers[i].IngredientID) + "]";
+    Json += "[" + String(i) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].TimeMSoff) + "," + String(Dispensers[i].IngredientID) + "]";
   }
   Json += "],\"ingredients\":[";
-  for (byte i = 0; i < Ingredient_Amount; i++) {
+  for (uint8_t i = 0; i < Ingredient_Amount; i++) {
     if (i != 0) Json += ",";
     Json += "\"" + IngredientIDtoString(i) + "\"";
   }
@@ -359,18 +348,25 @@ void handle_Get() {
 }
 void handle_Info() {
   String Message = "https://github.com/jellewie \n"
-                   "Code compiled on " + String(__DATE__) + " " + String(__TIME__) + "\n"
-                   "MAC adress = " + String(WiFi.macAddress()) + "\n"
-                   "IP adress = " + IpAddress2String(WiFi.localIP()) + "\n"
-                   "X_Ref = " + IsTrueToString(digitalRead(PDI_X_Ref) == LOW) + " " + (digitalRead(PDI_X_Ref) ? "HIGH" : "LOW") + "\n"
-                   "Y_Ref = " + IsTrueToString(digitalRead(PDI_Y_Ref) == LOW) + " " + (digitalRead(PDI_Y_Ref) ? "HIGH" : "LOW") + "\n"
-                   "Switch = " + IsTrueToString(digitalRead(PDI_S)    == LOW) + " " + (digitalRead(PDI_S)     ? "HIGH" : "LOW") + "\n"
-                   "Running = " + IsTrueToString(digitalRead(PDI_S)    == LOW) + "\n"
-                   "\nSOFT_SETTINGS\n";
-  for (byte i = 0; i < WiFiManager_Settings - 2; i++)
+                   "Code compiled on "
+                   + String(__DATE__) + " " + String(__TIME__) + "\n"
+                                                                 "MAC adress = "
+                   + String(WiFi.macAddress()) + "\n"
+                                                 "IP adress = "
+                   + IpAddress2String(WiFi.localIP()) + "\n"
+                                                        "X_Ref = "
+                   + IsTrueToString(digitalRead(PDI_X_Ref) == LOW) + " " + (digitalRead(PDI_X_Ref) ? "HIGH" : "LOW") + "\n"
+                                                                                                                       "Y_Ref = "
+                   + IsTrueToString(digitalRead(PDI_Y_Ref) == LOW) + " " + (digitalRead(PDI_Y_Ref) ? "HIGH" : "LOW") + "\n"
+                                                                                                                       "Switch = "
+                   + IsTrueToString(digitalRead(PDI_S) == LOW) + " " + (digitalRead(PDI_S) ? "HIGH" : "LOW") + "\n"
+                                                                                                               "Running = "
+                   + IsTrueToString(digitalRead(PDI_S) == LOW) + "\n"
+                                                                 "\nSOFT_SETTINGS\n";
+  for (uint8_t i = 0; i < WiFiManager_Settings - 2; i++)
     Message += WiFiManager_VariableNames[i + 2] + " = " + WiFiManagerUser_Get_Value(i, false, true) + "\n";
   Message += "\nSOFT_SETTINGS raw\n";
-  for (byte i = 0; i < WiFiManager_Settings - 2; i++)
+  for (uint8_t i = 0; i < WiFiManager_Settings - 2; i++)
     Message += WiFiManager_VariableNames[i + 2] + " = " + WiFiManagerUser_Get_Value(i, false, false) + "\n";
   server.send(200, "text/plain", Message);
 }
@@ -390,7 +386,7 @@ void handle_NotFound() {
   Message += (server.method() == HTTP_GET) ? "GET" : "POST";
   Message += server.uri();
   if (server.args() > 0) Message += " ? ";
-  for (byte i = 0; i < server.args(); i++) {
+  for (uint8_t i = 0; i < server.args(); i++) {
     if (i != 0)
       Message += "&";
     Message += server.argName(i) + " = " + server.arg(i);

@@ -12,20 +12,21 @@
 #include <Wire.h>                     //used by LiquidCrystal_I2C
 #include <LiquidCrystal_I2C.h>        //Make sure to install LiquidCrystal_I2C V1.1.2(+) manually https://github.com/johnrickman/LiquidCrystal_I2C/blob/master/LiquidCrystal_I2C.cpp
 #include <FastLED.h>                  //Include the libary FastLED (If you get a error here, make sure it's installed!)
+#include <PJONSoftwareBitBang.h>
 //==============================================================
 //Very custom user settings
 //==============================================================
-const byte PDO_Step_enable = 16;
-const byte PAO_LED = 13;  //To which pin the <LED strip> is connected to
-const byte PDO_X_Dir = 23;
-const byte PDO_Y_Dir = 17;
-const byte PDO_X_Step = 4;
-const byte PDO_Y_Step = 12;
-const byte PDI_X_Ref = 5;  //LOW = TRIGGERED
-const byte PDI_Y_Ref = 27;
-const byte PDI_S = 39;
-const byte PDO_Pump[] = { 32, 33, 25, 26 };
-const int TotalLEDs = 100;  //The total amounts of LEDs in the strip
+const uint8_t PDO_Step_enable = 16;
+const uint8_t PAO_LED = 13;  //To which pin the <LED strip> is connected to
+const uint8_t PDO_X_Dir = 23;
+const uint8_t PDO_Y_Dir = 17;
+const uint8_t PDO_X_Step = 4;
+const uint8_t PDO_Y_Step = 12;
+const uint8_t PDI_X_Ref = 5;  //LOW = TRIGGERED
+const uint8_t PDI_Y_Ref = 27;
+const uint8_t PDI_S = 39;
+const uint8_t PDIO_buspin = 25;
+const uint16_t TotalLEDs = 100;  //The total amounts of LEDs in the strip
 CRGB ColorBoot = CRGB(255, 128, 0);
 CRGB ColorHoming = CRGB(0, 0, 255);
 CRGB ColorHomeFail = CRGB(255, 0, 0);
@@ -34,30 +35,32 @@ CRGB ColorMoveActive = CRGB(0, 255, 0);
 //==============================================================
 //Soft settings (can be changed with the interface)
 //==============================================================
-byte HomeMAXSpeed = 200;
+uint8_t HomeMAXSpeed = 200;
 bool Running = false;
-unsigned int MotorMAXSpeed = 5500;
-unsigned int MotorMAXAccel = 3000;
-unsigned int BedSize_X = 23950;
-unsigned int BedSize_Y = 7100;
-unsigned int Manual_X = BedSize_X;
-unsigned int Manual_Y = BedSize_Y;
-unsigned int HomedistanceBounce = 200;
-unsigned int MaxGlassSize = 300;
-unsigned int DisableSteppersAfterIdleS = 60;
-byte MaxBrightness = 128;
-int SaveEEPROMinSeconds = -1;
-int DisableSteppersinSeconds = -1;
+uint16_t MotorMAXSpeed = 5500;
+uint16_t MotorMAXAccel = 3000;
+uint16_t BedSize_X = 23950;
+uint16_t BedSize_Y = 7100;
+uint16_t Manual_X = BedSize_X;
+uint16_t Manual_Y = BedSize_Y;
+uint16_t HomedistanceBounce = 200;
+uint16_t MaxGlassSize = 300;
+uint16_t DisableSteppersAfterIdleS = 60;
+uint8_t MaxBrightness = 128;
+int16_t SaveEEPROMinSeconds = -1;
+int16_t DisableSteppersinSeconds = -1;
 bool Homed = false;
 //==============================================================
 //End of settings
 //==============================================================
 bool UpdateLEDs = false;
-byte Pump_Amount = sizeof(PDO_Pump) / sizeof(PDO_Pump[0]);  //Why filling this in if we can automate that? :)
-const byte Dispensers_Amount = 20;                          //Only 20 are saved in the WiFiManager!!
+const uint8_t Dispensers_Amount = 20;  //Only 20 are saved in the WiFiManager!!
+bool SlotConnected[Dispensers_Amount];
 AccelStepper Stepper_X(AccelStepper::DRIVER, PDO_X_Step, PDO_X_Dir);
 AccelStepper Stepper_Y(AccelStepper::DRIVER, PDO_Y_Step, PDO_Y_Dir);
 LiquidCrystal_I2C lcd(0x27, 20, 4);  //Set the LCD address to 0x27 for a 20 chars and 2 line display
+const uint8_t PrimaryID = 254;
+PJONSoftwareBitBang bus(PrimaryID);  //Master Device ID
 CRGB LEDs[TotalLEDs];
 #include "data.h"
 #include "functions.h"
@@ -88,10 +91,6 @@ void setup() {
   pinMode(PDI_X_Ref, INPUT_PULLUP);
   pinMode(PDI_Y_Ref, INPUT_PULLUP);
   pinMode(PDI_S, INPUT_PULLUP);
-  for (byte i = 0; i < Pump_Amount; i++) {
-    pinMode(PDO_Pump[i], OUTPUT);
-    digitalWrite(PDO_Pump[i], LOW);
-  }
   Stepper_X.setPinsInverted(false, true, false, false, false);  //stepInvert, directionInvert, pin3Invert, pin4Invert, enableInvert
   Stepper_Y.setPinsInverted(false, true, false, false, false);
   Stepper_X.setMaxSpeed(MotorMAXSpeed);
@@ -107,9 +106,14 @@ void setup() {
   server.on("/info", handle_Info);
   server.on("/reset", handle_Reset);
   server.onNotFound(handle_NotFound);  //When a client requests an unknown URI
-  byte Answer = WiFiManager.Start();   //Run the wifi startup (and save results)
-  WiFiManager.OTA_Enabled = true;      //(runtime) Turn off/on OTA
-  WiFiManager.EnableSetup(true);       //(runtime) Enable the settings, only enabled in APmode by default
+  bus.set_error(error_handler);
+  bus.set_receiver(receiver_function);
+  bus.strategy.set_pin(PDIO_buspin);
+  bus.begin();
+  pingAll();                             //Look for all available dispensers
+  uint8_t Answer = WiFiManager.Start();  //Run the wifi startup (and save results)
+  WiFiManager.OTA_Enabled = true;        //(runtime) Turn off/on OTA
+  WiFiManager.EnableSetup(true);         //(runtime) Enable the settings, only enabled in APmode by default
   if (Answer == 1) {
     LcdPrint("Mixer online!", IpAddress2String(WiFi.localIP()));
   } else {
@@ -120,6 +124,11 @@ void setup() {
 void loop() {
   MyYield();
   server.handleClient();
+  static bool HomedLast = Homed;
+  if (Homed != HomedLast) {
+    HomedLast = Homed;
+    BusSend(CHANGECOLOR, 0b00000010);  //Send dispenser LED Rainbow command
+  }
   if (Homed) {
     EVERY_N_MILLISECONDS(40) {
       LED_Rainbow(0, TotalLEDs, 255 / TotalLEDs);  //Show a rainbow to sinal we are done and IDLE
@@ -127,19 +136,19 @@ void loop() {
     }
   }
 }
-
 void MakeCocktail(Drink Mix) {
   if (Running) return;
   Running = true;
   LcdPrint("Mixing cocktail", Mix.Name);
-  DisableSteppersinSeconds = -1;  //Make sure the steppers do not auto disable
+  BusSend(CHANGECOLOR, 0b00000000);  //Reset dispenser LED color command
+  DisableSteppersinSeconds = -1;     //Make sure the steppers do not auto disable
   if (!Homed) {
     if (!Home(true, true)) {
       LcdPrint("Mix not started", "Homing failed");
       return;
     }
   }
-  for (byte i = 0; i < 8; i++) {  //For each Ingredient
+  for (uint8_t i = 0; i < 8; i++) {  //For each Ingredient
     MyYield();
     if (Mix.Ingredients[i].ID != 0 or Mix.Ingredients[i].Action != 0) {
       String msg = "";
@@ -162,45 +171,16 @@ void GetIngredient(Ingredient IN) {
     LightSection(Manual_X);
     if (WaitForUser("Waiting on user", String(IN.Action))) return;
   }
-  byte DispenserID = GetDispenserID(IN.ID);
+  uint8_t DispenserID = GetDispenserID(IN.ID);
   if (DispenserID != 255) {
-    LightSection(Dispensers[DispenserID].LocationX);
-    switch (Dispensers[DispenserID].Type) {
-      case DOUBLENOZZLE:
-        {
-          Serial.println("GetIngredient DOUBLENOZZLE IN.ml=" + String(IN.ml));
-          MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);
+    LightSection(Dispensers[DispenserID].LocationX);                               //Turn on the main LED so show where we are going
+    MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);  //Move to the dispenser
+    BusSendBlocking(DispenserID, DISPENSE, IN.ml);                                 //Give the dispence command
 
-          //IN.ml; ID of the dispenser
-          //IN.Action; If given, prompt the message and wait for user confirmation first
-          //IN.ID; ml of the fluid
-
-          //Code for the action to dispense liquid should be put here
-
-
-        break;
-      case PUMP:
-        {
-          Serial.println("GetIngredient from Pump ID=" + String(Dispensers[DispenserID].ExtraData));
-          if (Dispensers[DispenserID].ExtraData <= Pump_Amount) {
-            MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);
-            digitalWrite(PDO_Pump[Dispensers[DispenserID].ExtraData], HIGH);
-            MyDelay(Dispensers[DispenserID].TimeMSML * IN.ml);
-            digitalWrite(PDO_Pump[Dispensers[DispenserID].ExtraData], LOW);
-            MyDelay(Dispensers[DispenserID].TimeMSoff);
-          } else {
-            if (WaitForUser("UNK pump ID", "ExtraData=" + String(Dispensers[DispenserID].ExtraData))) return;
-          }
-        }
-        break;
-      default:
-        if (WaitForUser("UNK Dispenser type", String(Dispensers[DispenserID].Type))) return;
-        break;
-    }
   }
 }
 void LightSection(long LocationX) {
-  byte Len = 13;
+  uint8_t Len = 13;
   float LEDPos = (LocationX * TotalLEDs) / (BedSize_X);
   LEDPos = LEDPos - Len < 0 ? 0 : LEDPos - Len;
   LEDPos = LEDPos + Len > TotalLEDs ? LEDPos - Len : LEDPos;

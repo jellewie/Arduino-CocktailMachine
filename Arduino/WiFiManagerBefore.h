@@ -17,7 +17,7 @@
   HOW TO ADD CUSTOM VALUES
    -"WiFiManagerUser_VariableNames_Defined" define this, and ass custom names for the values
    -"WiFiManager_VariableNames"  Add the description name of the value to get/set to this list
-   -"EEPROM_size"     [optional] Make sure it is big enough for your needs, SIZE_SSID+SIZE_PASS+YourValues (1 byte = 1 character)
+   -"EEPROM_size"     [optional] Make sure it is big enough for your needs, SIZE_SSID+SIZE_PASS+YourValues (1 uint8_t = 1 character)
    -"Set_Value"       Set the action on what to do on startup with this value
    -"Get_Value"       [optional] Set the action on what to fill in in the boxes in the 'AP settings portal'
 */
@@ -39,7 +39,7 @@
 
 #define WiFiManagerUser_VariableNames_Defined  //Define that we want to use the custom user variables (Dont forget to setup WiFiManager_VariableNames and WiFiManager_Settings)
 const String WiFiManager_VariableNames[] = { "SSID", "Password", "name", "MotorMAXSpeed", "MotorMAXAccel", "BedSize_X", "BedSize_Y", "", "Manual_X", "Manual_Y", "", "HomeMAXSpeed", "HomedistanceBounce", "DisableSteppersAfterIdleS", "MaxGlassSize", "MaxBrightness", "Reserved", "Reserved", "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D13", "D14", "D15", "D16", "D17", "D18", "D19" };
-const int EEPROM_size = 4096;  //Max Amount of chars for 'SSID(16) + PASSWORD(16) + extra custom vars(?) +1(NULL)' defaults to 3
+const uint16_t EEPROM_size = 4096;  //Max Amount of chars for 'SSID(16) + PASSWORD(16) + extra custom vars(?) +1(NULL)' defaults to 3
 
 #define WiFiManagerUser_Name_Defined
 char Name[16] = "mixer";  //If you want to define the name somewhere else use 'char* Name = Name'
