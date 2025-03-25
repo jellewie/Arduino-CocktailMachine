@@ -177,6 +177,14 @@ void GetIngredient(Ingredient IN) {
     MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);  //Move to the dispenser
     BusSendBlocking(DispenserID, DISPENSE, IN.ml);                                 //Give the dispence command
 
+    /*
+      BusSend(CHANGECOLOR, 0b00000010);  //Send dispenser LED Rainbow command
+      BusSend(CHANGECOLOR, 0b00000000);  //Reset dispenser LED color command
+      BusSendBlocking(DispenserID, DISPENSE, 30);
+      BusSendBlocking(DispenserID, CHANGEFLUID, 7);
+      BusSendBlocking(DispenserID, CALIBRATEMSPERML, 40);
+      BusSendBlocking(DispenserID, CHANGEDELAY, 100);  //100*5=500ms
+    */
   }
 }
 void LightSection(long LocationX) {
