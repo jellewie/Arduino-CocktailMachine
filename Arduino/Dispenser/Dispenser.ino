@@ -35,7 +35,7 @@ struct Settings {
   uint8_t DelayAir;  //ms to let the air valve open before the fluid valve, to get rid of pressure buildup in the bottle
 };
 Settings dispenserSettings;  //Create a variable of type Settings
-enum COMMANDS { UNK,
+enum COMMANDS { UNKNOWN,
                 ADOPT,
                 DISPENSE,
                 CALIBRATEMSPERML,
@@ -43,7 +43,7 @@ enum COMMANDS { UNK,
                 CHANGEDELAY,
                 CHANGECOLOR,
                 DISPENSERSTATUS,
-};
+              };
 PJONSoftwareBitBang bus;  //DeviceID = PJON_NOT_ASSIGNED
 void setup() {
 #ifdef SerialDebug
@@ -120,6 +120,7 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
 #endif
   if (length == 2) {
     uint8_t triggerresult = triggerAction(payload[0], payload[1]);
+    if (triggerresult == 255) return;
     uint8_t BusSend[] = { DISPENSERSTATUS, triggerresult };   //Reply back we have completed
     uint16_t result2 = bus.reply(&BusSend, sizeof(BusSend));  //Send success Primary
 #ifdef SerialDebug
@@ -135,7 +136,7 @@ uint8_t triggerAction(uint8_t cmd1, uint8_t cmd2) {
     2=DISPENSE, ml to dispense
     3=CALIBRATEMSPERML, MSperML
     4=CHANGEFLUID, New_Fluid_ID
-    5=CHANGEDELAY, Time_in_ms*5 between air and fluid   
+    5=CHANGEDELAY, Time_in_ms*5 between air and fluid
     6=CHANGECOLOR, RRGGBBMM MM=00 = Auto
                             MM=01 = RGB mode,
                             MM=10 = rainbow mode
@@ -143,6 +144,9 @@ uint8_t triggerAction(uint8_t cmd1, uint8_t cmd2) {
   */
   uint8_t r, g, b, m;
   switch (cmd1) {
+    case UNKNOWN:
+      return 255;
+      break;
     case ADOPT:
       ImAdopted = true;
       LEDloop(true);
