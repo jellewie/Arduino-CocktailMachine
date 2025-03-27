@@ -379,11 +379,13 @@ bool Home(bool X, bool Y) {
   if (X) {
     LcdPrint("", "X");
     Stepper_X.setCurrentPosition(0);
+    Serial.println("Move to X1=" + String(BedSize_X * -1.1));
     if (MoveWait(Stepper_X, PDI_X_Ref, BedSize_X * -1.1)) {  //If the switch is touched
       Stepper_X.moveTo(HomedistanceBounce);
       while (Stepper_X.run())
         yield();
       Stepper_X.setMaxSpeed(HomeMAXSpeed);
+      Serial.println("Move to X2=" + String(-(BedSize_X / 20)));
       Homed_X = MoveWait(Stepper_X, PDI_X_Ref, -(BedSize_X / 20));
       Stepper_X.setCurrentPosition(0);       //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
       Stepper_X.setMaxSpeed(MotorMAXSpeed);  //Reset max speed
@@ -392,11 +394,13 @@ bool Home(bool X, bool Y) {
   if (Y) {
     LcdPrint("", "Y");
     Stepper_Y.setCurrentPosition(0);
+    Serial.println("Move to Y1=" + String(BedSize_Y * -1.1));
     if (MoveWait(Stepper_Y, PDI_Y_Ref, BedSize_Y * -1.1)) {  //If the switch is touched
       Stepper_Y.moveTo(HomedistanceBounce);
       while (Stepper_Y.run())
         yield();
       Stepper_Y.setMaxSpeed(HomeMAXSpeed);
+      Serial.println("Move to Y2=" + String(-(BedSize_Y / 20)));
       Homed_Y = MoveWait(Stepper_Y, PDI_Y_Ref, -(BedSize_Y / 20));
       Stepper_Y.setCurrentPosition(0);       //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
       Stepper_Y.setMaxSpeed(MotorMAXSpeed);  //Reset max speed
@@ -444,9 +448,9 @@ void MyDelay(uint16_t DelayMS) {  //Just a non-blocking delay
   while (millis() < _StartTime + DelayMS)
     MyYield();
 }
-void MoveTo(uint16_t LocationX = -1, uint16_t LocationY = -1, uint16_t LocationZ = -1);
-void MoveTo(uint16_t LocationX, uint16_t LocationY, uint16_t LocationZ) {
-  Serial.println("MoveTo " + String(LocationX) + " , " + String(LocationY) + " , " + String(LocationZ));
+void MoveTo(int16_t LocationX = -1, int16_t LocationY = -1);
+void MoveTo(int16_t LocationX, int16_t LocationY) {
+  Serial.println("MoveTo " + String(LocationX) + " , " + String(LocationY));
   if (!Homed) {
     if (!Home(true, true)) {
       return;

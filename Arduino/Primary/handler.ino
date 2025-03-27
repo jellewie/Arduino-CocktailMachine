@@ -59,7 +59,7 @@ void handle_Set() {
   bool makeMix = false;
   int8_t DoHoming = -1;
   Drink Mix;
-  uint16_t GoTo[3] = { -1, -1 };
+  int16_t GoTo[2] = { -1, -1 };
   for (uint8_t i = 0; i < 8; i++) {
     Mix.Ingredients[i].ID = 0;
     Mix.Ingredients[i].Action = "";
@@ -310,9 +310,9 @@ void handle_Set() {
     Home();
   }
   //If we need to somewhere
-  if (GoTo[0] != -1 or GoTo[1] != -1 or GoTo[2] != -1) {
+  if (GoTo[0] != -1 or GoTo[1] != -1) {
     LcdPrint("Moving to", String(GoTo[0]) + "," + String(GoTo[1]));
-    MoveTo(GoTo[0], GoTo[1], GoTo[2]);
+    MoveTo(GoTo[0], GoTo[1]);
   }
   //If we need to mix
   if (Mix.Name != "")
