@@ -6,7 +6,7 @@
   This code is bebugable on an ESP32, when the compiler detects you are compiling to an ESP it will change the code to debugging
 */
 
-uint8_t SlotID = 1;  //Unique 1-byte ID (change for every slot for dispenser). Must be higher than 0
+uint8_t SlotID = 1;  //Unique 1-byte ID (change for every slot for dispenser). Must be higher than 0 and lower then 255
 
 #ifdef ESP32
 const uint8_t PDI_Slot_TXRX = 13;

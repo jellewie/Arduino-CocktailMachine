@@ -27,6 +27,7 @@ const uint8_t PDI_Y_Ref = 27;
 const uint8_t PDI_S = 39;
 const uint8_t PDIO_buspin = 25;
 const uint16_t TotalLEDs = 100;  //The total amounts of LEDs in the strip
+const uint16_t DispenserHeartbeat = 5000; //time in ms to check if all dispensers are still there
 CRGB ColorBoot = CRGB(255, 128, 0);
 CRGB ColorHoming = CRGB(0, 0, 255);
 CRGB ColorHomeFail = CRGB(255, 0, 0);
@@ -54,7 +55,7 @@ bool Homed = false;
 //End of settings
 //==============================================================
 bool UpdateLEDs = false;
-const uint8_t Dispensers_Amount = 20;  //Only 20 are saved in the WiFiManager!!
+const uint8_t Dispensers_Amount = 20 + 1;  //Only 20 are saved in the WiFiManager!! 00 is reserved/invalid_ID so add 1 here
 bool SlotConnected[Dispensers_Amount];
 AccelStepper Stepper_X(AccelStepper::DRIVER, PDO_X_Step, PDO_X_Dir);
 AccelStepper Stepper_Y(AccelStepper::DRIVER, PDO_Y_Step, PDO_Y_Dir);
@@ -64,6 +65,7 @@ PJONSoftwareBitBang bus(PrimaryID);  //Master Device ID
 CRGB LEDs[TotalLEDs];
 #include "data.h"
 #include "functions.h"
+#include "dispensers.h"
 #include "WiFiManagerLater.h"  //Define options of WiFiManager (can also be done before), but WiFiManager can also be called here (example for DoRequest included here)
 
 void setup() {
@@ -110,10 +112,10 @@ void setup() {
   bus.set_receiver(receiver_function);
   bus.strategy.set_pin(PDIO_buspin);
   bus.begin();
-  pingAll();                             //Look for all available dispensers
   uint8_t Answer = WiFiManager.Start();  //Run the wifi startup (and save results)
   WiFiManager.OTA_Enabled = true;        //(runtime) Turn off/on OTA
   WiFiManager.EnableSetup(true);         //(runtime) Enable the settings, only enabled in APmode by default
+  pingAll();                             //Look for all available dispensers
   if (Answer == 1) {
     LcdPrint("Mixer online!", IpAddress2String(WiFi.localIP()));
   } else {
@@ -135,6 +137,9 @@ void loop() {
       UpdateLED(true);
     }
   }
+  static unsigned long LastTime;
+  if (TickEveryXms(&LastTime, DispenserHeartbeat))
+    pingOnline(); //Heartbeat to all dispensers to check if they are still there
 }
 void MakeCocktail(Drink Mix) {
   if (Running) return;
@@ -176,15 +181,6 @@ void GetIngredient(Ingredient IN) {
     LightSection(Dispensers[DispenserID].LocationX);                               //Turn on the main LED so show where we are going
     MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);  //Move to the dispenser
     BusSendBlocking(DispenserID, DISPENSE, IN.ml);                                 //Give the dispence command
-
-    /*
-      BusSend(CHANGECOLOR, 0b00000010);  //Send dispenser LED Rainbow command
-      BusSend(CHANGECOLOR, 0b00000000);  //Reset dispenser LED color command
-      BusSendBlocking(DispenserID, DISPENSE, 30);
-      BusSendBlocking(DispenserID, CHANGEFLUID, 7);
-      BusSendBlocking(DispenserID, CALIBRATEMSPERML, 40);
-      BusSendBlocking(DispenserID, CHANGEDELAY, 100);  //100*5=500ms
-    */
   }
 }
 void LightSection(long LocationX) {

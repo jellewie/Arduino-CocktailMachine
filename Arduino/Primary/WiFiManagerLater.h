@@ -115,7 +115,7 @@ bool WiFiManagerUser_Set_Value(uint8_t ValueID, String Value) {
       break;
     default:
       {
-        uint8_t i = ValueID - 16;  //Remove the amount above from the counter, so the next are of the Dispensers
+        uint8_t i = ValueID - 16;  //Remove the amount above from the counter, so the next ones are of the Dispensers
         if (i < Dispensers_Amount) {
           String _Output[5];
           CutVariable(Value, &_Output[0], 5);
@@ -123,14 +123,13 @@ bool WiFiManagerUser_Set_Value(uint8_t ValueID, String Value) {
           _Output[1].replace("Y=", "");
           _Output[2].replace("MSML", "");
           _Output[3].replace("MSoff", "");
-          _Output[4] = IngredientStringToID(_Output[6]);
-          if (!StringIsDigit(_Output[0]) or !StringIsDigit(_Output[1]) or !StringIsDigit(_Output[2]) or !StringIsDigit(_Output[3]) or !StringIsDigit(_Output[4])) return false;
+          if (!StringIsDigit(_Output[0]) or !StringIsDigit(_Output[1]) or !StringIsDigit(_Output[2]) or !StringIsDigit(_Output[3])) return false;
           Dispenser Dis;
           Dis.LocationX = _Output[0].toInt();
           Dis.LocationY = _Output[1].toInt();
           Dis.TimeMSML = _Output[2].toInt();
           Dis.TimeMSoff = _Output[3].toInt();
-          Dis.IngredientID = IngredientStringToID(_Output[5]);
+          Dis.IngredientID = 0;  //We do not do _Output[4] since thats stored in the dispenser
           SetDispenser(Dis, i);
           return true;
         }

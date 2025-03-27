@@ -26,16 +26,15 @@ CRGB ColorGetID = CRGB(255, 0, 0);                  //While trying to get an IP
 CRGB ColorWaitForAdoptionIdle = CRGB(255, 255, 0);  //While waiting for Primary to adopt us
 CRGB ColorIdle = CRGB(0, 0, 255);                   //While idle/normal state
 CRGB ColorDispencing = CRGB(0, 255, 0);             //While dispensing
-
-bool ImAdopted = false;   //If the primary has seen this dispenser yet
-bool LEDrainbow = false;  //use to enable rainbow led mode
+bool ImAdopted = false;                             //If the primary has seen this dispenser yet
+bool LEDrainbow = false;                            //use to enable rainbow led mode
 struct Settings {
-  uint8_t FluidID;   //Default Store the fluid of this dispenser
-  uint8_t MSperML;   //ms to let 1 ml go, for example it takes 12s to do 300ml, thats about 40 milliseconds per milliliter
-  uint8_t DelayAir;  //ms to let the air valve open before the fluid valve, to get rid of pressure buildup in the bottle
+  uint8_t FluidID = 1;   //Default Store the fluid of this dispenser
+  uint8_t MSperML = 40;  //ms to let 1 ml go, for example it takes 12s to do 300ml, thats about 40 milliseconds per milliliter
+  uint8_t DelayAir;      //ms to let the air valve open before the fluid valve, to get rid of pressure buildup in the bottle
 };
 Settings dispenserSettings;  //Create a variable of type Settings
-enum COMMANDS { UNKNOWN,
+enum COMMANDS { DONTREPLY,
                 ADOPT,
                 DISPENSE,
                 CALIBRATEMSPERML,
@@ -43,7 +42,7 @@ enum COMMANDS { UNKNOWN,
                 CHANGEDELAY,
                 CHANGECOLOR,
                 DISPENSERSTATUS,
-              };
+};
 PJONSoftwareBitBang bus;  //DeviceID = PJON_NOT_ASSIGNED
 void setup() {
 #ifdef SerialDebug
@@ -93,22 +92,15 @@ void SaveSettings() {
   EEPROM.commit();  //Commit changes (needed for ESP32)
 }
 void error_handler(uint8_t code, uint16_t data, void *custom_pointer) {
+  if (code == PJON_CONNECTION_LOST)
+    ImAdopted = false;
 #ifdef SerialDebug
-  if (code == PJON_CONNECTION_LOST) {
-    Serial.print("Connection with device ID ");
-    Serial.print(bus.packets[data].content[0], DEC);
-    Serial.println(" is lost.");
-  }
-  if (code == PJON_PACKETS_BUFFER_FULL) {
-    Serial.print("Packet buffer is full, has now a length of ");
-    Serial.println(data, DEC);
-    Serial.println("Possible wrong bus configuration!");
-    Serial.println("higher PJON_MAX_PACKETS if necessary.");
-  }
-  if (code == PJON_CONTENT_TOO_LONG) {
-    Serial.print("Content is too long, length: ");
-    Serial.println(data);
-  }
+  if (code == PJON_CONNECTION_LOST)
+    Serial.print("Connection with device ID " + String(bus.packets[data].content[0]) + " is lost.");
+  if (code == PJON_PACKETS_BUFFER_FULL)
+    Serial.print("Packet buffer is full, has now a length of " + String(data) + " Possible wrong bus configuration!");
+  if (code == PJON_CONTENT_TOO_LONG)
+    Serial.print("Content is too long, length: " + String(data));
 #endif
 }
 void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info &packet_info) {
@@ -120,7 +112,7 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
 #endif
   if (length == 2) {
     uint8_t triggerresult = triggerAction(payload[0], payload[1]);
-    if (triggerresult == 255) return;
+    if (triggerresult == DONTREPLY) return;                   //If we do not want to reply, then dont.
     uint8_t BusSend[] = { DISPENSERSTATUS, triggerresult };   //Reply back we have completed
     uint16_t result2 = bus.reply(&BusSend, sizeof(BusSend));  //Send success Primary
 #ifdef SerialDebug
@@ -144,13 +136,9 @@ uint8_t triggerAction(uint8_t cmd1, uint8_t cmd2) {
   */
   uint8_t r, g, b, m;
   switch (cmd1) {
-    case UNKNOWN:
-      return 255;
-      break;
     case ADOPT:
       ImAdopted = true;
       LEDloop(true);
-      return dispenserSettings.FluidID;
       break;
     case DISPENSE:
       DispenseStart();
@@ -162,8 +150,10 @@ uint8_t triggerAction(uint8_t cmd1, uint8_t cmd2) {
       SaveSettings();
       break;
     case CHANGEFLUID:
-      dispenserSettings.FluidID = cmd2;
-      SaveSettings();
+      if (cmd2 != DONTREPLY) {
+        dispenserSettings.FluidID = cmd2;
+        SaveSettings();
+      }
       break;
     case CHANGEDELAY:
       dispenserSettings.DelayAir = cmd2;
@@ -187,7 +177,7 @@ uint8_t triggerAction(uint8_t cmd1, uint8_t cmd2) {
       }
       if (m == 2)
         if (LEDs[0] == ColorIdle or LEDrainbow == 1) {  //Do not overwrite other modes OR if we want to sync the rainbow
-          LEDrainbow = true;                         //Set rainbow mode
+          LEDrainbow = true;                            //Set rainbow mode
           LEDloop(true);
         }
 #ifdef SerialDebug
@@ -195,10 +185,10 @@ uint8_t triggerAction(uint8_t cmd1, uint8_t cmd2) {
 #endif
       break;
     default:
-      return false;
+      return DONTREPLY;
       break;
   }
-  return true;
+  return dispenserSettings.FluidID;
 }
 void DispenseStart() {
   LEDrainbow = false;
