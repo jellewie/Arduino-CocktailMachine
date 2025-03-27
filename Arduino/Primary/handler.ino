@@ -361,8 +361,8 @@ void handle_Info() {
                                                                                                                        "Switch = "
                    + IsTrueToString(digitalRead(PDI_S) == LOW) + " " + (digitalRead(PDI_S) ? "HIGH" : "LOW") + "\n"
                                                                                                                "Running = "
-                   + IsTrueToString(digitalRead(PDI_S) == LOW) + "\n"
-                                                                 "\nSOFT_SETTINGS\n";
+                   + IsTrueToString(Running) + "\n"
+                                               "\nSOFT_SETTINGS\n";
   for (uint8_t i = 0; i < WiFiManager_Settings - 2; i++)
     Message += WiFiManager_VariableNames[i + 2] + " = " + WiFiManagerUser_Get_Value(i, false, true) + "\n";
   Message += "\nSOFT_SETTINGS raw\n";
