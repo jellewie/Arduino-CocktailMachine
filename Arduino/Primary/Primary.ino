@@ -36,7 +36,7 @@ CRGB ColorMoveActive = CRGB(0, 255, 0);
 //==============================================================
 //Soft settings (can be changed with the interface)
 //==============================================================
-uint8_t HomeMAXSpeed = 200;
+uint8_t HomeMAXSpeed = 200;   //Only used for last homing reference step
 bool Running = false;
 uint16_t MotorMAXSpeed = 5500;
 uint16_t MotorMAXAccel = 3000;
