@@ -26,8 +26,8 @@ const uint8_t PDI_X_Ref = 5;  //LOW = TRIGGERED
 const uint8_t PDI_Y_Ref = 27;
 const uint8_t PDI_S = 39;
 const uint8_t PDIO_buspin = 25;
-const uint16_t TotalLEDs = 100;  //The total amounts of LEDs in the strip
-const uint16_t DispenserHeartbeat = 5000; //time in ms to check if all dispensers are still there
+const uint16_t TotalLEDs = 100;             //The total amounts of LEDs in the strip
+const uint16_t DispenserHeartbeat = 60000;  //time in ms to check if all dispensers are still there
 CRGB ColorBoot = CRGB(255, 128, 0);
 CRGB ColorHoming = CRGB(0, 0, 255);
 CRGB ColorHomeFail = CRGB(255, 0, 0);
@@ -36,7 +36,7 @@ CRGB ColorMoveActive = CRGB(0, 255, 0);
 //==============================================================
 //Soft settings (can be changed with the interface)
 //==============================================================
-uint8_t HomeMAXSpeed = 200;   //Only used for last homing reference step
+uint8_t HomeMAXSpeed = 200;  //Only used for last homing reference step
 bool Running = false;
 uint16_t MotorMAXSpeed = 5500;
 uint16_t MotorMAXAccel = 3000;
@@ -56,7 +56,6 @@ bool Homed = false;
 //==============================================================
 bool UpdateLEDs = false;
 const uint8_t Dispensers_Amount = 20 + 1;  //Only 20 are saved in the WiFiManager!! 00 is reserved/invalid_ID so add 1 here
-bool SlotConnected[Dispensers_Amount];
 AccelStepper Stepper_X(AccelStepper::DRIVER, PDO_X_Step, PDO_X_Dir);
 AccelStepper Stepper_Y(AccelStepper::DRIVER, PDO_Y_Step, PDO_Y_Dir);
 LiquidCrystal_I2C lcd(0x27, 20, 4);  //Set the LCD address to 0x27 for a 20 chars and 2 line display
@@ -139,7 +138,7 @@ void loop() {
   }
   static unsigned long LastTime;
   if (TickEveryXms(&LastTime, DispenserHeartbeat))
-    pingOnline(); //Heartbeat to all dispensers to check if they are still there
+    pingOnline();  //Heartbeat to all dispensers to check if they are still there
 }
 void MakeCocktail(Drink Mix) {
   if (Running) return;
