@@ -77,7 +77,7 @@ bool WiFiManagerUser_Set_Value(uint8_t ValueID, String Value) {
     case 10:
       {
         if (!StringIsDigit(Value)) return false;
-        HomedistanceBounce = Value.toInt();
+        MaxHomeBounce = Value.toInt();
         return true;
       }
       break;
@@ -151,7 +151,7 @@ String WiFiManagerUser_Get_Value(uint8_t ValueID, bool Safe, bool Convert) {
     case 7: return String(Manual_Y); break;
     case 8: return ""; break;
     case 9: return String(HomeMAXSpeed); break;
-    case 10: return String(HomedistanceBounce); break;
+    case 10: return String(MaxHomeBounce); break;
     case 11: return String(DisableSteppersAfterIdleS); break;
     case 12: return String(MaxGlassSize); break;
     case 13: return String(MaxBrightness); break;

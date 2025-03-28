@@ -349,22 +349,26 @@ void LcdPrint(String msg, String msg2) {
     lcd.print(msg2);
   }
 }
-bool MoveWait(AccelStepper Step, uint8_t RefferenceButton, uint16_t pos = 0);
-bool MoveWait(AccelStepper Step, uint8_t RefferenceButton, uint16_t pos) {
-  Step.moveTo(pos);
+bool MoveWait(AccelStepper Step, uint8_t RefferenceButton, int32_t pos = 0);
+bool MoveWait(AccelStepper Step, uint8_t RefferenceButton, int32_t pos) {
   Serial.println("MW: " + String(pos) + " b=" + String(RefferenceButton) + "=" + String(digitalRead(RefferenceButton)));
+  Step.moveTo(pos);
+  int32_t BedSizeMax = max(BedSize_X, BedSize_Y) * 1.1;  // Get the maximum amount with an little bit of extra margin
+  if (pos > BedSizeMax || pos < -BedSizeMax) {
+    pos = constrain(pos, -BedSizeMax, BedSizeMax);
+    Serial.println("MW: pos out-of-range, changed to " + String(pos));
+  }
   while (true) {
+    if (digitalRead(RefferenceButton) == LOW) {  //If we have hit the switch
+      Step.setCurrentPosition(0);
+      Serial.println("MW: Switch reached");
+      return true;
+    }
     Step.run();
     if (not Step.isRunning()) {  //If we have done all steps
       Step.setCurrentPosition(0);
       Serial.println("MW: End of steps");
       return false;
-    } else {
-      if (digitalRead(RefferenceButton) == LOW) {  //If we have hit the switch
-        Step.setCurrentPosition(0);
-        Serial.println("MW: Switch reached");
-        return true;
-      }
     }
     yield();
   }
@@ -379,31 +383,27 @@ bool Home(bool X, bool Y) {
   if (X) {
     LcdPrint("", "X");
     Stepper_X.setCurrentPosition(0);
-    Serial.println("Move to X1=" + String(BedSize_X * -1.1));
-    if (MoveWait(Stepper_X, PDI_X_Ref, BedSize_X * -1.1)) {  //If the switch is touched
-      Stepper_X.moveTo(HomedistanceBounce);
-      while (Stepper_X.run())
+    if (MoveWait(Stepper_X, PDI_X_Ref, BedSize_X * -1.1)) {     //Move back to the beginning, but no more than 110% of bedsize. If the switch is touched during this
+      Stepper_X.moveTo(MaxHomeBounce);                     //Set max to move back
+      Stepper_X.setMaxSpeed(HomeMAXSpeed);                      //Set speed lower
+      while (Stepper_X.run() && digitalRead(PDI_X_Ref) == LOW)  //Move until the switch is unpressed
         yield();
-      Stepper_X.setMaxSpeed(HomeMAXSpeed);
-      Serial.println("Move to X2=" + String(-(BedSize_X / 20)));
-      Homed_X = MoveWait(Stepper_X, PDI_X_Ref, -(BedSize_X / 20));
-      Stepper_X.setCurrentPosition(0);       //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
-      Stepper_X.setMaxSpeed(MotorMAXSpeed);  //Reset max speed
+      Homed_X = MoveWait(Stepper_X, PDI_X_Ref, -(BedSize_X / 20));  //Move back to the beginning, but no more than 5% of bedsize
+      Stepper_X.setCurrentPosition(0);                              //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
+      Stepper_X.setMaxSpeed(MotorMAXSpeed);                         //Reset max speed
     }
   }
   if (Y) {
     LcdPrint("", "Y");
     Stepper_Y.setCurrentPosition(0);
-    Serial.println("Move to Y1=" + String(BedSize_Y * -1.1));
-    if (MoveWait(Stepper_Y, PDI_Y_Ref, BedSize_Y * -1.1)) {  //If the switch is touched
-      Stepper_Y.moveTo(HomedistanceBounce);
-      while (Stepper_Y.run())
+    if (MoveWait(Stepper_Y, PDI_Y_Ref, BedSize_Y * -1.1)) {     //Move back to the beginning, but no more than 110% of bedsize. If the switch is touched during this
+      Stepper_Y.moveTo(MaxHomeBounce);                     //Set max to move back
+      Stepper_Y.setMaxSpeed(HomeMAXSpeed);                      //Set speed lower
+      while (Stepper_Y.run() && digitalRead(PDI_Y_Ref) == LOW)  //Move until the switch is unpressed
         yield();
-      Stepper_Y.setMaxSpeed(HomeMAXSpeed);
-      Serial.println("Move to Y2=" + String(-(BedSize_Y / 20)));
-      Homed_Y = MoveWait(Stepper_Y, PDI_Y_Ref, -(BedSize_Y / 20));
-      Stepper_Y.setCurrentPosition(0);       //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
-      Stepper_Y.setMaxSpeed(MotorMAXSpeed);  //Reset max speed
+      Homed_Y = MoveWait(Stepper_Y, PDI_Y_Ref, -(BedSize_Y / 20));  //Move back to the beginning, but no more than 5% of bedsize
+      Stepper_Y.setCurrentPosition(0);                              //THERE IS A BUG IN AccelStepper SO WE NEED THIS SOMEHOW
+      Stepper_Y.setMaxSpeed(MotorMAXSpeed);                         //Reset max speed
     }
   }
   if (!X or !Y)

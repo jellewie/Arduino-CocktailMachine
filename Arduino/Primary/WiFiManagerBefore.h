@@ -38,7 +38,7 @@
 #define WiFiManager_Restart    //Adds a simple handle "/restart" to restart the ESP
 
 #define WiFiManagerUser_VariableNames_Defined  //Define that we want to use the custom user variables (Dont forget to setup WiFiManager_VariableNames and WiFiManager_Settings)
-const String WiFiManager_VariableNames[] = { "SSID", "Password", "name", "MotorMAXSpeed", "MotorMAXAccel", "BedSize_X", "BedSize_Y", "", "Manual_X", "Manual_Y", "", "HomeMAXSpeed", "HomedistanceBounce", "DisableSteppersAfterIdleS", "MaxGlassSize", "MaxBrightness", "Reserved", "Reserved", "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D13", "D14", "D15", "D16", "D17", "D18", "D19" };
+const String WiFiManager_VariableNames[] = { "SSID", "Password", "name", "MotorMAXSpeed", "MotorMAXAccel", "BedSize_X", "BedSize_Y", "", "Manual_X", "Manual_Y", "", "HomeMAXSpeed", "MaxHomeBounce", "DisableSteppersAfterIdleS", "MaxGlassSize", "MaxBrightness", "Reserved", "Reserved", "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D13", "D14", "D15", "D16", "D17", "D18", "D19" };
 const uint16_t EEPROM_size = 4096;  //Max Amount of chars for 'SSID(16) + PASSWORD(16) + extra custom vars(?) +1(NULL)' defaults to 3
 
 #define WiFiManagerUser_Name_Defined
