@@ -322,7 +322,7 @@ String IsTrueToString(bool input) {
 String IpAddress2String(const IPAddress &ipAddress) {
   return String(ipAddress[0]) + String(".") + String(ipAddress[1]) + String(".") + String(ipAddress[2]) + String(".") + String(ipAddress[3]);
 }
-String PJONresultToString(uint8_t id) {
+String PJONresultToString(uint16_t id) {
   switch (id) {
     case 6: return "PJON_ACK";
     case 21: return "PJON_NAK";
