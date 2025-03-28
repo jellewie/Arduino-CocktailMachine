@@ -128,7 +128,7 @@ bool WiFiManagerUser_Set_Value(uint8_t ValueID, String Value) {
           Dis.LocationX = _Output[0].toInt();
           Dis.LocationY = _Output[1].toInt();
           Dis.TimeMSML = _Output[2].toInt();
-          Dis.TimeMSoff = _Output[3].toInt();
+          Dis.DelayAir = _Output[3].toInt();
           Dis.IngredientID = 0;  //We do not do _Output[4] since thats stored in the dispenser
           SetDispenser(Dis, i);
           return true;
@@ -163,9 +163,9 @@ String WiFiManagerUser_Get_Value(uint8_t ValueID, bool Safe, bool Convert) {
         if (i < Dispensers_Amount) {
           String Output = "";
           if (Convert) {
-            Output = String(i) + ",X=" + String(Dispensers[i].LocationX) + ",Y=" + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "MSML," + String(Dispensers[i].TimeMSoff) + "MSoff," + IngredientIDtoString(Dispensers[i].IngredientID);
+            Output = String(i) + ",X=" + String(Dispensers[i].LocationX) + ",Y=" + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "MSML," + String(Dispensers[i].DelayAir) + "MSoff," + IngredientIDtoString(Dispensers[i].IngredientID);
           } else {
-            Output = String(i) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].TimeMSoff) + "," + String(Dispensers[i].IngredientID);
+            Output = String(i) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].DelayAir) + "," + String(Dispensers[i].IngredientID);
           }
           return String(Output);
         }

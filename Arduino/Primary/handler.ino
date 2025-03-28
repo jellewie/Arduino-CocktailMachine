@@ -10,17 +10,17 @@
 #define PreFixManual_Y "manualy"
 #define PreFixShotDispenserML "shotdispenserml"
 #define PreFixHomeMAXSpeed "homemaxspeed"
-#define PreFixHomedistanceBounce "homedistancebounce"
+#define PreFixMaxHomeBounce "MaxHomeBounce"
 #define PreFixDisableSteppersAfterIdleS "disablesteppersafteridles"
 #define PreFixMaxBrightness "maxbrightness"
 #define PreFixHome "homed"
 //Dispenser Settings
 #define PreFixSetDispenserID "di"
+#define PreFixSetDispenserIngredientID "dn"
 #define PreFixSetDispenserX "dx"
 #define PreFixSetDispenserY "dy"
-#define PreFixSetDispenserMSml "dl"
-#define PreFixSetDispenserMSoff "do"
-#define PreFixSetDispenserIngredientID "dn"
+#define PreFixSetDispenserDelayAir "do"
+#define PreFixSetDispenserTimeMSML "dl"
 //Create a mix (max 8 ingredient)
 #define PreFix_Mix_Name "m"  //this one MUST be set (=!"") to start creating a mix
 #define PreFix_0_Ingredient "i0"
@@ -66,7 +66,7 @@ void handle_Set() {
     Mix.Ingredients[i].ml = 0;
   }
   Dispenser Dis = { 0, 0, 0, 0, 0 };
-  int8_t DisID = -1;
+  int16_t DisID = -1;
   for (uint16_t i = 0; i < server.args(); i++) {
     String ArguName = server.argName(i);
     ArguName.toLowerCase();
@@ -121,9 +121,9 @@ void handle_Set() {
       } else {
         SaveEEPROMinSeconds = 30;
       }
-    } else if (ArguName == PreFixHomedistanceBounce) {
+    } else if (ArguName == PreFixMaxHomeBounce) {
       if (!WiFiManagerUser_Set_Value(10, ArgValue)) {
-        ERRORMSG = "HomedistanceBounce Not set";
+        ERRORMSG = "MaxHomeBounce Not set";
       } else {
         SaveEEPROMinSeconds = 30;
       }
@@ -250,27 +250,29 @@ void handle_Set() {
           Dis.LocationY = ArgValue.toInt();
         }
       }
-    } else if (ArguName == PreFixSetDispenserMSml) {
+    } else if (ArguName == PreFixSetDispenserTimeMSML) {
       if (!StringIsDigit(ArgValue)) {
-        ERRORMSG = "SetDispenserMSml not a value";
-      } else {
+        ERRORMSG = "SetDispenserTimeMSML not a value";
+      } else if (ArgValue.toInt() < 0 or ArgValue.toInt() > 255) {
+        ERRORMSG = "SetDispenserTimeMSML out of valid range";
+      } else if (Dispensers[DisID].TimeMSML != ArgValue.toInt()) {
         Dis.TimeMSML = ArgValue.toInt();
       }
-    } else if (ArguName == PreFixSetDispenserMSoff) {
+    } else if (ArguName == PreFixSetDispenserDelayAir) {
       if (!StringIsDigit(ArgValue)) {
-        ERRORMSG = "SetDispenserMSoff not a value";
-      } else {
-        Dis.TimeMSoff = ArgValue.toInt();
+        ERRORMSG = "SetDispenserDelayAir not a value";
+      } else if (ArgValue.toInt() < 0 or ArgValue.toInt() > 255) {
+        ERRORMSG = "SetDispenserDelayAir out of valid range";
+      } else if (Dispensers[DisID].DelayAir != ArgValue.toInt()) {
+        Dis.DelayAir = ArgValue.toInt();
       }
     } else if (ArguName == PreFixSetDispenserIngredientID) {
       if (!StringIsDigit(ArgValue)) {
         ERRORMSG = "SetDispenserIngredientID not a value";
-      } else {
-        if (ArgValue.toInt() < 0 or ArgValue.toInt() >= Ingredient_Amount) {
-          ERRORMSG = "SetDispenserIngredientID out of valid range";
-        } else {
-          Dis.IngredientID = ArgValue.toInt();
-        }
+      } else if (ArgValue.toInt() < 0 or ArgValue.toInt() >= Ingredient_Amount) {
+        ERRORMSG = "SetDispenserIngredientID out of valid range";
+      } else if (Dispensers[DisID].IngredientID != ArgValue.toInt()) {
+        Dis.IngredientID = ArgValue.toInt();
       }
     } else {
       ERRORMSG += "UNK argument " + ArguName + " = " + ArgValue + "\n";
@@ -290,9 +292,26 @@ void handle_Set() {
     ERRORMSG += "No mix ingredients given/n";
   }
   //Process the dispenser update
-  if (DisID != -1 or Dis.LocationX != 0 or Dis.LocationY != 0 or Dis.TimeMSML != 0 or Dis.TimeMSoff != 0 or Dis.IngredientID != 0) {
+  if (DisID != -1 or Dis.LocationX != 0 or Dis.LocationY != 0 or Dis.TimeMSML != 0 or Dis.DelayAir != 0 or Dis.IngredientID != 0) {
     if (DisID >= 0) {
       SetDispenser(Dis, DisID);
+      if (Dis.TimeMSML != 0) {
+        Serial.println("BUS " + String(DisID) + " TimeMSML to " + String(Dis.TimeMSML));
+        int8_t BusSend = Dis.TimeMSML;
+        BusSendBlocking(DisID, CALIBRATEMSPERML, BusSend);
+      }
+      if (Dis.DelayAir != 0) {
+        Serial.println("BUS " + String(DisID) + " DelayAir to " + String(Dis.DelayAir));
+        int8_t BusSend = Dis.DelayAir;
+        BusSendBlocking(DisID, CHANGEDELAY, BusSend);
+      }
+      if (Dis.IngredientID != 0) {
+        Serial.println("BUS " + String(DisID) + " IngredientID to " + String(Dis.IngredientID));
+        int8_t BusSend = Dis.IngredientID;
+        BusSendBlocking(DisID, CHANGEFLUID, BusSend);
+      }
+      delay(10);        //Just some time to make sure bus is clear again, seems to be needed
+      BusAdopt(DisID);  //Ask for the dispenser settings
     } else {
       if (!AddDispenser(Dis))
         ERRORMSG += "No more space for a new dispenser";
@@ -320,9 +339,9 @@ void handle_Set() {
 }
 void handle_Get() {
   String Json = "{\"dispensers\":[";
-  for (uint8_t i = 0; i < Dispensers_Amount; i++) {
-    if (i != 0) Json += ",";
-    Json += "[" + String(i) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].TimeMSoff) + "," + String(Dispensers[i].IngredientID) + "]";
+  for (uint8_t i = 1; i < Dispensers_Amount; i++) {
+    if (i != 1) Json += ",";
+    Json += "[" + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].DelayAir) + "," + String(Dispensers[i].IngredientID) + "]";
   }
   Json += "],\"ingredients\":[";
   for (uint8_t i = 0; i < Ingredient_Amount; i++) {
@@ -339,7 +358,7 @@ void handle_Get() {
   Json += ",\"motorMaxSpeed\":" + String(MotorMAXSpeed);
   Json += ",\"motorMaxAccel\":" + String(MotorMAXAccel);
   Json += ",\"homeMaxSpeed\":" + String(HomeMAXSpeed);
-  Json += ",\"homedistanceBounce\":" + String(HomedistanceBounce);
+  Json += ",\"MaxHomeBounce\":" + String(MaxHomeBounce);
   Json += ",\"maxGlassSize\":" + String(MaxGlassSize);
   Json += ",\"maxBrightness\":" + String(MaxBrightness);
   Json += "}";

@@ -29,15 +29,15 @@ CRGB ColorDispencing = CRGB(0, 255, 0);             //While dispensing
 bool ImAdopted = false;                             //If the primary has seen this dispenser yet
 bool LEDrainbow = false;                            //use to enable rainbow led mode
 struct Settings {
-  uint8_t FluidID = 1;   //Default Store the fluid of this dispenser
-  uint8_t MSperML = 40;  //ms to let 1 ml go, for example it takes 12s to do 300ml, thats about 40 milliseconds per milliliter
+  uint8_t IngredientID = 1;   //Default Store the fluid of this dispenser
+  uint8_t TimeMSML = 40;  //ms to let 1 ml go, for example it takes 12s to do 300ml, thats about 40 milliseconds per milliliter
   uint8_t DelayAir;      //ms to let the air valve open before the fluid valve, to get rid of pressure buildup in the bottle
 };
 Settings dispenserSettings;  //Create a variable of type Settings
 enum COMMANDS { DONTREPLY,
                 ADOPT,
                 DISPENSE,
-                CALIBRATEMSPERML,
+                CALIBRATETimeMSML,
                 CHANGEFLUID,
                 CHANGEDELAY,
                 CHANGECOLOR,
@@ -77,18 +77,18 @@ void loop() {
 }
 void LoadSettings() {
   EEPROM.begin(16);  //Initialize EEPROM (needed for ESP32)
-  dispenserSettings.FluidID = EEPROM.read(0);
+  dispenserSettings.IngredientID = EEPROM.read(0);
   dispenserSettings.DelayAir = EEPROM.read(1);
-  dispenserSettings.MSperML = EEPROM.read(2);
+  dispenserSettings.TimeMSML = EEPROM.read(2);
 #ifdef SerialDebug
   for (uint8_t i = 0; i < 3; i++)
     Serial.println("LoadedSetting " + String(i) + "=" + EEPROM.read(i));
 #endif
 }
 void SaveSettings() {
-  EEPROM.write(0, dispenserSettings.FluidID);
+  EEPROM.write(0, dispenserSettings.IngredientID);
   EEPROM.write(1, dispenserSettings.DelayAir);
-  EEPROM.write(2, dispenserSettings.MSperML);
+  EEPROM.write(2, dispenserSettings.TimeMSML);
   EEPROM.commit();  //Commit changes (needed for ESP32)
 }
 void error_handler(uint8_t code, uint16_t data, void *custom_pointer) {
@@ -110,23 +110,10 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
     Serial.print(payload[i] + String(" "));
   Serial.println();
 #endif
-  if (length == 2) {
-    uint8_t triggerresult = triggerAction(payload[0], payload[1]);
-    if (triggerresult == DONTREPLY) return;                   //If we do not want to reply, then dont.
-    uint8_t BusSend[] = { DISPENSERSTATUS, triggerresult };   //Reply back we have completed
-    uint16_t result2 = bus.reply(&BusSend, sizeof(BusSend));  //Send success Primary
-#ifdef SerialDebug
-    Serial.println("called triggerAction with result=" + String(triggerresult));
-    if (result2 == PJON_FAIL)
-      Serial.print("bus.reply wrong =" + String(result2));
-#endif
-  }
-}
-uint8_t triggerAction(uint8_t cmd1, uint8_t cmd2) {
   /*
     1=ADOPT, IGNORED
     2=DISPENSE, ml to dispense
-    3=CALIBRATEMSPERML, MSperML
+    3=CALIBRATETimeMSML, TimeMSML
     4=CHANGEFLUID, New_Fluid_ID
     5=CHANGEDELAY, Time_in_ms*5 between air and fluid
     6=CHANGECOLOR, RRGGBBMM MM=00 = Auto
@@ -134,61 +121,68 @@ uint8_t triggerAction(uint8_t cmd1, uint8_t cmd2) {
                             MM=10 = rainbow mode
                             MM=11 = reserved for other modes
   */
-  uint8_t r, g, b, m;
-  switch (cmd1) {
+
+  switch (payload[0]) {
     case ADOPT:
-      ImAdopted = true;
-      LEDloop(true);
-      break;
+      {
+        ImAdopted = true;
+        LEDloop(true);
+        uint8_t BusSend[] = { DISPENSERSTATUS, dispenserSettings.IngredientID, dispenserSettings.TimeMSML, dispenserSettings.DelayAir };  //Reply back we have completed
+        uint16_t result = bus.reply(&BusSend, sizeof(BusSend));                                                                     //Send success Primary
+#ifdef SerialDebug
+        if (result == PJON_FAIL)
+          Serial.print("bus.reply wrong =" + String(result));
+#endif
+        break;
+      }
     case DISPENSE:
       DispenseStart();
-      delay(cmd2 * dispenserSettings.MSperML);
+      delay(payload[1] * dispenserSettings.TimeMSML);
       DispenseStop();
       break;
-    case CALIBRATEMSPERML:
-      dispenserSettings.MSperML = cmd2;
+    case CALIBRATETimeMSML:
+      dispenserSettings.TimeMSML = payload[1];
       SaveSettings();
       break;
     case CHANGEFLUID:
-      if (cmd2 != DONTREPLY) {
-        dispenserSettings.FluidID = cmd2;
+      if (payload[1] != DONTREPLY) {
+        dispenserSettings.IngredientID = payload[1];
         SaveSettings();
       }
       break;
     case CHANGEDELAY:
-      dispenserSettings.DelayAir = cmd2;
+      dispenserSettings.DelayAir = payload[1];
       SaveSettings();
       break;
     case CHANGECOLOR:
-      r = (cmd2 >> 6) & 0b11;    //Extract bits 7-6 (RR)
-      g = (cmd2 >> 4) & 0b11;    //Extract bits 5-4 (GG)
-      b = (cmd2 >> 2) & 0b11;    //Extract bits 3-2 (BB)
-      r = map(r, 0, 3, 0, 255);  //Map the 2-bit value to the range 0-255
-      g = map(g, 0, 3, 0, 255);  //Map the 2-bit value to the range 0-255
-      b = map(b, 0, 3, 0, 255);  //Map the 2-bit value to the range 0-255
-      m = cmd2 & 0x03;           //Mask with 0x03 (00000011)
-      if (m == 0) {
-        LEDrainbow = false;
-        LEDloop(true);
-      }
-      if (m == 1) {
-        fill_solid(&(LEDs[0]), TotalLEDs, CRGB(r, g, b));
-        FastLED.show();
-      }
-      if (m == 2)
-        if (LEDs[0] == ColorIdle or LEDrainbow == 1) {  //Do not overwrite other modes OR if we want to sync the rainbow
-          LEDrainbow = true;                            //Set rainbow mode
+      {
+        uint8_t r, g, b, m;
+        r = (payload[1] >> 6) & 0b11;  //Extract bits 7-6 (RR)
+        g = (payload[1] >> 4) & 0b11;  //Extract bits 5-4 (GG)
+        b = (payload[1] >> 2) & 0b11;  //Extract bits 3-2 (BB)
+        r = map(r, 0, 3, 0, 255);      //Map the 2-bit value to the range 0-255
+        g = map(g, 0, 3, 0, 255);      //Map the 2-bit value to the range 0-255
+        b = map(b, 0, 3, 0, 255);      //Map the 2-bit value to the range 0-255
+        m = payload[1] & 0x03;         //Mask with 0x03 (00000011)
+        if (m == 0) {
+          LEDrainbow = false;
           LEDloop(true);
         }
+        if (m == 1) {
+          fill_solid(&(LEDs[0]), TotalLEDs, CRGB(r, g, b));
+          FastLED.show();
+        }
+        if (m == 2)
+          if (LEDs[0] == ColorIdle or LEDrainbow == 1) {  //Do not overwrite other modes OR if we want to sync the rainbow
+            LEDrainbow = true;                            //Set rainbow mode
+            LEDloop(true);
+          }
 #ifdef SerialDebug
-      Serial.println("r=" + String(r) + " g=" + String(g) + " b=" + String(b) + " m=" + String(m));
+        Serial.println("r=" + String(r) + " g=" + String(g) + " b=" + String(b) + " m=" + String(m));
 #endif
-      break;
-    default:
-      return DONTREPLY;
-      break;
+        break;
+      }
   }
-  return dispenserSettings.FluidID;
 }
 void DispenseStart() {
   LEDrainbow = false;

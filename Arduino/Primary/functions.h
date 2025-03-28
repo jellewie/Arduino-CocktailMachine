@@ -11,8 +11,8 @@ struct Drink {
 struct Dispenser {
   uint16_t LocationX;    //X location of the dispenser
   uint16_t LocationY;    //Y location of the dispenser
-  uint16_t TimeMSML;     //Timer per ms for each mL
-  uint16_t TimeMSoff;    //Delay in MS to wait after
+  uint8_t TimeMSML;      //Timer per ms for each mL
+  uint8_t DelayAir;      //Delay in MS to wait after
   uint8_t IngredientID;  //The fluid in this dispenser
 };
 
@@ -384,7 +384,7 @@ bool Home(bool X, bool Y) {
     LcdPrint("", "X");
     Stepper_X.setCurrentPosition(0);
     if (MoveWait(Stepper_X, PDI_X_Ref, BedSize_X * -1.1)) {     //Move back to the beginning, but no more than 110% of bedsize. If the switch is touched during this
-      Stepper_X.moveTo(MaxHomeBounce);                     //Set max to move back
+      Stepper_X.moveTo(MaxHomeBounce);                          //Set max to move back
       Stepper_X.setMaxSpeed(HomeMAXSpeed);                      //Set speed lower
       while (Stepper_X.run() && digitalRead(PDI_X_Ref) == LOW)  //Move until the switch is unpressed
         yield();
@@ -397,7 +397,7 @@ bool Home(bool X, bool Y) {
     LcdPrint("", "Y");
     Stepper_Y.setCurrentPosition(0);
     if (MoveWait(Stepper_Y, PDI_Y_Ref, BedSize_Y * -1.1)) {     //Move back to the beginning, but no more than 110% of bedsize. If the switch is touched during this
-      Stepper_Y.moveTo(MaxHomeBounce);                     //Set max to move back
+      Stepper_Y.moveTo(MaxHomeBounce);                          //Set max to move back
       Stepper_Y.setMaxSpeed(HomeMAXSpeed);                      //Set speed lower
       while (Stepper_Y.run() && digitalRead(PDI_Y_Ref) == LOW)  //Move until the switch is unpressed
         yield();
