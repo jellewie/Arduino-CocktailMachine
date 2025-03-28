@@ -320,7 +320,7 @@ void handle_Set() {
   if (ERRORMSG == "") {
     server.send(200, "text/plain", "OK");
   } else {
-    server.send(400, "application/json", ERRORMSG);
+    server.send(400, "text/plain", ERRORMSG);
   }
   //If we need to home
   if (DoHoming == 0) {
