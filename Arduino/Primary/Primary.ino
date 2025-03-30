@@ -25,7 +25,7 @@ const uint8_t PDO_Y_Step = 12;
 const uint8_t PDI_X_Ref = 5;  //LOW = TRIGGERED
 const uint8_t PDI_Y_Ref = 27;
 const uint8_t PDI_S = 39;
-const uint8_t PDIO_buspin = 25;
+const uint8_t PDIO_buspin = 25;             //must be 12 or 25 for PJONSoftwareBitBang
 const uint16_t TotalLEDs = 100;             //The total amounts of LEDs in the strip
 const uint16_t DispenserHeartbeat = 60000;  //time in ms to check if all dispensers are still there
 CRGB ColorBoot = CRGB(255, 128, 0);

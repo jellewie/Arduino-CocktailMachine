@@ -15,9 +15,9 @@
 const uint8_t PDI_Button = 14;                      //Pull down to trigger
 const uint8_t PDO_ValveFluid = 33;                  //LOW=OFF
 const uint8_t PDO_ValveAir = 32;                    //LOW=OFF
-const uint8_t PDI_SLOT_TXRX = 13;                   //The wire from which to get local ID from    //must be 2 or 3 on attiny85 I think
+const uint8_t PDI_SLOT_TXRX = 13;                   //The wire from which to get local ID from
 const uint8_t PAO_LED = 26;                         //To which pin the <LED> is connected to
-const uint8_t PDIO_buspin = 25;                     //must be 12,25 for SerialDebug
+const uint8_t PDIO_buspin = 25;                     //must be 12 or 25 for PJONSoftwareBitBang
 const uint8_t PrimaryID = 254;                      //Used to request adoption
 const uint8_t TotalLEDs = 1;                        //The total amounts of LEDs in the strip
 CRGB LEDs[TotalLEDs];                               //Array with our status LED
