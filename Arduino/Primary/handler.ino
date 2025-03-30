@@ -310,7 +310,7 @@ void handle_Set() {
         int8_t BusSend = Dis.IngredientID;
         BusSendBlocking(DisID, CHANGEFLUID, BusSend);
       }
-      delay(10);        //Just some time to make sure bus is clear again, seems to be needed
+      MyDelay(10);        //Just some time to make sure bus is clear again, seems to be needed
       BusAdopt(DisID);  //Ask for the dispenser settings
     } else {
       if (!AddDispenser(Dis))
