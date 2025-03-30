@@ -9,8 +9,8 @@ _A machine that can mix drinks_
 
 The firmware needs to be flashed to enable OTA BIN file uploads. You can do this either using the Arduino IDE and compiling it, or by using a BIN uploader of your choice.
 There 3 PCB's with firmware
-- each DISPENSER (ESP32)
-- each SLOT (ATTINY85, required compiling for each ID)
+- Each DISPENSER (ESP32)
+- Each SLOT (ATTINY85, required compiling for each ID)
 - PRIMARY (ESP32) the main PCB
 
 ### Compile
@@ -23,8 +23,8 @@ There 3 PCB's with firmware
 - [Arduino-WIFIManager](https://github.com/jellewie/Arduino-WiFiManager) (already included).
 - [Arduino-Button](https://github.com/jellewie/Arduino-Button) (already included).
 - [Arduino-Stable-analog-read](https://github.com/jellewie/Arduino-Stable-analog-read) (already included).
-- [FreeCAD] (https://github.com/FreeCAD/FreeCAD) is used for 3D modeling.
-- [A2Plus_Workbench] (https://github.com/kbwbe/A2plus) is used for creating the assembly.
+- [FreeCAD](https://github.com/FreeCAD/FreeCAD) is used for 3D modeling.
+- [A2Plus_Workbench](https://github.com/kbwbe/A2plus) is used for creating the assembly.
 
 To custom compile with new drinks and such, update the drinks in [Website/src/drinksConfig.js](Website/src/drinksConfig.js). I use an automated Google Drive sheet for this.
 
