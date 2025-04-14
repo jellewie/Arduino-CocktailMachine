@@ -12,12 +12,12 @@
 #include <PJONSoftwareBitBang.h>
 //#define SWBB_MODE 1  //1 should be default, 1=1.97kB/s //https://github.com/gioblu/PJON/blob/master/src/strategies/SoftwareBitBang/README.md#performance
 //#define SWBB_MAX_ATTEMPTS 20;	//Maximum transmission attempts	Numeric value (20 by default)
-const uint8_t PDI_Button = 14;                      //Pull down to trigger
-const uint8_t PDO_ValveFluid = 33;                  //LOW=OFF
-const uint8_t PDO_ValveAir = 32;                    //LOW=OFF
-const uint8_t PDI_SLOT_TXRX = 13;                   //The wire from which to get local ID from
-const uint8_t PAO_LED = 26;                         //To which pin the <LED> is connected to
-const uint8_t PDIO_buspin = 25;                     //must be 12 or 25 for PJONSoftwareBitBang
+const uint8_t PDI_Button = 2;                      //Pull down to trigger
+const uint8_t PDO_ValveFluid = 4;                  //LOW=OFF
+const uint8_t PDO_ValveAir = 3;                    //LOW=OFF
+const uint8_t PDI_SLOT_TXRX = 0;                   //The wire from which to get local ID from
+const uint8_t PAO_LED = 1;                         //To which pin the <LED> is connected to
+const uint8_t PDIO_buspin = 20;                     //must be 12 or 25 for PJONSoftwareBitBang
 const uint8_t PrimaryID = 254;                      //Used to request adoption
 const uint8_t TotalLEDs = 1;                        //The total amounts of LEDs in the strip
 CRGB LEDs[TotalLEDs];                               //Array with our status LED
