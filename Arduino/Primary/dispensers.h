@@ -4,7 +4,7 @@ void BusSend(uint8_t cmd1, uint8_t cmd2) {
   bus.send_packet(PJON_BROADCAST, BusSend, sizeof(BusSend));
 }
 bool BusSendBlocking(uint8_t DispenserID, uint8_t cmd1, uint8_t cmd2) {
-  Serial.println("BusSendBlocking " + String(cmd1) + "," + String(cmd2));
+  Serial.println("BusSendBlocking ID=" + String(DispenserID) + " cmd=" + String(cmd1) + "," + String(cmd2));
   uint8_t BusSend[] = { cmd1, cmd2 };
   uint16_t result = bus.send_packet_blocking(DispenserID, BusSend, sizeof(BusSend));
   if (result != PJON_ACK) {
