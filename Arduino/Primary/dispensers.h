@@ -19,7 +19,7 @@ void BusAdopt(uint8_t i) {
   //it takes 6327 microseconds to recieve 2 uint8_t and process the response, we run at 1.97kB/s
   if (result == PJON_ACK) {
     result = bus.receive(1000);  //Just handle the adoption right here (time in microseconds)
-    if (result == PJON_ACK){
+    if (result == PJON_ACK) {
       LcdPrint("Disp added:" + String(i), PJONresultToString(result));
       Serial.println("Dispenser " + String(i) + " Connected " + String(result));
       return;
