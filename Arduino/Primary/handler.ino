@@ -295,22 +295,13 @@ void handle_Set() {
   if (DisID != -1 or Dis.LocationX != 0 or Dis.LocationY != 0 or Dis.TimeMSML != 0 or Dis.DelayAir != 0 or Dis.IngredientID != 0) {
     if (DisID >= 0) {
       SetDispenser(Dis, DisID);
-      if (Dis.TimeMSML != 0) {
-        Serial.println("BUS " + String(DisID) + " TimeMSML to " + String(Dis.TimeMSML));
-        int8_t BusSend = Dis.TimeMSML;
-        BusSendBlocking(DisID, CALIBRATEMSPERML, BusSend);
-      }
-      if (Dis.DelayAir != 0) {
-        Serial.println("BUS " + String(DisID) + " DelayAir to " + String(Dis.DelayAir));
-        int8_t BusSend = Dis.DelayAir;
-        BusSendBlocking(DisID, CHANGEDELAY, BusSend);
-      }
-      if (Dis.IngredientID != 0) {
-        Serial.println("BUS " + String(DisID) + " IngredientID to " + String(Dis.IngredientID));
-        int8_t BusSend = Dis.IngredientID;
-        BusSendBlocking(DisID, CHANGEFLUID, BusSend);
-      }
       MyDelay(10);        //Just some time to make sure bus is clear again, seems to be needed
+      if (Dis.TimeMSML != 0)
+        BusSendBlocking(DisID, CALIBRATEMSPERML, Dis.TimeMSML);
+      if (Dis.DelayAir != 0)
+        BusSendBlocking(DisID, CHANGEDELAY, Dis.DelayAir);
+      if (Dis.IngredientID != 0)
+        BusSendBlocking(DisID, CHANGEFLUID, Dis.IngredientID);
       BusAdopt(DisID);  //Ask for the dispenser settings
     } else {
       if (!AddDispenser(Dis))
