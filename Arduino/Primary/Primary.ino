@@ -10,9 +10,9 @@
 #include "WiFiManager/WiFiManager.h"  //Includes <WiFi> and <WebServer.h> and setups up 'WebServer server(80)' if needed
 #include <AccelStepper.h>             //Make sure to install AccelStepper V1.61.0(+) manually //https://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html#a68942c66e78fb7f7b5f0cdade6eb7f06
 #include <Wire.h>                     //used by LiquidCrystal_I2C
-#include <LiquidCrystal_I2C.h>        //Make sure to install LiquidCrystal_I2C V1.1.2(+) manually https://github.com/johnrickman/LiquidCrystal_I2C/blob/master/LiquidCrystal_I2C.cpp
-#include <FastLED.h>                  //Include the libary FastLED (If you get a error here, make sure it's installed!)
-#include <PJONSoftwareBitBang.h>
+#include <LiquidCrystal_I2C.h>        //Make sure to install LiquidCrystal_I2C V1.1.2(+) manually https://github.com/johnrickman/LiquidCrystal_I2C/
+#include <FastLED.h>                  //Make sure to install FastLED V3.9.14(+) manually https://github.com/FastLED/FastLED
+#include <PJONSoftwareBitBang.h>      //Make sure to install PJON V13.1(+) manually https://github.com/gioblu/PJON
 //==============================================================
 //Very custom user settings
 //==============================================================
