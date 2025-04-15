@@ -18,10 +18,15 @@ void BusAdopt(uint8_t i) {
   uint16_t result = bus.send_packet(i, BusSend, sizeof(BusSend));  //Tries to send data 1 time
   //it takes 6327 microseconds to recieve 2 uint8_t and process the response, we run at 1.97kB/s
   if (result == PJON_ACK) {
-    uint16_t result2 = bus.receive(1000);  //Just handle the adoption right here (time in microseconds)
-    Serial.println("Dispenser " + String(i) + " Connected " + String(result2));
-  } else
-    Serial.println("Dispenser " + String(i) + " error code " + String(result) + "=" + PJONresultToString(result));
+    result = bus.receive(1000);  //Just handle the adoption right here (time in microseconds)
+    if (result == PJON_ACK){
+      LcdPrint("Disp added:" + String(i), PJONresultToString(result));
+      Serial.println("Dispenser " + String(i) + " Connected " + String(result));
+      return;
+    }
+  }
+  LcdPrint("BUS adpt err:" + String(i), PJONresultToString(result));
+  Serial.println("Dispenser " + String(i) + " error code " + String(result) + "=" + PJONresultToString(result));
 }
 void pingAll() {
   Serial.println("pingAll " + String(Dispensers_Amount));
