@@ -55,7 +55,7 @@ bool Homed = false;
 //End of settings
 //==============================================================
 bool UpdateLEDs = false;
-const uint8_t Dispensers_Amount = 256; //20 + 1;  //Only 20 are saved in the WiFiManager!! 00 is reserved/invalid_ID so add 1 here
+const uint8_t Dispensers_Amount = 20 + 1;  //Only 20 are saved in the WiFiManager!! 00 is reserved/invalid_ID so add 1 here
 AccelStepper Stepper_X(AccelStepper::DRIVER, PDO_X_Step, PDO_X_Dir);
 AccelStepper Stepper_Y(AccelStepper::DRIVER, PDO_Y_Step, PDO_Y_Dir);
 LiquidCrystal_I2C lcd(0x27, 20, 4);  //Set the LCD address to 0x27 for a 20 chars and 2 line display
