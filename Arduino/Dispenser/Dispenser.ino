@@ -12,12 +12,17 @@
 #include <PJONSoftwareBitBang.h>
 //#define SWBB_MODE 1  //1 should be default, 1=1.97kB/s //https://github.com/gioblu/PJON/blob/master/src/strategies/SoftwareBitBang/README.md#performance
 //#define SWBB_MAX_ATTEMPTS 20;	//Maximum transmission attempts	Numeric value (20 by default)
-const uint8_t PDI_Button = 2;                      //Pull down to trigger
-const uint8_t PDO_ValveFluid = 4;                  //LOW=OFF
-const uint8_t PDO_ValveAir = 3;                    //LOW=OFF
-const uint8_t PDI_SLOT_TXRX = 0;                   //The wire from which to get local ID from
-const uint8_t PAO_LED = 1;                         //To which pin the <LED> is connected to
+const uint8_t PDI_Button = 2;                       //Pull down to trigger
+const uint8_t PDO_ValveFluid = 4;                   //LOW=OFF
+const uint8_t PDO_ValveAir = 3;                     //LOW=OFF
+const uint8_t PDI_SLOT_TXRX = 0;                    //The wire from which to get local ID from
+const uint8_t PAO_LED = 1;                          //To which pin the <LED> is connected to
 const uint8_t PDIO_buspin = 20;                     //must be 12 or 25 for PJONSoftwareBitBang
+const uint8_t PDI_IDBit1 = 6;                       //bit of hardware ID 0b00000001 = 1
+const uint8_t PDI_IDBit2 = 7;                       //bit of hardware ID 0b00000010 = 2
+const uint8_t PDI_IDBit3 = 8;                       //bit of hardware ID 0b00000100 = 4
+const uint8_t PDI_IDBit4 = 10;                      //bit of hardware ID 0b00001000 = 8
+const uint8_t PAI_IDBits5to8 = A5;                  //bit of hardware ID 0b11110000 = 16,32,64,128
 const uint8_t PrimaryID = 254;                      //Used to request adoption
 const uint8_t TotalLEDs = 1;                        //The total amounts of LEDs in the strip
 CRGB LEDs[TotalLEDs];                               //Array with our status LED
@@ -29,9 +34,9 @@ CRGB ColorDispencing = CRGB(0, 255, 0);             //While dispensing
 bool ImAdopted = false;                             //If the primary has seen this dispenser yet
 bool LEDrainbow = false;                            //use to enable rainbow led mode
 struct Settings {
-  uint8_t IngredientID = 1;   //Default Store the fluid of this dispenser
-  uint8_t TimeMSML = 40;  //ms to let 1 ml go, for example it takes 12s to do 300ml, thats about 40 milliseconds per milliliter
-  uint8_t DelayAir;      //ms to let the air valve open before the fluid valve, to get rid of pressure buildup in the bottle
+  uint8_t IngredientID = 1;  //Default Store the fluid of this dispenser
+  uint8_t TimeMSML = 40;     //ms to let 1 ml go, for example it takes 12s to do 300ml, thats about 40 milliseconds per milliliter
+  uint8_t DelayAir;          //ms to let the air valve open before the fluid valve, to get rid of pressure buildup in the bottle
 };
 Settings dispenserSettings;  //Create a variable of type Settings
 enum COMMANDS { DONTREPLY,
@@ -52,6 +57,11 @@ void setup() {
   pinMode(PDO_ValveFluid, OUTPUT);
   pinMode(PDO_ValveAir, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(PDI_IDBit1, INPUT_PULLUP);
+  pinMode(PDI_IDBit2, INPUT_PULLUP);
+  pinMode(PDI_IDBit3, INPUT_PULLUP);
+  pinMode(PDI_IDBit4, INPUT_PULLUP);
+  pinMode(PAI_IDBits5to8, INPUT_PULLUP);
   digitalWrite(PDO_ValveFluid, LOW);  //Ensure valve is OFF at start
   digitalWrite(PDO_ValveAir, LOW);    //Ensure valveAir is OFF at start
   LoadSettings();
@@ -121,14 +131,13 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
                             MM=10 = rainbow mode
                             MM=11 = reserved for other modes
   */
-
   switch (payload[0]) {
     case ADOPT:
       {
         ImAdopted = true;
         LEDloop(true);
         uint8_t BusSend[] = { DISPENSERSTATUS, dispenserSettings.IngredientID, dispenserSettings.TimeMSML, dispenserSettings.DelayAir };  //Reply back we have completed
-        uint16_t result = bus.reply(&BusSend, sizeof(BusSend));                                                                     //Send success Primary
+        uint16_t result = bus.reply(&BusSend, sizeof(BusSend));                                                                           //Send success to Primary
 #ifdef SerialDebug
         if (result == PJON_FAIL)
           Serial.print("bus.reply wrong =" + String(result));
@@ -221,31 +230,64 @@ void LEDloop(bool init) {
   }
 }
 void CheckAndGetSlotID() {
+  /*
+    Check if ID is set by hardware, else we get it from the slot
+    0b0<GPIO5(4 bits)><GPIO10_inversed><GPIO8_inversed><GPIO7_inversed><GPIO6_inversed>
+    example:
+      If non-connected. the ID is 0=NULL and invalid, and it will be recieved from Slot.
+      If GPIO7 AND GPIO6 pulled low = 0b00000011 = 3
+    Resistor examples for GPIO5:
+      Bin  R1   R2 (Ω) 
+      0000 DNP  DNP
+      0001 1500 120
+      0010 1000 150
+      0011 3300 820
+      0100 3300 1200
+      0101 6800 3300
+      0110 1500 1000
+      0111 3900 3300
+      1000 3300 3900
+      1001 1000 1500
+      1010 3300 6800
+      1011 1200 3300
+      1100 820  3300
+      1101 150  1000
+      1110 120  1500
+      1111 DNP  1000
+  */
   if (bus.device_id() == PJON_NOT_ASSIGNED) {
     if (LEDs[0] != ColorGetID and LEDs[0] != ColorDispencing) {  //If not yet desired color, but do not overwrite ColorDispencing
       fill_solid(&(LEDs[0]), TotalLEDs, ColorGetID);
       FastLED.show();
     }
-    delay(1);
-    uint8_t ID1 = GetSlotID();
-    delay(1);
-    uint8_t ID2 = GetSlotID();
-    delay(1);
-    uint8_t ID3 = GetSlotID();
-    if (ID1 > 0 && ID1 == ID2 && ID2 == ID3) {
-      bus.set_id(ID1);
-      if (LEDs[0] != ColorDispencing)  //Do not overwrite ColorDispencing
-        LEDloop(true);
-      uint8_t BusSend[] = { ADOPT, bus.device_id() };  //Ask Primary for us to be adopted
-      uint16_t result = bus.send(PrimaryID, &BusSend, sizeof(BusSend));
+    uint8_t digitalID = (!digitalRead(PDI_IDBit4) << 3) | (!digitalRead(PDI_IDBit3) << 2) | (!digitalRead(PDI_IDBit2) << 1) | !digitalRead(PDI_IDBit1);
+    uint8_t analogID = analogRead(PAI_IDBits5to8) / 256;  //Divide by 256 to get 16 levels
+    uint8_t deviceID = (analogID << 4) | digitalID;
+    if (deviceID != 0) {  //If no ID has been defined in hardware
+      Serial.println("SlotID defined in hardware, I am " + String(deviceID));
+    } else {
+      delay(1);
+      uint8_t ID1 = GetSlotID();
+      delay(1);
+      uint8_t ID2 = GetSlotID();
+      delay(1);
+      uint8_t ID3 = GetSlotID();
+      if (ID1 > 0 && ID1 == ID2 && ID2 == ID3) {
+        deviceID = ID1;
+      }
 #ifdef SerialDebug
-      Serial.println("SlotID recieved, I am " + String(bus.device_id()));
-      if (result == PJON_FAIL) Serial.print("bus request fail =" + String(result));
+      else
+        Serial.println("Error in SlotID recieved, ID1=" + String(ID1) + " ID2=" + String(ID2) + " ID3=" + String(ID3));
 #endif
     }
+    bus.set_id(deviceID);
+    if (LEDs[0] != ColorDispencing)  //Do not overwrite ColorDispencing
+      LEDloop(true);
+    uint8_t BusSend[] = { ADOPT, bus.device_id() };  //Ask Primary for us to be adopted
+    uint16_t result = bus.send(PrimaryID, &BusSend, sizeof(BusSend));
 #ifdef SerialDebug
-    else
-      Serial.println("Error in SlotID recieved, ID1=" + String(ID1) + " ID2=" + String(ID2) + " ID3=" + String(ID3));
+    Serial.println("SlotID recieved, I am " + String(bus.device_id()));
+    if (result == PJON_FAIL) Serial.print("bus request fail =" + String(result));
 #endif
   }
 }
