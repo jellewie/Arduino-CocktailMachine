@@ -236,31 +236,7 @@ void LEDloop(bool init) {
   }
 }
 void CheckAndGetSlotID() {
-  /*
-    Check if ID is set by hardware, else we get it from the slot
-    0b0<GPIO5(4 bits)><GPIO10_inversed><GPIO8_inversed><GPIO7_inversed><GPIO6_inversed>
-    example:
-      If non-connected. the ID is 0=NULL and invalid, and it will be recieved from Slot.
-      If GPIO7 AND GPIO6 pulled low = 0b00000011 = 3
-    Resistor examples for GPIO5:
-      Bin  R1   R2 (Ω) 
-      0000 DNP  DNP
-      0001 1500 120
-      0010 1000 150
-      0011 3300 820
-      0100 3300 1200
-      0101 6800 3300
-      0110 1500 1000
-      0111 3900 3300
-      1000 3300 3900
-      1001 1000 1500
-      1010 3300 6800
-      1011 1200 3300
-      1100 820  3300
-      1101 150  1000
-      1110 120  1500
-      1111 DNP  1000
-  */
+  //Check if ID is set by hardware, else we get it from the slot
   if (bus.device_id() == PJON_NOT_ASSIGNED) {
     if (LEDs[0] != ColorGetID and LEDs[0] != ColorDispencing) {  //If not yet desired color, but do not overwrite ColorDispencing
       fill_solid(&(LEDs[0]), TotalLEDs, ColorGetID);
