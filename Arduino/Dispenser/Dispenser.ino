@@ -25,6 +25,7 @@ const uint8_t PDI_IDBit4 = 10;                      //bit of hardware ID 0b00001
 const uint8_t PAI_IDBits5to8 = A5;                  //bit of hardware ID 0b11110000 = 16,32,64,128
 const uint8_t PrimaryID = 254;                      //Used to request adoption
 const uint8_t TotalLEDs = 1;                        //The total amounts of LEDs in the strip
+const uint8_t ManualDispenceML = 15;                //everytime you press the manual button, dispence this amount of ml
 CRGB LEDs[TotalLEDs];                               //Array with our status LED
 CRGB ColorBoot = CRGB(255, 128, 0);                 //While starting up
 CRGB ColorGetID = CRGB(255, 0, 0);                  //While trying to get an IP
@@ -80,6 +81,11 @@ void loop() {
   if (button_state != OLD_button_state) {                      //Only update if button state changes
     OLD_button_state = button_state;                           //remember the new state as the old one
     (button_state == LOW) ? DispenseStart() : DispenseStop();  //Button pressed
+    if (button_state == LOW) {
+      DispenseStart();
+      delay(ManualDispenceML * dispenserSettings.TimeMSML);
+      DispenseStop();
+    }
   }
   bus.receive(50000);  //Receive messages
   bus.update();        //Handle bus updates
