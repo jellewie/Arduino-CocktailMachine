@@ -5,6 +5,8 @@ _A machine that can mix drinks_
 
 ![Cocktail Mixer Machine CAD](Images/CAD%20overview.png)
 
+Part of this project is sponsored by [PCBWay](https://www.pcbway.com/). Read more about that [here](Sponsorship.md).
+
 ## **Firmware**
 
 The firmware needs to be flashed to enable OTA BIN file uploads. You can do this either using the Arduino IDE and compiling it, or by using a BIN uploader of your choice.
