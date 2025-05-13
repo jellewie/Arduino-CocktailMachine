@@ -67,6 +67,8 @@ CRGB LEDs[TotalLEDs];
 #include "dispensers.h"
 #include "WiFiManagerLater.h"  //Define options of WiFiManager (can also be done before), but WiFiManager can also be called here (example for DoRequest included here)
 
+const uint8_t PDI_Button = 26;
+
 void setup() {
   Serial.begin(115200);
   lcd.init();
@@ -89,6 +91,9 @@ void setup() {
   pinMode(PDO_Y_Dir, OUTPUT);
   pinMode(PDO_X_Step, OUTPUT);
   pinMode(PDO_Y_Step, OUTPUT);
+
+  pinMode(PDI_Button, INPUT_PULLUP);
+
   pinMode(PDI_X_Ref, INPUT_PULLUP);
   pinMode(PDI_Y_Ref, INPUT_PULLUP);
   pinMode(PDI_S, INPUT_PULLUP);
@@ -123,6 +128,28 @@ void setup() {
   digitalWrite(LED_BUILTIN, LOW);
 }
 void loop() {
+
+  Serial.print(".");
+  bool button_state = digitalRead(PDI_Button);  //read manual button
+  static bool OLD_button_state = button_state;  //Save old state to see changes
+  if (button_state != OLD_button_state) {       //Only update if button state changes
+    Serial.println("button_state, old=" + String(OLD_button_state) + ", new=" + String(button_state));
+    OLD_button_state = button_state;  //remember the new state as the old one
+    if (button_state == LOW) {
+      digitalWrite(LED_BUILTIN, HIGH);
+      uint8_t DisID = 1;
+      //BusSendBlocking(DisID, CALIBRATEMSPERML, 40);
+      //BusSendBlocking(DisID, CHANGEFLUID, 1);
+      //BusSendBlocking(DisID, CHANGEDELAY, 200);
+      BusSend(CHANGECOLOR, 0b00000000);      //Reset dispenser LED color command
+      BusSendBlocking(DisID, DISPENSE, 10);  //Give the dispence command
+      //delay(100);
+      //BusSend(CHANGECOLOR, 0b00000010);  //Send dispenser LED Rainbow command
+      digitalWrite(LED_BUILTIN, LOW);
+    }
+  }
+
+
   MyYield();
   server.handleClient();
   static bool HomedLast = Homed;
