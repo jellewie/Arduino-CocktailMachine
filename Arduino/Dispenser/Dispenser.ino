@@ -1,6 +1,6 @@
 /*
   Program written by JelleWho https://github.com/jellewie
-  Board: ESP32
+  Board: https://dl.espressif.com/dl/package_esp32_index.json ESP32C3
   DISPENSER
 */
 #define SerialDebug
