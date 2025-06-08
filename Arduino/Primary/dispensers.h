@@ -61,12 +61,12 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
       //Serial.println("Dispenser " + String(packet_info.tx.id) + " has fluid " + String(payload[1]) + "=" + IngredientIDtoString(payload[1]));
       break;
     case ADOPT:
-      LcdPrint("Disp " + String(packet_info.tx.id) + " booted", "Scanning bus");
+      LcdPrint("Slot " + String(packet_info.tx.id) + " booted", "Scanning bus");
       pingAll();
       LcdPrint("", "Scanned bus");
       break;
     default:
-      LcdPrint("Disp:" + String(packet_info.tx.id), "unk command" + String(payload[0]));
+      LcdPrint("Slot:" + String(packet_info.tx.id), "unk command" + String(payload[0]));
       break;
   }
 }
