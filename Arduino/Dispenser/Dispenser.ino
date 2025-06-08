@@ -73,6 +73,7 @@ void setup() {
   bus.set_receiver(receiver_function);
   bus.strategy.set_pin(PDIO_buspin);
   bus.begin();
+  delay(250);
 }
 void loop() {
   CheckAndGetSlotID();                                         //Try and get the SLOT ID
