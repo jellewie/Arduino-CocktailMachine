@@ -230,7 +230,10 @@ void LEDloop(bool init) {
       if (ImAdopted) {
         fill_solid(&(LEDs[0]), TotalLEDs, ColorIdle);
       } else {
-        fill_solid(&(LEDs[0]), TotalLEDs, ColorWaitForAdoptionIdle);
+        if (bus.device_id() == 0)
+          fill_solid(&(LEDs[0]), TotalLEDs, ColorGetID);  //No ID known
+        else
+          fill_solid(&(LEDs[0]), TotalLEDs, ColorWaitForAdoptionIdle);  //Not yet adopted
       }
       FastLED.show();
     }
@@ -264,14 +267,15 @@ void CheckAndGetSlotID() {
 #endif
     }
     bus.set_id(deviceID);
-    if (LEDs[0] != ColorDispencing)  //Do not overwrite ColorDispencing
+    if (LEDs[0] != ColorDispencing) {  //Do not overwrite ColorDispencing
       LEDloop(true);
-    uint8_t BusSend[] = { ADOPT, bus.device_id() };  //Ask Primary for us to be adopted
-    uint16_t result = bus.send(PrimaryID, &BusSend, sizeof(BusSend));
+      uint8_t BusSend[] = { ADOPT, bus.device_id() };  //Ask Primary for us to be adopted
+      uint16_t result = bus.send(PrimaryID, &BusSend, sizeof(BusSend));
 #ifdef SerialDebug
-    Serial.println("SlotID recieved, I am " + String(bus.device_id()));
-    if (result == PJON_FAIL) Serial.print("bus request fail =" + String(result));
+      Serial.println("SlotID recieved, I am " + String(bus.device_id()));
+      if (result == PJON_FAIL) Serial.print("bus request fail =" + String(result));
 #endif
+    }
   }
 }
 uint8_t GetSlotID() {
