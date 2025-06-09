@@ -3,7 +3,7 @@
   Board: https://dl.espressif.com/dl/package_esp32_index.json ESP32C3
   DISPENSER
 */
-#define SerialDebug
+//#define SerialDebug  //Enable for ESP32-DOIT board for serial debugging
 #ifndef ESP32
 #error "Please select ESP32 as a board."
 #endif
@@ -12,17 +12,28 @@
 #include <PJONSoftwareBitBang.h>
 //#define SWBB_MODE 1  //1 should be default, 1=1.97kB/s //https://github.com/gioblu/PJON/blob/master/src/strategies/SoftwareBitBang/README.md#performance
 //#define SWBB_MAX_ATTEMPTS 20;	//Maximum transmission attempts	Numeric value (20 by default)
-const uint8_t PDI_Button = 2;                       //Pull down to trigger
-const uint8_t PDO_ValveFluid = 4;                   //LOW=OFF
-const uint8_t PDO_ValveAir = 3;                     //LOW=OFF
-const uint8_t PDI_SLOT_TXRX = 0;                    //The wire from which to get local ID from
-const uint8_t PAO_LED = 1;                          //To which pin the <LED> is connected to
-const uint8_t PDIO_buspin = 20;                     //must be 12 or 25 for PJONSoftwareBitBang
-const uint8_t PDI_IDBit1 = 6;                       //bit of hardware ID 0b00000001 = 1
-const uint8_t PDI_IDBit2 = 7;                       //bit of hardware ID 0b00000010 = 2
-const uint8_t PDI_IDBit3 = 8;                       //bit of hardware ID 0b00000100 = 4
-const uint8_t PDI_IDBit4 = 10;                      //bit of hardware ID 0b00001000 = 8
-const uint8_t PAI_IDBits5to8 = A5;                  //bit of hardware ID 0b11110000 = 16,32,64,128
+const uint8_t PDI_Button = 2;      //Pull down to trigger
+const uint8_t PDO_ValveFluid = 4;  //LOW=OFF
+const uint8_t PDO_ValveAir = 3;    //LOW=OFF
+#ifndef SerialDebug
+const uint8_t PDI_SLOT_TXRX = 0;  //The wire from which to get local ID from
+const uint8_t PAO_LED = 1;        //To which pin the <LED> is connected to
+const uint8_t PDIO_buspin = 20;   //must be 12 or 25 for PJONSoftwareBitBang
+const uint8_t PDI_IDBit1 = 6;     //bit of hardware ID 0b00000001 = 1
+const uint8_t PDI_IDBit2 = 7;     //bit of hardware ID 0b00000010 = 2
+const uint8_t PDI_IDBit3 = 8;     //bit of hardware ID 0b00000100 = 4
+const uint8_t PDI_IDBit4 = 10;    //bit of hardware ID 0b00001000 = 8
+// A5=33, pull pin 33 to GND to be not-set
+#else
+const uint8_t PDI_SLOT_TXRX = 14;  //The wire from which to get local ID from
+const uint8_t PAO_LED = 27;        //To which pin the <LED> is connected to
+const uint8_t PDIO_buspin = 12;    //must be 12 or 25 for PJONSoftwareBitBang
+const uint8_t PDI_IDBit1 = 16;     //bit of hardware ID 0b00000001 = 1
+const uint8_t PDI_IDBit2 = 17;     //bit of hardware ID 0b00000010 = 2
+const uint8_t PDI_IDBit3 = 18;     //bit of hardware ID 0b00000100 = 4
+const uint8_t PDI_IDBit4 = 19;     //bit of hardware ID 0b00001000 = 8
+#endif
+const uint8_t PAI_IDBits5to8 = A5;                  //bit of hardware ID 0b11110000 = 16,32,64,128.
 const uint8_t PrimaryID = 254;                      //Used to request adoption
 const uint8_t TotalLEDs = 1;                        //The total amounts of LEDs in the strip
 const uint8_t ManualDispenceML = 15;                //everytime you press the manual button, dispence this amount of ml
@@ -252,11 +263,10 @@ void CheckAndGetSlotID() {
     if (deviceID != 0) {  //If no ID has been defined in hardware
       Serial.println("SlotID defined in hardware, I am " + String(deviceID));
     } else {
-      delay(1);
       uint8_t ID1 = GetSlotID();
-      delay(1);
+      delay(10);  //must be the same or higher than DelayAfterSend-lastPulseTimeTimeout
       uint8_t ID2 = GetSlotID();
-      delay(1);
+      delay(10);  //must be the same or higher than DelayAfterSend-lastPulseTimeTimeout
       uint8_t ID3 = GetSlotID();
       if (ID1 > 0 && ID1 == ID2 && ID2 == ID3) {
         deviceID = ID1;
@@ -267,8 +277,10 @@ void CheckAndGetSlotID() {
 #endif
     }
     bus.set_id(deviceID);
-    if (LEDs[0] != ColorDispencing) {  //Do not overwrite ColorDispencing
+    if (LEDs[0] != ColorDispencing)  //Do not overwrite ColorDispencing
       LEDloop(true);
+
+    if (bus.device_id() != 0) {
       uint8_t BusSend[] = { ADOPT, bus.device_id() };  //Ask Primary for us to be adopted
       uint16_t result = bus.send(PrimaryID, &BusSend, sizeof(BusSend));
 #ifdef SerialDebug
@@ -276,6 +288,11 @@ void CheckAndGetSlotID() {
       if (result == PJON_FAIL) Serial.print("bus request fail =" + String(result));
 #endif
     }
+#ifdef SerialDebug
+    else {
+      Serial.println("Could not recieve Slot ID");
+    }
+#endif
   }
 }
 uint8_t GetSlotID() {
@@ -286,7 +303,8 @@ uint8_t GetSlotID() {
   uint8_t pulseCount = 0;  //Amount of pulses counted from SLOT
   unsigned long lastPulseTime = millis();
   bool OLD_PIN_state = 0;
-  while (millis() - lastPulseTime < 10) {  //Do NOT put Serial in this while loop. It will be to slow to count the pulses
+  const static uint8_t lastPulseTimeTimeout = 10;
+  while (millis() - lastPulseTime < lastPulseTimeTimeout) {  //Do NOT put Serial in this while loop. It will be to slow to count the pulses
     bool PIN_state = digitalRead(PDI_SLOT_TXRX);
     if (PIN_state != OLD_PIN_state) {  //Only update if state changes
       OLD_PIN_state = PIN_state;
