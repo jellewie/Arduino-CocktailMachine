@@ -15,24 +15,14 @@
 const uint8_t PDI_Button = 2;      //Pull down to trigger
 const uint8_t PDO_ValveFluid = 4;  //LOW=OFF
 const uint8_t PDO_ValveAir = 3;    //LOW=OFF
-#ifndef SerialDebug
-const uint8_t PDI_SLOT_TXRX = 0;  //The wire from which to get local ID from
-const uint8_t PAO_LED = 1;        //To which pin the <LED> is connected to
-const uint8_t PDIO_buspin = 20;   //must be 12 or 25 for PJONSoftwareBitBang
-const uint8_t PDI_IDBit1 = 6;     //bit of hardware ID 0b00000001 = 1
-const uint8_t PDI_IDBit2 = 7;     //bit of hardware ID 0b00000010 = 2
-const uint8_t PDI_IDBit3 = 8;     //bit of hardware ID 0b00000100 = 4
-const uint8_t PDI_IDBit4 = 10;    //bit of hardware ID 0b00001000 = 8
-// A5=33, pull pin 33 to GND to be not-set
-#else
-const uint8_t PDI_SLOT_TXRX = 14;  //The wire from which to get local ID from
-const uint8_t PAO_LED = 27;        //To which pin the <LED> is connected to
-const uint8_t PDIO_buspin = 12;    //must be 12 or 25 for PJONSoftwareBitBang
-const uint8_t PDI_IDBit1 = 16;     //bit of hardware ID 0b00000001 = 1
-const uint8_t PDI_IDBit2 = 17;     //bit of hardware ID 0b00000010 = 2
-const uint8_t PDI_IDBit3 = 18;     //bit of hardware ID 0b00000100 = 4
-const uint8_t PDI_IDBit4 = 19;     //bit of hardware ID 0b00001000 = 8
-#endif
+#define LED_BUILTIN 8
+const uint8_t PDI_SLOT_TXRX = 0;                    //The wire from which to get local ID from
+const uint8_t PAO_LED = 1;                          //To which pin the <LED> is connected to
+const uint8_t PDIO_buspin = 20;                     //must be 12 or 25 for PJONSoftwareBitBang
+const uint8_t PDI_IDBit1 = 6;                       //bit of hardware ID 0b00000001 = 1
+const uint8_t PDI_IDBit2 = 7;                       //bit of hardware ID 0b00000010 = 2
+const uint8_t PDI_IDBit3 = 8;                       //bit of hardware ID 0b00000100 = 4
+const uint8_t PDI_IDBit4 = 10;                      //bit of hardware ID 0b00001000 = 8
 const uint8_t PAI_IDBits5to8 = A5;                  //bit of hardware ID 0b11110000 = 16,32,64,128.
 const uint8_t PrimaryID = 254;                      //Used to request adoption
 const uint8_t TotalLEDs = 1;                        //The total amounts of LEDs in the strip
@@ -62,24 +52,18 @@ enum COMMANDS { DONTREPLY,
 };
 PJONSoftwareBitBang bus;  //DeviceID = PJON_NOT_ASSIGNED
 void setup() {
+  FastLED.addLeds<WS2812B, PAO_LED, GRB>(LEDs, TotalLEDs);
+  fill_solid(&(LEDs[0]), TotalLEDs, ColorBoot);
+  FastLED.show();
 #ifdef SerialDebug
   Serial.begin(115200);
 #endif
   pinMode(PDI_Button, INPUT_PULLUP);
   pinMode(PDO_ValveFluid, OUTPUT);
   pinMode(PDO_ValveAir, OUTPUT);
-  pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(PDI_IDBit1, INPUT_PULLUP);
-  pinMode(PDI_IDBit2, INPUT_PULLUP);
-  pinMode(PDI_IDBit3, INPUT_PULLUP);
-  pinMode(PDI_IDBit4, INPUT_PULLUP);
-  pinMode(PAI_IDBits5to8, INPUT_PULLUP);
   digitalWrite(PDO_ValveFluid, LOW);  //Ensure valve is OFF at start
   digitalWrite(PDO_ValveAir, LOW);    //Ensure valveAir is OFF at start
   LoadSettings();
-  FastLED.addLeds<WS2812B, PAO_LED, GRB>(LEDs, TotalLEDs);
-  fill_solid(&(LEDs[0]), TotalLEDs, ColorBoot);  //RED to show we do not have an ID
-  FastLED.show();
   bus.set_error(error_handler);
   bus.set_receiver(receiver_function);
   bus.strategy.set_pin(PDIO_buspin);
@@ -257,6 +241,11 @@ void CheckAndGetSlotID() {
       fill_solid(&(LEDs[0]), TotalLEDs, ColorGetID);
       FastLED.show();
     }
+    pinMode(PDI_IDBit1, INPUT_PULLUP);
+    pinMode(PDI_IDBit2, INPUT_PULLUP);
+    pinMode(PDI_IDBit3, INPUT_PULLUP);
+    pinMode(PDI_IDBit4, INPUT_PULLUP);
+    pinMode(PAI_IDBits5to8, INPUT_PULLUP);
     uint8_t digitalID = (!digitalRead(PDI_IDBit4) << 3) | (!digitalRead(PDI_IDBit3) << 2) | (!digitalRead(PDI_IDBit2) << 1) | !digitalRead(PDI_IDBit1);
     uint8_t analogID = analogRead(PAI_IDBits5to8) / 256;  //Divide by 256 to get 16 levels
     uint8_t deviceID = (analogID << 4) | digitalID;
@@ -264,13 +253,55 @@ void CheckAndGetSlotID() {
       Serial.println("SlotID defined in hardware, I am " + String(deviceID));
     } else {
       uint8_t ID1 = GetSlotID();
-      delay(10);  //must be the same or higher than DelayAfterSend-lastPulseTimeTimeout
+      delay(25);  //must be the same or higher than DelayAfterSend-lastPulseTimeTimeout
       uint8_t ID2 = GetSlotID();
-      delay(10);  //must be the same or higher than DelayAfterSend-lastPulseTimeTimeout
+      delay(25);  //must be the same or higher than DelayAfterSend-lastPulseTimeTimeout
       uint8_t ID3 = GetSlotID();
-      if (ID1 > 0 && ID1 == ID2 && ID2 == ID3) {
-        deviceID = ID1;
+
+      pinMode(LED_BUILTIN, OUTPUT);  //HIGH = OFF
+      static const uint16_t BlinkDelayOn = 100;
+      static const uint16_t BlinkDelayOff = 1000;
+      bool WeBlinked = false;
+      if (ID1 + ID2 + ID3 == 0) {  //If they are all wrong
+        digitalWrite(LED_BUILTIN, LOW);
+        delay(BlinkDelayOn * 5);
+        digitalWrite(LED_BUILTIN, HIGH);
+      } else {  //Show who failed
+        if (ID1 == 0) {
+          WeBlinked = true;
+          for (int i = 0; i < 1; i++) {
+            digitalWrite(LED_BUILTIN, LOW);
+            delay(BlinkDelayOn);
+            digitalWrite(LED_BUILTIN, HIGH);
+            delay(BlinkDelayOn);
+          }
+        }
+        if (ID2 == 0 or (ID2 != ID1 and ID2 != ID3)) {
+          if (WeBlinked) delay(BlinkDelayOff);
+          WeBlinked = true;
+          for (int i = 0; i < 2; i++) {
+            digitalWrite(LED_BUILTIN, LOW);
+            delay(BlinkDelayOn);
+            digitalWrite(LED_BUILTIN, HIGH);
+            delay(BlinkDelayOn);
+          }
+        }
+        if (ID3 == 0 or (ID3 != ID1 and ID3 != ID2)) {
+          if (WeBlinked) delay(BlinkDelayOff);
+          for (int i = 0; i < 3; i++) {
+            digitalWrite(LED_BUILTIN, LOW);
+            delay(BlinkDelayOn);
+            digitalWrite(LED_BUILTIN, HIGH);
+            delay(BlinkDelayOn);
+          }
+        }
       }
+      digitalWrite(LED_BUILTIN, HIGH);                //HIGH = OFF
+
+      if (ID1 > 0 && (ID1 == ID2) or (ID1 == ID3)) {  //Two measurements need to agree
+        deviceID = ID1;
+      } else if (ID2 > 0 && ID2 == ID3)
+        deviceID = ID2;
 #ifdef SerialDebug
       else
         Serial.println("Error in SlotID recieved, ID1=" + String(ID1) + " ID2=" + String(ID2) + " ID3=" + String(ID3));
@@ -298,12 +329,11 @@ void CheckAndGetSlotID() {
 uint8_t GetSlotID() {
   pinMode(PDI_SLOT_TXRX, OUTPUT);
   digitalWrite(PDI_SLOT_TXRX, LOW);
-  delay(1);
   pinMode(PDI_SLOT_TXRX, INPUT);
   uint8_t pulseCount = 0;  //Amount of pulses counted from SLOT
   unsigned long lastPulseTime = millis();
   bool OLD_PIN_state = 0;
-  const static uint8_t lastPulseTimeTimeout = 10;
+  const static uint8_t lastPulseTimeTimeout = 15;
   while (millis() - lastPulseTime < lastPulseTimeTimeout) {  //Do NOT put Serial in this while loop. It will be to slow to count the pulses
     bool PIN_state = digitalRead(PDI_SLOT_TXRX);
     if (PIN_state != OLD_PIN_state) {  //Only update if state changes
