@@ -308,8 +308,11 @@ uint8_t GetSlotID() {
     bool PIN_state = digitalRead(PDI_SLOT_TXRX);
     if (PIN_state != OLD_PIN_state) {  //Only update if state changes
       OLD_PIN_state = PIN_state;
-      if (PIN_state == LOW)  //Only count if the line goes low
+      if (PIN_state == LOW) {  //Only count if the line goes low
         pulseCount++;
+        if (pulseCount == 255)
+          return 0;
+      }
       lastPulseTime = millis();  //Reset timeout on pulse detection
     }
   }
