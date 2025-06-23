@@ -5,7 +5,7 @@
   Do an "Burn bootloader" for each new Attiny85 you program to burn in the clock settings!
 */
 
-uint8_t SlotID = 3;  //Unique 1-byte ID (change for every slot for dispenser). Must be higher than 0 and lower then 255
+uint8_t SlotID = 1;  //Unique 1-byte ID (change for every slot for dispenser). Must be higher than 0 and lower then 255
 
 const uint8_t PDI_Slot_TXRX = 4;
 const uint8_t Delaypulses = 1;      //Must be lower then lastPulseTimeTimeout/2
