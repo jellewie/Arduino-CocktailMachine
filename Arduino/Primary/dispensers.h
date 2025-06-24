@@ -30,7 +30,8 @@ bool BusAdopt(uint8_t i) {
   }
   return false;
 }
-void pingAll() {
+void pingAll(bool Print = true);
+void pingAll(bool Print) {
   Serial.println("pingAll " + String(Dispensers_Amount));
   uint8_t dispAmount = 0;
   String addedList = "Disp ";
@@ -47,7 +48,7 @@ void pingAll() {
       }
     }
   }
-  LcdPrint("Disp = " + String(dispAmount) + " (" + String(dispenserMask) + ")");
+  if (Print)
     LcdPrint(addedList, "added, " + String(dispAmount) + " total");
 }
 void pingOnline() {  //We can call this code periodicaly this will check if all dispensers are still attached
