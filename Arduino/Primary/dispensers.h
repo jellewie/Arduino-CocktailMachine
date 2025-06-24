@@ -20,7 +20,7 @@ bool BusAdopt(uint8_t i) {
   if (result == PJON_ACK) {
     result = bus.receive(1000);  //Just handle the adoption right here (time in microseconds)
     if (result == PJON_ACK) {
-      LcdPrint("Disp " + String(i) + " added", PJONresultToString(result));
+      //LcdPrint("Disp " + String(i) + " added", PJONresultToString(result));
       Serial.println("Dispenser " + String(i) + " Connected " + String(result));
       return true;
     }
@@ -32,15 +32,23 @@ bool BusAdopt(uint8_t i) {
 }
 void pingAll() {
   Serial.println("pingAll " + String(Dispensers_Amount));
-  uint16_t dispenserMask = 0;
   uint8_t dispAmount = 0;
-  for (uint8_t i = 1; i < Dispensers_Amount; i++) {
-    bool result = BusAdopt(i);
-    dispenserMask |= (result << i);
-    if (result == 1)
-      dispAmount = dispAmount + 1;
+  String addedList = "Disp ";
+  for (uint8_t i = 1; i < Dispensers_Amount; i++) {                         //For each dispenser
+    bool dispensorConnected = Dispensers[i].IngredientID != 0;              //Remember if this dispenser is already connected
+    if (BusAdopt(i) == 1) {                                                 //If there is a dispenser available on this ID
+      dispAmount++;                                                         //Increase the connected counter
+      if (addedList.length() < 16 and !dispensorConnected) {                //If there is still room to list antoher one, and its newly adopted
+        String NewEntry = (addedList.length() > 8 ? "," : "") + String(i);  //Created the proposed new string
+        if (addedList.length() + NewEntry.length() < 15)                    //If we can add this propsal
+          addedList += NewEntry;                                            //Add the dispenser ID to the list
+        else
+          addedList += "+               ";  //just mark that we have more dispensers we can't show
+      }
+    }
   }
   LcdPrint("Disp = " + String(dispAmount) + " (" + String(dispenserMask) + ")");
+    LcdPrint(addedList, "added, " + String(dispAmount) + " total");
 }
 void pingOnline() {  //We can call this code periodicaly this will check if all dispensers are still attached
   Serial.println("pingOnline " + String(Dispensers_Amount));
@@ -51,7 +59,7 @@ void pingOnline() {  //We can call this code periodicaly this will check if all 
       uint16_t result = bus.send_packet_blocking(i, BusSend, sizeof(BusSend));  //Check if they are all still online, to make sure also retry if we fail the first time
       if (result != PJON_ACK) {
         Dispensers[i].IngredientID = 0;  //Disconnect the dispenser by setting the fluid to 0 (UNK)
-        LcdPrint("Disp " + String(i), " removed");
+        LcdPrint("Disp " + String(i), "removed");
         Serial.println("BUS error:" + String(i) + "=" + PJONresultToString(result) + " Dispenser" + String(i) + " went offline");
       }
     }
@@ -70,9 +78,9 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
       //Serial.println("Dispenser " + String(packet_info.tx.id) + " has fluid " + String(payload[1]) + "=" + IngredientIDtoString(payload[1]));
       break;
     case ADOPT:
-      LcdPrint("Disp " + String(packet_info.tx.id) + " booted", "Scanning bus");
+      //LcdPrint("Disp " + String(packet_info.tx.id) + " booted", "Scanning bus");
       pingAll();
-      LcdPrint("", "Scanned bus");
+      //LcdPrint("", "Scanned bus");
       break;
     default:
       LcdPrint("Disp:" + String(packet_info.tx.id), "unk command" + String(payload[0]));
