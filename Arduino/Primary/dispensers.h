@@ -48,6 +48,8 @@ void pingAll(bool Print) {
       }
     }
   }
+  if (Homed && !Running)
+    BusSend(CHANGECOLOR, 0b00000010);  //Send dispenser LED Rainbow command
   if (Print) {
     if (ddedList == "Disp ")
       addedList += "?";  //Unknown what was added, probably we didn't notice someone went offline
