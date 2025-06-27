@@ -48,8 +48,11 @@ void pingAll(bool Print) {
       }
     }
   }
-  if (Print)
+  if (Print) {
+    if (ddedList == "Disp ")
+      addedList += "?";  //Unknown what was added, probably we didn't notice someone went offline
     LcdPrint(addedList, "added, " + String(dispAmount) + " total");
+  }
 }
 void pingOnline() {  //We can call this code periodicaly this will check if all dispensers are still attached
   Serial.println("pingOnline " + String(Dispensers_Amount));
