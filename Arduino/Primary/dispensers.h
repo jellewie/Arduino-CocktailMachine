@@ -40,7 +40,7 @@ void pingAll(bool Print) {
     if (BusAdopt(i) == 1) {                                                 //If there is a dispenser available on this ID
       dispAmount++;                                                         //Increase the connected counter
       if (addedList.length() < 16 and !dispensorConnected) {                //If there is still room to list antoher one, and its newly adopted
-        String NewEntry = (addedList.length() > 8 ? "," : "") + String(i);  //Created the proposed new string
+        String NewEntry = (addedList.length() > 5 ? "," : "") + String(i);  //Created the proposed new string
         if (addedList.length() + NewEntry.length() < 15)                    //If we can add this propsal
           addedList += NewEntry;                                            //Add the dispenser ID to the list
         else
