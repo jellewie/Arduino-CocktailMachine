@@ -1,5 +1,5 @@
 import { DrinkDisplay } from "./DrinkDisplay.js";
-import { getAvailableIngredients, getConfig } from "./configLoader.js";
+import { getAvailableIngredients, getConfig, onConfigUpdated } from "./configLoader.js";
 import { drinksConfig, ingredientNames } from "./drinksConfig.js";
 import { drinkSelectorEl } from "./globalElements.js";
 import { randFromArray } from "./util.js";
@@ -80,6 +80,10 @@ export async function initDrinkSelector() {
 		firstDrink.scrollIntoView();
 	}
 }
+
+onConfigUpdated(() => {
+	updateDrinkIngredients();
+});
 
 async function updateDrinkIngredients() {
 	const availableIngredients = await getAvailableIngredients();
