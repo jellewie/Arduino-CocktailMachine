@@ -9,17 +9,14 @@
 import {serveDir} from "https://deno.land/std@0.145.0/http/file_server.ts";
 import {Server} from "https://deno.land/std@0.145.0/http/server.ts";
 import {resolve, fromFileUrl, dirname} from "https://deno.land/std@0.145.0/path/mod.ts";
-import {generateTypes} from "https://deno.land/x/deno_tsc_helper@v0.1.2/mod.js";
+import {generateTypes} from "https://deno.land/x/deno_tsc_helper@v0.7.1/mod.js";
 import {setCwd} from "https://deno.land/x/chdir_anywhere@v0.0.2/mod.js";
 setCwd();
 
 generateTypes({
 	outputDir: "../.denoTypes",
-	excludeUrls: [
-		"https://esm.sh/rollup@2.75.7?pin=v87",
-		"https://esm.sh/clean-css@5.3.0?pin=v87",
-	],
 	logLevel: "WARNING",
+	importMap: "../deno.json",
 });
 
 const libs = {
@@ -89,8 +86,6 @@ const server = new Server({
 	handler: request => {
 		const url = new URL(request.url);
 		if (url.pathname == "/get") {
-			// @ts-expect-error Response.json is implemented in Deno but typescript
-			// doesn't have types for it yet.
 			return Response.json(mockGetData);
 		} else if (url.pathname == "/set") {
 			const searchParams = Array.from(url.searchParams.entries()).map(([k,v]) => `${k}: ${v}`).join("\n");

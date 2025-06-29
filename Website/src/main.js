@@ -7,17 +7,17 @@ import { showModal as showSettingsModal } from "./settingsDialog/dialog.js";
 import { showModal as showDispensersModal } from "./dispensersDialog/dialog.js";
 
 // @ts-ignore
-import globalStyleSheet from "./globalStyle.css" assert {type: "css"};
+import globalStyleSheet from "./globalStyle.css" with {type: "css"};
 // @ts-ignore
-import drinkDisplaySheet from "./DrinkDisplay.css" assert {type: "css"};
+import drinkDisplaySheet from "./DrinkDisplay.css" with {type: "css"};
 // @ts-ignore
-import drinkCustomizationDialogSheet from "./drinkCustomizationDialog/style.css" assert {type: "css"};
+import drinkCustomizationDialogSheet from "./drinkCustomizationDialog/style.css" with {type: "css"};
 // @ts-ignore
-import settingsDialogSheet from "./settingsDialog/style.css" assert {type: "css"};
+import settingsDialogSheet from "./settingsDialog/style.css" with {type: "css"};
 // @ts-ignore
-import dispensersDialogSheet from "./dispensersDialog/style.css" assert {type: "css"};
+import dispensersDialogSheet from "./dispensersDialog/style.css" with {type: "css"};
 // @ts-ignore
-import toastMessagesSheet from "./toastMessages/style.css" assert {type: "css"};
+import toastMessagesSheet from "./toastMessages/style.css" with {type: "css"};
 
 globalThis["DEBUG_BUILD"] = true;
 
