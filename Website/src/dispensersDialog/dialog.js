@@ -1,7 +1,6 @@
 import { getConfig } from "../configLoader.js";
 import { dispensersDialog } from "../globalElements.js";
 import { handleRequestWithToast } from "../handleRequestWithToast.js";
-import { showToastMessage } from "../toastMessages/showToastMessage.js";
 import { DispenserSettingsItem } from "./DispenserSettingsItem.js";
 
 const dispensersList = /** @type {HTMLUListElement} */ (document.getElementById("dispensersList"));
@@ -21,16 +20,22 @@ async function updateDispensersList() {
 	for (const [i, dispenser] of config.dispensers.entries()) {
 		const settingsItem = new DispenserSettingsItem(i, dispenser, config.ingredients);
 		dispensersList.appendChild(settingsItem.el);
-		settingsItem.onDispenserChange(async dispenserConfig => {
+		settingsItem.onDispenserChange(async (dispenserConfig, changedSettingType) => {
 			const url = new URL("/set", window.location.href);
 			url.searchParams.set("di", String(i));
-			url.searchParams.set("dx", String(dispenserConfig.x));
-			url.searchParams.set("dy", String(dispenserConfig.y));
-			url.searchParams.set("dl", String(dispenserConfig.timeMsMl));
-			url.searchParams.set("do", String(dispenserConfig.delayAir));
-			let ingredientId = config.ingredients.indexOf(dispenserConfig.ingredient);
-			if (ingredientId < 0) ingredientId = 0;
-			url.searchParams.set("dn", String(ingredientId));
+			if (changedSettingType == "x") {
+				url.searchParams.set("dx", String(dispenserConfig.x));
+			} else if (changedSettingType == "y") {
+				url.searchParams.set("dy", String(dispenserConfig.y));
+			} else if (changedSettingType == "timeMsMl") {
+				url.searchParams.set("dl", String(dispenserConfig.timeMsMl));
+			} else if (changedSettingType == "delayAir") {
+				url.searchParams.set("do", String(dispenserConfig.delayAir));
+			} else  if (changedSettingType == "ingredient") {
+				let ingredientId = config.ingredients.indexOf(dispenserConfig.ingredient);
+				if (ingredientId < 0) ingredientId = 0;
+				url.searchParams.set("dn", String(ingredientId));
+			}
 			await handleRequestWithToast(url, {
 				successMessage: "Dispenser updated.",
 				fallbackErrorMessage: "Failed to update dispenser.",
