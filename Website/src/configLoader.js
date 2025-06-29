@@ -37,7 +37,7 @@ import { showToastMessage } from "./toastMessages/showToastMessage.js";
  * @typedef {Object.<string, number | boolean>} SettingsConfig
  */
 
-/** @typedef {(config: ParsedConfigData) => void} OnConfigLoadedCallback */
+/** @typedef {(config: ParsedConfigData) => void} OnConfigUpdatedCallback */
 
 /** @type {ParsedConfigData?} */
 let currentConfigData = null;
@@ -46,8 +46,8 @@ let isRefreshingConfigData = false;
 /** @type {Promise<void>?} */
 let lastRefreshingConfigPromise = null;
 
-/** @type {Set<OnConfigLoadedCallback>} */
-const onConfigLoadedCbs = new Set();
+/** @type {Set<OnConfigUpdatedCallback>} */
+const onConfigUpdatedCbs = new Set();
 
 /**
  * Returns the cached config if it exists, otherwise it loads the config first.
@@ -93,7 +93,11 @@ async function refreshConfigFn() {
 			settings: data.settings,
 		};
 		const config = currentConfigData;
-		onConfigLoadedCbs.forEach(cb => cb(config));
+		const autoRefreshSetting = config.settings.DispenserHeartbeatS;
+		if (typeof autoRefreshSetting == "number") {
+			updateAutoRefreshInterval(autoRefreshSetting * 1000);
+		}
+		onConfigUpdatedCbs.forEach(cb => cb(config));
 	}
 }
 
@@ -108,8 +112,22 @@ export async function getAvailableIngredients() {
 }
 
 /**
- * @param {OnConfigLoadedCallback} cb
+ * @param {OnConfigUpdatedCallback} cb
  */
-export function onConfigLoaded(cb) {
-	onConfigLoadedCbs.add(cb);
+export function onConfigUpdated(cb) {
+	onConfigUpdatedCbs.add(cb);
+}
+
+let autoRefreshInterval = -1;
+
+/**
+ * @param {number} interval
+ */
+function updateAutoRefreshInterval(interval) {
+	if (autoRefreshInterval != -1) {
+		clearInterval(autoRefreshInterval);
+	}
+	autoRefreshInterval = setInterval(() => {
+		refreshConfig();
+	}, interval);
 }

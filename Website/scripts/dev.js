@@ -71,6 +71,7 @@ const currentSettings = {
 	numberD: 3000,
 	"Boolean with spaces": true,
 	"Number with spaces": 1234,
+	DispenserHeartbeatS: 30,
 }
 
 const mockGetData = {

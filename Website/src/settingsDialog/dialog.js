@@ -1,15 +1,17 @@
-import { getConfig, onConfigLoaded, refreshConfig } from "../configLoader.js";
+import { getConfig, onConfigUpdated, refreshConfig } from "../configLoader.js";
 import { settingsDialog } from "../globalElements.js";
 import { handleRequestWithToast } from "../handleRequestWithToast.js";
-import { showToastMessage } from "../toastMessages/showToastMessage.js";
 
 const settingsListEl = /** @type {HTMLUListElement} */ (document.getElementById("settingsList"));
 
 /** @type {Map<string, HTMLInputElement>} */
 const createdSettings = new Map();
 
+let hasUpdatedConfigSinceOpen = false;
+
 export function showModal() {
 	settingsDialog.showModal();
+	hasUpdatedConfigSinceOpen = false;
 	initSettingsList();
 	refreshConfig();
 }
@@ -56,8 +58,9 @@ async function initSettingsList() {
 	settingsInitialized = true;
 }
 
-onConfigLoaded(config => {
+onConfigUpdated(config => {
 	if (!settingsInitialized) return;
+	if (hasUpdatedConfigSinceOpen) return;
 	for (const [key, value] of Object.entries(config.settings)) {
 		const inputEl = createdSettings.get(key);
 		if (inputEl) {
@@ -68,6 +71,7 @@ onConfigLoaded(config => {
 			}
 		}
 	}
+	hasUpdatedConfigSinceOpen = true;
 });
 
 /**
