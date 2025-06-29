@@ -101,6 +101,11 @@ const server = new Server({
 					}
 				}
 			}
+			//  Set to true to debug error messages on the client
+			const DEBUG_ERROR = false;
+			if (DEBUG_ERROR) {
+				return new Response("Oh no! Something went wrong :(", {status: 400})
+			}
 			return new Response();
 		}
 		return serveDir(request, {

@@ -1,8 +1,12 @@
 /**
+ * @typedef ShowToastMessageOptions
+ * @property {HTMLElement} [parent]
+ * @property {"top" | "bottom"} [location]
+ */
+
+/**
  * @param {string} message
- * @param {Object} options
- * @param {HTMLElement} [options.parent]
- * @param {"top" | "bottom"} [options.location]
+ * @param {ShowToastMessageOptions} options
  */
 export async function showToastMessage(message, {
 	parent = document.body,

@@ -1,5 +1,6 @@
 import { ingredientNames } from "../drinksConfig.js";
 import { dispensersDialog } from "../globalElements.js";
+import { handleRequestWithToast } from "../handleRequestWithToast.js";
 import { showToastMessage } from "../toastMessages/showToastMessage.js";
 import { DispenserSettingItem } from "./DispenserSettingItem.js";
 
@@ -188,11 +189,13 @@ export class DispenserSettingsItem {
 			const url = new URL("/set", window.location.href);
 			url.searchParams.set("x", String(this.getXSetting()));
 			url.searchParams.set("y", String(this.getYSetting()));
-			const response = await fetch(url);
-			let message = response.ok ? "Moving to dispenser..." : "Failed to go to the dispenser.";
-			showToastMessage(message, {
-				parent: dispensersDialog,
-				location: "top",
+			await handleRequestWithToast(url, {
+				successMessage: "Moving to dispenser...",
+				fallbackErrorMessage: "Failed to go to the dispenser.",
+				toastOptions: {
+					parent: dispensersDialog,
+					location: "top",
+				},
 			});
 		});
 		this.el.appendChild(goToButton);

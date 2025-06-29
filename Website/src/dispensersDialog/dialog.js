@@ -1,5 +1,6 @@
 import { getConfig } from "../configLoader.js";
 import { dispensersDialog } from "../globalElements.js";
+import { handleRequestWithToast } from "../handleRequestWithToast.js";
 import { showToastMessage } from "../toastMessages/showToastMessage.js";
 import { DispenserSettingsItem } from "./DispenserSettingsItem.js";
 
@@ -32,11 +33,13 @@ async function updateDispensersList() {
 			let ingredientId = config.ingredients.indexOf(dispenserConfig.ingredient);
 			if (ingredientId < 0) ingredientId = 0;
 			url.searchParams.set("dn", String(ingredientId));
-			const response = await fetch(url);
-			const message = response.ok ? "Dispenser updated." : "Failed to update dispenser.";
-			showToastMessage(message, {
-				parent: dispensersDialog,
-				location: "top",
+			await handleRequestWithToast(url, {
+				successMessage: "Dispenser updated.",
+				fallbackErrorMessage: "Failed to update dispenser.",
+				toastOptions: {
+					parent: dispensersDialog,
+					location: "top",
+				},
 			});
 		});
 	}

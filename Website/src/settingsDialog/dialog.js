@@ -1,5 +1,6 @@
 import { getConfig, onConfigLoaded, refreshConfig } from "../configLoader.js";
 import { settingsDialog } from "../globalElements.js";
+import { handleRequestWithToast } from "../handleRequestWithToast.js";
 import { showToastMessage } from "../toastMessages/showToastMessage.js";
 
 const settingsListEl = /** @type {HTMLUListElement} */ (document.getElementById("settingsList"));
@@ -76,10 +77,12 @@ onConfigLoaded(config => {
 async function sendChangeSetting(key, value) {
 	const url = new URL("/set", window.location.href);
 	url.searchParams.set(key, value);
-	const response = await fetch(url);
-	const message = response.ok ? "Setting updated." : "Failed to update setting.";
-	showToastMessage(message, {
-		parent: settingsDialog,
-		location: "top",
+	await handleRequestWithToast(url, {
+		successMessage: "Setting updated.",
+		fallbackErrorMessage: "Failed to update setting.",
+		toastOptions: {
+			parent: settingsDialog,
+			location: "top",
+		},
 	});
 }

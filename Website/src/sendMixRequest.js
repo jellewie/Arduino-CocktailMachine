@@ -1,4 +1,4 @@
-import { showToastMessage } from "./toastMessages/showToastMessage.js";
+import { handleRequestWithToast } from "./handleRequestWithToast.js";
 
 /**
  * @param {Object} options
@@ -20,10 +20,8 @@ export async function sendMixRequest({
 			url.searchParams.set("a" + queryIndex, "#" + action.action);
 		}
 	}
-	const response = await fetch(url.href);
-	if (response.ok) {
-		showToastMessage("Mixing!");
-	} else {
-		showToastMessage("Failed to send mix request");
-	}
+	await handleRequestWithToast(url, {
+		successMessage: "Mixing!",
+		fallbackErrorMessage: "Failed to send mix request.",
+	});
 }
