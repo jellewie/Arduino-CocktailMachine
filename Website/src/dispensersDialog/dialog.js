@@ -24,12 +24,10 @@ async function updateDispensersList() {
 		settingsItem.onDispenserChange(async dispenserConfig => {
 			const url = new URL("/set", window.location.href);
 			url.searchParams.set("di", String(i));
-			url.searchParams.set("dt", String(dispenserConfig.typeId));
 			url.searchParams.set("dx", String(dispenserConfig.x));
 			url.searchParams.set("dy", String(dispenserConfig.y));
-			url.searchParams.set("dz", String(dispenserConfig.z));
-			url.searchParams.set("dl", String(dispenserConfig.msMl));
-			url.searchParams.set("do", String(dispenserConfig.msOff));
+			url.searchParams.set("dl", String(dispenserConfig.timeMsMl));
+			url.searchParams.set("do", String(dispenserConfig.delayAir));
 			let ingredientId = config.ingredients.indexOf(dispenserConfig.ingredient);
 			if (ingredientId < 0) ingredientId = 0;
 			url.searchParams.set("dn", String(ingredientId));

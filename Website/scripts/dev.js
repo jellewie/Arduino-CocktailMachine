@@ -49,14 +49,12 @@ await Promise.all(libFetchPromises);
 
 const dispensers = [];
 for (let i = 0; i < 11; i++) {
-	const type = Math.floor(Math.random() * 3);
-	const x = Math.floor(Math.random() * 3000);
-	const y = Math.floor(Math.random() * 3000);
-	const z = Math.floor(Math.random() * 3000);
-	const msMl = Math.floor(Math.random() * 500);
-	const msOff = Math.floor(Math.random() * 500);
+	const locationX = Math.floor(Math.random() * 30_000);
+	const locationY = Math.floor(Math.random() * 30_000);
+	const timeMsMl = Math.floor(Math.random() * 500);
+	const delayAir = Math.floor(Math.random() * 500);
 	const ingredientId = Math.floor(Math.random() * 18);
-	dispensers.push([type, x, y, z, msMl, msOff, ingredientId]);
+	dispensers.push([locationX, locationY, timeMsMl, delayAir, ingredientId]);
 }
 
 // TODO: use the ingredients list from drinksConfig.js somehow

@@ -122,20 +122,6 @@ export class DispenserSettingsItem {
 		/** @private */
 		this.getIngredientSetting = ingredientSetting.getValue;
 
-		const typeSetting = createSelectSetting({
-			label: "Type",
-			availableValues: {
-				"0": "Unspecified",
-				"1": "Shot",
-				"2": "Pump",
-			},
-			initialValue: String(dispenserConfig.typeId),
-			onChange: boundFireDispenserChangeCbs,
-		});
-		this.el.appendChild(typeSetting.el);
-		/** @private */
-		this.getTypeSetting = typeSetting.getValue;
-
 		const xSetting = createNumberSetting({
 			label: "x",
 			initialValue: dispenserConfig.x,
@@ -154,32 +140,23 @@ export class DispenserSettingsItem {
 		/** @private */
 		this.getYSetting = ySetting.getValue;
 
-		const zSetting = createNumberSetting({
-			label: "z",
-			initialValue: dispenserConfig.z,
-			onChange: boundFireDispenserChangeCbs,
-		});
-		this.el.appendChild(zSetting.el);
-		/** @private */
-		this.getZSetting = zSetting.getValue;
-
-		const msMlSetting = createNumberSetting({
+		const timeMsMlSetting = createNumberSetting({
 			label: "ms/ml",
-			initialValue: dispenserConfig.msMl,
+			initialValue: dispenserConfig.timeMsMl,
 			onChange: boundFireDispenserChangeCbs,
 		});
-		this.el.appendChild(msMlSetting.el);
+		this.el.appendChild(timeMsMlSetting.el);
 		/** @private */
-		this.getMsMlSetting = msMlSetting.getValue;
+		this.getTimeMsMlSetting = timeMsMlSetting.getValue;
 
-		const msOffSetting = createNumberSetting({
-			label: "ms off",
-			initialValue: dispenserConfig.msOff,
+		const delayAirSetting = createNumberSetting({
+			label: "delay ms",
+			initialValue: dispenserConfig.delayAir,
 			onChange: boundFireDispenserChangeCbs,
 		});
-		this.el.appendChild(msOffSetting.el);
+		this.el.appendChild(delayAirSetting.el);
 		/** @private */
-		this.getMsOffSetting = msOffSetting.getValue;
+		this.getDelayAirSetting = delayAirSetting.getValue;
 
 		const goToButton = document.createElement("button");
 		goToButton.textContent = "Go to";
@@ -215,12 +192,10 @@ export class DispenserSettingsItem {
 		/** @type {import("../configLoader.js").DispenserConfig} */
 		const config = {
 			ingredient: this.getIngredientSetting(),
-			typeId: parseInt(this.getTypeSetting()),
 			x: this.getXSetting(),
 			y: this.getYSetting(),
-			z: this.getZSetting(),
-			msMl: this.getMsMlSetting(),
-			msOff: this.getMsOffSetting(),
+			timeMsMl: this.getTimeMsMlSetting(),
+			delayAir: this.getDelayAirSetting(),
 		}
 
 		this.onDispenserChangeCbs.forEach(cb => cb(config));

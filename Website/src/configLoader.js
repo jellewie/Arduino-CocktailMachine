@@ -21,17 +21,15 @@ import { showToastMessage } from "./toastMessages/showToastMessage.js";
  */
 
 /**
- * @typedef {[typeId: number, x: number, y: number, z: number, msMl: number, msOff: number, ingredientId: number]} DispenserConfigArr
+ * @typedef {[x: number, y: number, timeMsMl: number, delayAir: number, ingredientId: number]} DispenserConfigArr
  */
 
 /**
  * @typedef DispenserConfig
- * @property {number} typeId
  * @property {number} x
  * @property {number} y
- * @property {number} z
- * @property {number} msMl
- * @property {number} msOff
+ * @property {number} timeMsMl
+ * @property {number} delayAir
  * @property {import("./drinksConfig.js").Ingredients} ingredient
  */
 
@@ -82,13 +80,11 @@ async function refreshConfigFn() {
 		const dispensers = [];
 		for (const dispenser of data.dispensers) {
 			dispensers.push({
-				typeId: dispenser[0],
-				x: dispenser[1],
-				y: dispenser[2],
-				z: dispenser[3],
-				msMl: dispenser[4],
-				msOff: dispenser[5],
-				ingredient: data.ingredients[dispenser[6]]
+				x: dispenser[0],
+				y: dispenser[1],
+				timeMsMl: dispenser[2],
+				delayAir: dispenser[3],
+				ingredient: data.ingredients[dispenser[4]]
 			});
 		}
 		currentConfigData = {
