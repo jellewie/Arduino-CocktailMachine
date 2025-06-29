@@ -104,7 +104,7 @@ const server = new Server({
 
 			if (url.searchParams.has("di")) {
 				const dispenserIndex = Number(url.searchParams.get("di"));
-				const dispenser = dispensers[dispenserIndex];
+				const dispenser = dispensers[dispenserIndex - 1];
 				if (dispenser) {
 					if (url.searchParams.has("dx")) {
 						dispenser[0] = Number(url.searchParams.get("dx"));

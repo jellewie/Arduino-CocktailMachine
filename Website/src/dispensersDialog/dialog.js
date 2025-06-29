@@ -18,11 +18,12 @@ async function updateDispensersList() {
 	}
 
 	for (const [i, dispenser] of config.dispensers.entries()) {
-		const settingsItem = new DispenserSettingsItem(i, dispenser, config.ingredients);
+		const dispenserId = i + 1;
+		const settingsItem = new DispenserSettingsItem(dispenserId, dispenser, config.ingredients);
 		dispensersList.appendChild(settingsItem.el);
 		settingsItem.onDispenserChange(async (dispenserConfig, changedSettingType) => {
 			const url = new URL("/set", window.location.href);
-			url.searchParams.set("di", String(i));
+			url.searchParams.set("di", String(dispenserId));
 			if (changedSettingType == "x") {
 				url.searchParams.set("dx", String(dispenserConfig.x));
 			} else if (changedSettingType == "y") {
