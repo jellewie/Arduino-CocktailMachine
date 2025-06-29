@@ -47,6 +47,7 @@ for (const [file, url] of Object.entries(libs)) {
 }
 await Promise.all(libFetchPromises);
 
+/** @type {import("../src/configLoader.js").DispenserConfigArr[]} */
 const dispensers = [];
 for (let i = 0; i < 11; i++) {
 	const locationX = Math.floor(Math.random() * 30_000);
@@ -100,6 +101,25 @@ const server = new Server({
 					}
 				}
 			}
+
+			if (url.searchParams.has("di")) {
+				const dispenserIndex = Number(url.searchParams.get("di"));
+				const dispenser = dispensers[dispenserIndex];
+				if (dispenser) {
+					if (url.searchParams.has("dx")) {
+						dispenser[0] = Number(url.searchParams.get("dx"));
+					} else if (url.searchParams.has("dy")) {
+						dispenser[1] = Number(url.searchParams.get("dy"));
+					} else if (url.searchParams.has("dl")) {
+						dispenser[2] = Number(url.searchParams.get("dl"));
+					} else if (url.searchParams.has("do")) {
+						dispenser[3] = Number(url.searchParams.get("do"));
+					} else if (url.searchParams.has("dn")) {
+						dispenser[4] = Number(url.searchParams.get("dn"));
+					}
+				}
+			}
+
 			//  Set to true to debug error messages on the client
 			const DEBUG_ERROR = false;
 			if (DEBUG_ERROR) {
