@@ -105,7 +105,10 @@ bool WiFiManagerUser_Set_Value(uint8_t ValueID, String Value) {
       break;
     case 14:
       {
-        //reserved
+        if (!StringIsDigit(Value)) return false;
+        uint16_t Temp = Value.toInt();
+        if (Temp < 30) return false;  //Dont allow faster speeds than 30s, it takes up to 4 seconds to check if a dispenser went offline
+        DispenserHeartbeat = Temp;
       }
       break;
     case 15:
@@ -155,7 +158,7 @@ String WiFiManagerUser_Get_Value(uint8_t ValueID, bool Safe, bool Convert) {
     case 11: return String(DisableSteppersAfterIdleS); break;
     case 12: return String(MaxGlassSize); break;
     case 13: return String(MaxBrightness); break;
-    case 14: return ""; break;
+    case 14: return String(DispenserHeartbeat); break;
     case 15: return ""; break;
     default:
       {

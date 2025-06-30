@@ -14,6 +14,7 @@
 #define PreFixDisableSteppersAfterIdleS "disablesteppersafteridles"
 #define PreFixMaxBrightness "maxbrightness"
 #define PreFixHome "homed"
+#define PreFixDispenserHeartbeat "DispenserHeartbeat"
 //Dispenser Settings
 #define PreFixSetDispenserID "di"
 #define PreFixSetDispenserIngredientID "dn"
@@ -140,6 +141,12 @@ void handle_Set() {
         SaveEEPROMinSeconds = 30;
       }
       FastLED.setBrightness(MaxBrightness);  //Set brightness
+    } else if (ArguName == PreFixDispenserHeartbeat) {
+      if (!WiFiManagerUser_Set_Value(14, ArgValue)) {
+        ERRORMSG = "DispenserHeartbeat Not set";
+      } else {
+        SaveEEPROMinSeconds = 30;
+      }
     } else if (ArguName == PreFixHome) {
       DoHoming = IsTrue(ArgValue);
     } else if (ArguName == PreFix_Mix_Name) {
@@ -352,6 +359,7 @@ void handle_Get() {
   Json += ",\"MaxHomeBounce\":" + String(MaxHomeBounce);
   Json += ",\"maxGlassSize\":" + String(MaxGlassSize);
   Json += ",\"maxBrightness\":" + String(MaxBrightness);
+  Json += ",\"DispenserHeartbeat\":" + String(DispenserHeartbeat);
   Json += "}";
   Json += "}";
   server.send(200, "text/html", Json);
