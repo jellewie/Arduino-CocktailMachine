@@ -25,8 +25,8 @@ const uint8_t PDO_Y_Step = 12;
 const uint8_t PDI_X_Ref = 5;  //LOW = TRIGGERED
 const uint8_t PDI_Y_Ref = 27;
 const uint8_t PDI_S = 39;
-const uint8_t PDIO_buspin = 25;             //must be 12 or 25 for PJONSoftwareBitBang
-const uint16_t TotalLEDs = 100;             //The total amounts of LEDs in the strip
+const uint8_t PDIO_buspin = 25;    //must be 12 or 25 for PJONSoftwareBitBang
+const uint16_t TotalLEDs = 100;    //The total amounts of LEDs in the strip
 uint16_t DispenserHeartbeat = 30;  //time in s to check if all dispensers are still there
 CRGB ColorBoot = CRGB(255, 128, 0);
 CRGB ColorHoming = CRGB(0, 0, 255);
@@ -77,7 +77,6 @@ void setup() {
   //===========================================================================
   //Init LED and set the boot color
   //===========================================================================
-  pinMode(PAO_LED, OUTPUT);
   FastLED.addLeds<WS2812B, PAO_LED, GRB>(LEDs, TotalLEDs);
   FastLED.setBrightness(MaxBrightness);  //Set brightness
   LED_Fill(0, TotalLEDs, ColorBoot);
@@ -103,7 +102,7 @@ void setup() {
   bus.set_receiver(receiver_function);
   bus.strategy.set_pin(PDIO_buspin);
   bus.begin();
-  pingAll(false);                         //Look for all available dispensers
+  pingAll(false);                    //Look for all available dispensers
   server.on("/", handle_OnConnect);  //Call the 'handleRoot' function when a client requests URL "/"
   server.on("/set", handle_Set);
   server.on("/get", handle_Get);
