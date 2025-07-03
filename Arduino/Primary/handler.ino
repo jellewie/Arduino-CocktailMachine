@@ -268,10 +268,10 @@ void handle_Set() {
     } else if (ArguName == PreFixSetDispenserDelayAir) {
       if (!StringIsDigit(ArgValue)) {
         ERRORMSG = "SetDispenserDelayAir not a value";
-      } else if (ArgValue.toInt() < 0 or ArgValue.toInt() > 255) {
+      } else if (ArgValue.toInt() < 0 or ArgValue.toInt() / 5 > 255) {
         ERRORMSG = "SetDispenserDelayAir out of valid range";
       } else if (Dispensers[DisID].DelayAir != ArgValue.toInt()) {
-        Dis.DelayAir = ArgValue.toInt();
+        Dis.DelayAir = ArgValue.toInt() / 5;
       }
     } else if (ArguName == PreFixSetDispenserIngredientID) {
       if (!StringIsDigit(ArgValue)) {
@@ -339,7 +339,7 @@ void handle_Get() {
   String Json = "{\"dispensers\":[";
   for (uint8_t i = 1; i < Dispensers_Amount; i++) {
     if (i != 1) Json += ",";
-    Json += "[" + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].DelayAir) + "," + String(Dispensers[i].IngredientID) + "]";
+    Json += "[" + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].DelayAir / 5) + "," + String(Dispensers[i].IngredientID) + "]";
   }
   Json += "],\"ingredients\":[";
   for (uint8_t i = 0; i < Ingredient_Amount; i++) {
