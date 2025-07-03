@@ -71,15 +71,20 @@ void setup() {
   delay(250);
 }
 void loop() {
-  CheckAndGetSlotID();                                         //Try and get the SLOT ID
-  bool button_state = digitalRead(PDI_Button);                 //read manual button
-  static bool OLD_button_state = button_state;                 //Save old state to see changes
-  if (button_state != OLD_button_state) {                      //Only update if button state changes
-    OLD_button_state = button_state;                           //remember the new state as the old one
-    (button_state == LOW) ? DispenseStart() : DispenseStop();  //Button pressed
-    if (button_state == LOW) {
+  CheckAndGetSlotID();                          //Try and get the SLOT ID
+  bool button_state = digitalRead(PDI_Button);  //read manual button
+  static bool OLD_button_state = button_state;  //Save old state to see changes
+  static uint32_t pressStartTime = 0;           //To store the time we started pressing the button in
+  if (button_state != OLD_button_state) {       //Only update if button state changes
+    OLD_button_state = button_state;            //remember the new state as the old one
+    if (button_state == LOW) {                  //Button just pressed
+      pressStartTime = millis();                //Remember when we started with dispensing
       DispenseStart();
-      delay(ManualDispenceML * dispenserSettings.TimeMSML);
+    } else {  //Button just released
+      uint32_t pressedDuration = millis() - pressStartTime;
+      uint32_t MinimumDuration = ManualDispenceML * dispenserSettings.TimeMSML;
+      if (pressedDuration < MinimumDuration)       //If we pressed shorter than ManualDispenceML
+        delay(MinimumDuration - pressedDuration);  //If released before 1 manual unit dispensed, wait to finish 15ml
       DispenseStop();
     }
   }
