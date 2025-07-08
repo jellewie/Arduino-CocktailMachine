@@ -36,14 +36,14 @@ void pingAll(bool Print) {
   uint8_t dispAmount = 0;
   static const String addedListPrefix = "Disp ";
   String addedList = addedListPrefix;
-  for (uint8_t i = 1; i < Dispensers_Amount; i++) {                                 //For each dispenser
-    bool dispensorConnected = Dispensers[i].IngredientID != 0;                      //Remember if this dispenser is already connected
-    if (BusAdopt(i) == 1) {                                                         //If there is a dispenser available on this ID
-      dispAmount++;                                                                 //Increase the connected counter
-      if (addedList.length() < addedListPrefix.length() and !dispensorConnected) {  //If there is still room to list antoher one, and its newly adopted
-        String NewEntry = (addedList.length() > 5 ? "," : "") + String(i);          //Created the proposed new string
-        if (addedList.length() + NewEntry.length() < 15)                            //If we can add this propsal
-          addedList += NewEntry;                                                    //Add the dispenser ID to the list
+  for (uint8_t i = 1; i < Dispensers_Amount; i++) {                               //For each dispenser
+    bool dispensorConnected = Dispensers[i].IngredientID != 0;                    //Remember if this dispenser is already connected
+    if (BusAdopt(i) == 1) {                                                       //If there is a dispenser available on this ID
+      dispAmount++;                                                               //Increase the connected counter
+      if (!dispensorConnected) {                                                  //If its newly adopted
+        String NewEntry = (addedList != addedListPrefix ? "," : "") + String(i);  //Created the proposed new string addition
+        if (addedList.length() + NewEntry.length() <= 15)                         //If we can add this propsal
+          addedList += NewEntry;                                                  //Add the dispenser ID to the list
         else
           addedList += "+               ";  //just mark that we have more dispensers we can't show
       }
