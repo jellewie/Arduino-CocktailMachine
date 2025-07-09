@@ -292,8 +292,10 @@ void CheckEEPROMSave() {
   if (SaveEEPROMinSeconds >= 0) {
     static unsigned long LastTime;
     if (TickEveryXms(&LastTime, 1000)) {
-      if (SaveEEPROMinSeconds == 0)
+      if (SaveEEPROMinSeconds == 0) {
         WiFiManager.WriteEEPROM();  //(runtime) If you want to manually save the settings(EEPROM LIMITED WRITES! do not spam)
+        Serial.println("Saved EEPROM");
+      }
       SaveEEPROMinSeconds -= 1;
     }
   }
