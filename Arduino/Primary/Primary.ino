@@ -173,9 +173,12 @@ void GetIngredient(Ingredient IN) {
   }
   uint8_t DispenserID = GetDispenserID(IN.ID);
   if (DispenserID != 255) {
-    LightSection(Dispensers[DispenserID].LocationX);                               //Turn on the main LED so show where we are going
-    MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);  //Move to the dispenser
-    BusSendBlocking(DispenserID, DISPENSE, IN.ml);                                 //Give the dispence command
+    LightSection(Dispensers[DispenserID].LocationX);                                         //Turn on the main LED so show where we are going
+    MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);            //Move to the dispenser
+    if (BusSendBlocking(DispenserID, DISPENSE, IN.ml))                                       //Give the dispence command
+      MyDelay(IN.ml * Dispensers[DispenserID].TimeMSML + Dispensers[DispenserID].DelayAir);  //Wait for the dispenser to be done
+    else
+      LcdPrint("Failed to get", IngredientIDtoString(IN.ID));
   }
 }
 void LightSection(long LocationX) {
