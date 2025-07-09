@@ -116,6 +116,11 @@ bool WiFiManagerUser_Set_Value(uint8_t ValueID, String Value) {
         //reserved
       }
       break;
+    case 16:
+      {
+        //reserved
+      }
+      break;
     default:
       {
         uint8_t i = ValueID - 16;  //Remove the amount above from the counter, so the next ones are of the Dispensers
@@ -160,15 +165,16 @@ String WiFiManagerUser_Get_Value(uint8_t ValueID, bool Safe, bool Convert) {
     case 13: return String(MaxBrightness); break;
     case 14: return String(DispenserHeartbeat); break;
     case 15: return ""; break;
+    case 16: return ""; break;
     default:
       {
         uint8_t i = ValueID - 16;  //Remove the amount above from the counter, so the next are of the Dispensers
         if (i < Dispensers_Amount) {
           String Output = "";
           if (Convert) {
-            Output = String(i) + ",X=" + String(Dispensers[i].LocationX) + ",Y=" + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "MSML," + String(Dispensers[i].DelayAir) + "MSoff," + IngredientIDtoString(Dispensers[i].IngredientID);
+            Output = "X=" + String(Dispensers[i].LocationX) + ",Y=" + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "MSML," + String(Dispensers[i].DelayAir) + "MSoff," + IngredientIDtoString(Dispensers[i].IngredientID);
           } else {
-            Output = String(i) + "," + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].DelayAir) + "," + String(Dispensers[i].IngredientID);
+            Output = String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].DelayAir) + "," + String(Dispensers[i].IngredientID);
           }
           return String(Output);
         }
