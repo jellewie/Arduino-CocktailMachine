@@ -67,7 +67,8 @@ void handle_Set() {
     Mix.Ingredients[i].ml = 0;
   }
   Dispenser Dis = { 0, 0, 0, 0, 0 };
-  int16_t DisID = -1;
+  int16_t DisID = -1, DelayAir = -1;
+  int32_t LocationX = -1, LocationY = -1;
   for (uint16_t i = 0; i < server.args(); i++) {
     String ArguName = server.argName(i);
     ArguName.toLowerCase();
@@ -241,10 +242,10 @@ void handle_Set() {
       if (!StringIsDigit(ArgValue)) {
         ERRORMSG = "SetDispenserX not a value";
       } else {
-        if (ArgValue.toInt() <= 0 or ArgValue.toInt() > BedSize_X) {
+        if (ArgValue.toInt() < 0 or ArgValue.toInt() > BedSize_X) {
           ERRORMSG = "SetDispenserX out of valid range";
         } else {
-          Dis.LocationX = ArgValue.toInt();
+          LocationX = ArgValue.toInt();
           SaveEEPROMinSeconds = 30;
         }
       }
@@ -252,10 +253,10 @@ void handle_Set() {
       if (!StringIsDigit(ArgValue)) {
         ERRORMSG = "SetDispenserY not a value";
       } else {
-        if (ArgValue.toInt() <= 0 or ArgValue.toInt() > BedSize_Y) {
+        if (ArgValue.toInt() < 0 or ArgValue.toInt() > BedSize_Y) {
           ERRORMSG = "SetDispenserY out of valid range";
         } else {
-          Dis.LocationY = ArgValue.toInt();
+          LocationY = ArgValue.toInt();
           SaveEEPROMinSeconds = 30;
         }
       }
@@ -272,8 +273,8 @@ void handle_Set() {
         ERRORMSG = "SetDispenserDelayAir not a value";
       } else if (ArgValue.toInt() < 0 or ArgValue.toInt() / 5 > 255) {
         ERRORMSG = "SetDispenserDelayAir out of valid range";
-      } else if (Dispensers[DisID].DelayAir != ArgValue.toInt()) {
-        Dis.DelayAir = ArgValue.toInt() / 5;
+      } else if (Dispensers[DisID].DelayAir != ArgValue.toInt() / 5) {
+        DelayAir = ArgValue.toInt() / 5;
       }
     } else if (ArguName == PreFixSetDispenserIngredientID) {
       if (!StringIsDigit(ArgValue)) {
@@ -301,28 +302,50 @@ void handle_Set() {
     ERRORMSG += "No mix ingredients given/n";
   }
   //Process the dispenser update
-  if (DisID != -1 or Dis.LocationX != 0 or Dis.LocationY != 0 or Dis.TimeMSML != 0 or Dis.DelayAir != 0 or Dis.IngredientID != 0) {
+  if (DisID != -1 or LocationX != -1 or LocationY != -1 or Dis.TimeMSML != 0 or DelayAir != -1 or Dis.IngredientID != 0) {
     if (DisID >= 0) {
       bool DisError = false;
-      if (Dis.LocationX == 0)
-        Dis.LocationX = Dispensers[DisID].LocationX;  //X location not given, so keep what we have
-      if (Dis.LocationY == 0)
-        Dis.LocationY = Dispensers[DisID].LocationY;  //X location not given, so keep what we have
-      if (Dis.TimeMSML != 0)
+
+
+
+      Serial.println("LocationX=" + String(LocationX));
+      Serial.println("LocationY=" + String(LocationY));
+
+
+
+      if (LocationX != -1)
+        Dis.LocationX = LocationX;
+      else
+        Dis.LocationX = Dispensers[DisID].LocationX;  //not given, so keep what we have
+      if (LocationY != -1)
+        Dis.LocationY = LocationY;
+      else
+        Dis.LocationY = Dispensers[DisID].LocationY;  //not given, so keep what we have
+      if (Dis.TimeMSML != 0) {
         if (!BusSendBlocking(DisID, CALIBRATEMSPERML, Dis.TimeMSML))
           DisError = true;
-      if (Dis.DelayAir != 0)
-        if (!BusSendBlocking(DisID, CHANGEDELAY, Dis.DelayAir))
+      } else {
+        Dis.TimeMSML = Dispensers[DisID].TimeMSML;  //not given, so keep what we have
+      }
+      if (DelayAir != -1) {
+        if (!BusSendBlocking(DisID, CHANGEDELAY, DelayAir))
           DisError = true;
-      if (Dis.IngredientID != 0)
+      } else {
+        Dis.DelayAir = Dispensers[DisID].DelayAir;  //not given, so keep what we have
+      }
+      if (Dis.IngredientID != 0) {
         if (!BusSendBlocking(DisID, CHANGEFLUID, Dis.IngredientID))
           DisError = true;
+      } else {
+        Dis.IngredientID = Dispensers[DisID].IngredientID;  //not given, so keep what we have
+      }
       if (!DisError)
         SetDispenser(Dis, DisID);
       else
         ERRORMSG += "Error in communcation to dispener " + String(DisID);
-      MyDelay(10);      //Just some time to make sure bus is clear again, seems to be needed
-      BusAdopt(DisID);  //Ask for the dispenser settings
+      MyDelay(10);  //Just some time to make sure bus is clear again, seems to be needed
+      if (Dis.TimeMSML != 0 or DelayAir != -1 or Dis.IngredientID != 0)
+        BusAdopt(DisID);  //Ask for the dispenser for comformation of it's settings
     } else {
       if (!AddDispenser(Dis))
         ERRORMSG += "No more space for a new dispenser";
