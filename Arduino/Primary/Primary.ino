@@ -97,12 +97,6 @@ void setup() {
   Stepper_Y.setMaxSpeed(MotorMAXSpeed);
   Stepper_X.setAcceleration(MotorMAXAccel);
   Stepper_Y.setAcceleration(MotorMAXAccel);
-  LcdPrint("", "Connecting disp");
-  bus.set_error(error_handler);
-  bus.set_receiver(receiver_function);
-  bus.strategy.set_pin(PDIO_buspin);
-  bus.begin();
-  pingAll(false);                    //Look for all available dispensers
   server.on("/", handle_OnConnect);  //Call the 'handleRoot' function when a client requests URL "/"
   server.on("/set", handle_Set);
   server.on("/get", handle_Get);
@@ -110,6 +104,12 @@ void setup() {
   server.on("/reset", handle_Reset);
   server.onNotFound(handle_NotFound);    //When a client requests an unknown URI
   uint8_t Answer = WiFiManager.Start();  //Run the wifi startup (and save results)
+  LcdPrint("", "Connecting disp");
+  bus.set_error(error_handler);
+  bus.set_receiver(receiver_function);
+  bus.strategy.set_pin(PDIO_buspin);
+  bus.begin();
+  pingAll(false);                    //Look for all available dispensers
   WiFiManager.OTA_Enabled = true;        //(runtime) Turn off/on OTA
   WiFiManager.EnableSetup(true);         //(runtime) Enable the settings, only enabled in APmode by default
   if (Answer == 1) {
