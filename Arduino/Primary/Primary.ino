@@ -109,9 +109,9 @@ void setup() {
   bus.set_receiver(receiver_function);
   bus.strategy.set_pin(PDIO_buspin);
   bus.begin();
-  pingAll(false);                    //Look for all available dispensers
-  WiFiManager.OTA_Enabled = true;        //(runtime) Turn off/on OTA
-  WiFiManager.EnableSetup(true);         //(runtime) Enable the settings, only enabled in APmode by default
+  pingAll(false);                  //Look for all available dispensers
+  WiFiManager.OTA_Enabled = true;  //(runtime) Turn off/on OTA
+  WiFiManager.EnableSetup(true);   //(runtime) Enable the settings, only enabled in APmode by default
   if (Answer == 1) {
     LcdPrint("Mixer online!", IpAddress2String(WiFi.localIP()));
   } else {
