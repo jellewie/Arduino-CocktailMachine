@@ -14,7 +14,7 @@
 #define PreFixDisableSteppersAfterIdleS "disablesteppersafteridles"
 #define PreFixMaxBrightness "maxbrightness"
 #define PreFixHome "homed"
-#define PreFixDispenserHeartbeat "DispenserHeartbeat"
+#define PreFixDispenserHeartbeat "dispenserheartbeat"
 //Dispenser Settings
 #define PreFixSetDispenserID "di"
 #define PreFixSetDispenserIngredientID "dn"
@@ -360,18 +360,18 @@ void handle_Get() {
     Json += "\"" + IngredientIDtoString(i) + "\"";
   }
   Json += "],\"settings\":{";
-  Json += "\"homed\":" + IsTrueToString(Homed);
-  Json += ",\"disablesteppersafteridles\":" + String(DisableSteppersAfterIdleS);
-  Json += ",\"bedSizeX\":" + String(BedSize_X);
-  Json += ",\"bedSizeY\":" + String(BedSize_Y);
-  Json += ",\"manualX\":" + String(Manual_X);
-  Json += ",\"manualY\":" + String(Manual_Y);
-  Json += ",\"motorMaxSpeed\":" + String(MotorMAXSpeed);
-  Json += ",\"motorMaxAccel\":" + String(MotorMAXAccel);
-  Json += ",\"homeMaxSpeed\":" + String(HomeMAXSpeed);
+  Json += "\"Homed\":" + IsTrueToString(Homed);
+  Json += ",\"DisableSteppersAfterIdleS\":" + String(DisableSteppersAfterIdleS);
+  Json += ",\"BedSizeX\":" + String(BedSize_X);
+  Json += ",\"BedSizeY\":" + String(BedSize_Y);
+  Json += ",\"ManualX\":" + String(Manual_X);
+  Json += ",\"ManualY\":" + String(Manual_Y);
+  Json += ",\"MotorMaxSpeed\":" + String(MotorMAXSpeed);
+  Json += ",\"MotorMaxAccel\":" + String(MotorMAXAccel);
+  Json += ",\"HomeMaxSpeed\":" + String(HomeMAXSpeed);
   Json += ",\"MaxHomeBounce\":" + String(MaxHomeBounce);
-  Json += ",\"maxGlassSize\":" + String(MaxGlassSize);
-  Json += ",\"maxBrightness\":" + String(MaxBrightness);
+  Json += ",\"MaxGlassSize\":" + String(MaxGlassSize);
+  Json += ",\"MaxBrightness\":" + String(MaxBrightness);
   Json += ",\"DispenserHeartbeat\":" + String(DispenserHeartbeat);
   Json += "}";
   Json += "}";

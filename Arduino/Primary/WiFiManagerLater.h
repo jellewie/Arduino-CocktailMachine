@@ -107,8 +107,9 @@ bool WiFiManagerUser_Set_Value(uint8_t ValueID, String Value) {
       {
         if (!StringIsDigit(Value)) return false;
         uint16_t Temp = Value.toInt();
-        if (Temp < 30) return false;  //Dont allow faster speeds than 30s, it takes up to 4 seconds to check if a dispenser went offline
+        if (Temp < 30 or Temp > 255) return false;  //Dont allow faster speeds than 30s, it takes up to 4 seconds to check if a dispenser went offline
         DispenserHeartbeat = Temp;
+        return true;
       }
       break;
     case 15:
