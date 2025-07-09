@@ -245,6 +245,7 @@ void handle_Set() {
           ERRORMSG = "SetDispenserX out of valid range";
         } else {
           Dis.LocationX = ArgValue.toInt();
+          SaveEEPROMinSeconds = 30;
         }
       }
     } else if (ArguName == PreFixSetDispenserY) {
@@ -255,6 +256,7 @@ void handle_Set() {
           ERRORMSG = "SetDispenserY out of valid range";
         } else {
           Dis.LocationY = ArgValue.toInt();
+          SaveEEPROMinSeconds = 30;
         }
       }
     } else if (ArguName == PreFixSetDispenserTimeMSML) {
