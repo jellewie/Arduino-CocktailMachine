@@ -22,9 +22,9 @@ const uint8_t PDO_X_Dir = 23;
 const uint8_t PDO_Y_Dir = 17;
 const uint8_t PDO_X_Step = 4;
 const uint8_t PDO_Y_Step = 12;
-const uint8_t PDI_X_Ref = 5;  //LOW = TRIGGERED
-const uint8_t PDI_Y_Ref = 27;
-const uint8_t PDI_S = 39;
+const uint8_t PDI_X_Ref = 5;       //LOW = TRIGGERED
+const uint8_t PDI_Y_Ref = 27;      //LOW = TRIGGERED
+const uint8_t PDI_S = 39;          //LOW = TRIGGERED
 const uint8_t PDIO_buspin = 25;    //must be 12 or 25 for PJONSoftwareBitBang
 const uint16_t TotalLEDs = 100;    //The total amounts of LEDs in the strip
 uint16_t DispenserHeartbeat = 30;  //time in s to check if all dispensers are still there
@@ -90,7 +90,7 @@ void setup() {
   pinMode(PDO_Y_Step, OUTPUT);
   pinMode(PDI_X_Ref, INPUT_PULLUP);
   pinMode(PDI_Y_Ref, INPUT_PULLUP);
-  pinMode(PDI_S, INPUT_PULLUP);
+  pinMode(PDI_S, INPUT);
   Stepper_X.setPinsInverted(false, true, false, false, false);  //stepInvert, directionInvert, pin3Invert, pin4Invert, enableInvert
   Stepper_Y.setPinsInverted(false, true, false, false, false);
   Stepper_X.setMaxSpeed(MotorMAXSpeed);
