@@ -352,7 +352,7 @@ void handle_Get() {
   String Json = "{\"dispensers\":[";
   for (uint8_t i = 1; i < Dispensers_Amount; i++) {
     if (i != 1) Json += ",";
-    Json += "[" + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].DelayAir / 5) + "," + String(Dispensers[i].IngredientID) + "]";
+    Json += "[" + String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].DelayAir * 5) + "," + String(Dispensers[i].IngredientID) + "]";
   }
   Json += "],\"ingredients\":[";
   for (uint8_t i = 0; i < Ingredient_Amount; i++) {
