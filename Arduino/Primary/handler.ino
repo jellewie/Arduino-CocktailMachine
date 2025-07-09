@@ -241,7 +241,7 @@ void handle_Set() {
       if (!StringIsDigit(ArgValue)) {
         ERRORMSG = "SetDispenserX not a value";
       } else {
-        if (ArgValue.toInt() < 0) {
+        if (ArgValue.toInt() <= 0) {
           ERRORMSG = "SetDispenserX out of valid range";
         } else {
           Dis.LocationX = ArgValue.toInt();
@@ -252,7 +252,7 @@ void handle_Set() {
       if (!StringIsDigit(ArgValue)) {
         ERRORMSG = "SetDispenserY not a value";
       } else {
-        if (ArgValue.toInt() < 0) {
+        if (ArgValue.toInt() <= 0) {
           ERRORMSG = "SetDispenserY out of valid range";
         } else {
           Dis.LocationY = ArgValue.toInt();
@@ -304,6 +304,10 @@ void handle_Set() {
   if (DisID != -1 or Dis.LocationX != 0 or Dis.LocationY != 0 or Dis.TimeMSML != 0 or Dis.DelayAir != 0 or Dis.IngredientID != 0) {
     if (DisID >= 0) {
       bool DisError = false;
+      if (Dis.LocationX == 0)
+        Dis.LocationX = Dispensers[DisID].LocationX;  //X location not given, so keep what we have
+      if (Dis.LocationY == 0)
+        Dis.LocationY = Dispensers[DisID].LocationY;  //X location not given, so keep what we have
       if (Dis.TimeMSML != 0)
         if (!BusSendBlocking(DisID, CALIBRATEMSPERML, Dis.TimeMSML))
           DisError = true;
