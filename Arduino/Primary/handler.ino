@@ -301,13 +301,20 @@ void handle_Set() {
   //Process the dispenser update
   if (DisID != -1 or Dis.LocationX != 0 or Dis.LocationY != 0 or Dis.TimeMSML != 0 or Dis.DelayAir != 0 or Dis.IngredientID != 0) {
     if (DisID >= 0) {
-      SetDispenser(Dis, DisID);
+      bool DisError = false;
       if (Dis.TimeMSML != 0)
-        BusSendBlocking(DisID, CALIBRATEMSPERML, Dis.TimeMSML);
+        if (!BusSendBlocking(DisID, CALIBRATEMSPERML, Dis.TimeMSML))
+          DisError = true;
       if (Dis.DelayAir != 0)
-        BusSendBlocking(DisID, CHANGEDELAY, Dis.DelayAir);
+        if (!BusSendBlocking(DisID, CHANGEDELAY, Dis.DelayAir))
+          DisError = true;
       if (Dis.IngredientID != 0)
-        BusSendBlocking(DisID, CHANGEFLUID, Dis.IngredientID);
+        if (!BusSendBlocking(DisID, CHANGEFLUID, Dis.IngredientID))
+          DisError = true;
+      if (!DisError)
+        SetDispenser(Dis, DisID);
+      else
+        ERRORMSG += "Error in communcation to dispener " + String(DisID);
       MyDelay(10);      //Just some time to make sure bus is clear again, seems to be needed
       BusAdopt(DisID);  //Ask for the dispenser settings
     } else {
