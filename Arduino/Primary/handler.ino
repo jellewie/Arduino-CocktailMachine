@@ -241,7 +241,7 @@ void handle_Set() {
       if (!StringIsDigit(ArgValue)) {
         ERRORMSG = "SetDispenserX not a value";
       } else {
-        if (ArgValue.toInt() <= 0) {
+        if (ArgValue.toInt() <= 0 or ArgValue.toInt() > BedSize_X) {
           ERRORMSG = "SetDispenserX out of valid range";
         } else {
           Dis.LocationX = ArgValue.toInt();
@@ -252,7 +252,7 @@ void handle_Set() {
       if (!StringIsDigit(ArgValue)) {
         ERRORMSG = "SetDispenserY not a value";
       } else {
-        if (ArgValue.toInt() <= 0) {
+        if (ArgValue.toInt() <= 0 or ArgValue.toInt() > BedSize_Y) {
           ERRORMSG = "SetDispenserY out of valid range";
         } else {
           Dis.LocationY = ArgValue.toInt();
