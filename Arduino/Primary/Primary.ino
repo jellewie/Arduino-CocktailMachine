@@ -152,7 +152,6 @@ void MakeCocktail(Drink Mix) {
   for (uint8_t i = 0; i < 8; i++) {  //For each Ingredient
     MyYield();
     if (Mix.Ingredients[i].ID != 0 or Mix.Ingredients[i].Action != 0) {
-      String msg = "";
       if (Mix.Ingredients[i].ID != 0)
         LcdPrint("Getting", IngredientIDtoString(Mix.Ingredients[i].ID));
       else
