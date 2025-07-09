@@ -20,7 +20,7 @@ uint8_t Ingredient_Amount = sizeof(IngredientS) / sizeof(IngredientS[0]);  //Why
 
 Dispenser Dispensers[Dispensers_Amount] = {
   //X, Y, MSml, MSoff, IngredientID
-  { 0, 0, 0, 0, 0 }  //Invalid ID, this is the Primary
+  { 0, 0, 0, 0, 0 },  //Invalid ID, this is the Primary
   { 23900, 6250, 0, 0, 0 },
   { 20000, 6250, 0, 0, 0 },
   { 15875, 6250, 0, 0, 0 },
