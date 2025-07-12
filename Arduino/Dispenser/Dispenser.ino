@@ -3,7 +3,7 @@
   Board: https://dl.espressif.com/dl/package_esp32_index.json ESP32C3
   DISPENSER
 */
-//#define SerialDebug  //Enable for ESP32-DOIT board for serial debugging
+//#define SerialDebug  //Enable for ESP32-DOIT board for serial debugging, dont forget to enable CDC on boot while uploading
 #ifndef ESP32
 #error "Please select ESP32 as a board."
 #endif
