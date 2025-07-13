@@ -332,24 +332,28 @@ void CheckAndGetSlotID() {
   }
 }
 uint8_t GetSlotID() {
+  uint8_t pulseCount = 0;  //Amount of pulses counted from SLOT
+  bool OLD_PIN_state = 0;
+  const static uint16_t lastPulseTimeTimeout = 40;
   pinMode(PDI_SLOT_TXRX, OUTPUT);
   digitalWrite(PDI_SLOT_TXRX, LOW);
+  delayMicroseconds(10);
   pinMode(PDI_SLOT_TXRX, INPUT);
-  uint8_t pulseCount = 0;  //Amount of pulses counted from SLOT
-  unsigned long lastPulseTime = millis();
-  bool OLD_PIN_state = 0;
-  const static uint8_t lastPulseTimeTimeout = 15;
-  while (millis() - lastPulseTime < lastPulseTimeTimeout) {  //Do NOT put Serial in this while loop. It will be to slow to count the pulses
+  unsigned long lastPulseTime;
+  lastPulseTime = micros();
+  while (micros() - lastPulseTime < lastPulseTimeTimeout) {  //Do NOT put Serial in this while loop. It will be to slow to count the pulses
     bool PIN_state = digitalRead(PDI_SLOT_TXRX);
     if (PIN_state != OLD_PIN_state) {  //Only update if state changes
       OLD_PIN_state = PIN_state;
-      if (PIN_state == LOW) {  //Only count if the line goes low
+      if (PIN_state == HIGH) {  //Only count if the line goes HIGH
         pulseCount++;
         if (pulseCount == 255)
           return 0;
       }
-      lastPulseTime = millis();  //Reset timeout on pulse detection
+      lastPulseTime = micros();  //Reset timeout on pulse detection
     }
   }
+  //pinMode(PDI_SLOT_TXRX, OUTPUT);
+  digitalWrite(PDI_SLOT_TXRX, HIGH);
   return pulseCount;
 }

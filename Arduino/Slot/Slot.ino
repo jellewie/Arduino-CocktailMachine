@@ -9,8 +9,7 @@ uint8_t SlotID = 1;  //Unique 1-byte ID (change for every slot for dispenser). M
 
 const uint8_t PDI_Slot_TXRX = 4;
 const uint8_t Delaypulses = 1;      //Must be lower then lastPulseTimeTimeout/2
-const uint16_t DelayBeforeSend = 500;
-const uint8_t DelayAfterSend = 20;  //Must be higher then lastPulseTimeTimeout
+const uint8_t DelayAfterSend = 100;  //Must be higher then lastPulseTimeTimeout
 void setup() {
   pinMode(PDI_Slot_TXRX, OUTPUT);
 #ifdef ESP32
@@ -20,14 +19,13 @@ void setup() {
 void loop() {
   digitalWrite(PDI_Slot_TXRX, HIGH);
   pinMode(PDI_Slot_TXRX, INPUT);
-  delay(DelayAfterSend);
   while (digitalRead(PDI_Slot_TXRX) == HIGH) {}  //Wait until its is pulled low by a dispenser
   pinMode(PDI_Slot_TXRX, OUTPUT);
-  delayMicroseconds(DelayBeforeSend);
   for (uint8_t i = 0; i < SlotID; i++) {  //Amount of pulses based on SlotID
     digitalWrite(PDI_Slot_TXRX, LOW);
     delayMicroseconds(Delaypulses);
     digitalWrite(PDI_Slot_TXRX, HIGH);
     delayMicroseconds(Delaypulses);
   }
+  delay(DelayAfterSend);
 }
