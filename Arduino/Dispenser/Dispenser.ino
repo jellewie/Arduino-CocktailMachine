@@ -68,7 +68,7 @@ void setup() {
   bus.set_receiver(receiver_function);
   bus.strategy.set_pin(PDIO_buspin);
   bus.begin();
-  delay(250);
+  delay(250);  //Wait for the connection to be made stably, esp_reset_reason() == ESP_RST_POWERON is power on by power/button
 }
 void loop() {
   CheckAndGetSlotID();                          //Try and get the SLOT ID
@@ -258,9 +258,9 @@ void CheckAndGetSlotID() {
       Serial.println("SlotID defined in hardware, I am " + String(deviceID));
     } else {
       uint8_t ID1 = GetSlotID();
-      delay(25);  //must be the same or higher than DelayAfterSend-lastPulseTimeTimeout
+      delayMicroseconds(100);  //must be the same or higher than DelayAfterSend-(lastPulseTimeTimeout/2)
       uint8_t ID2 = GetSlotID();
-      delay(25);  //must be the same or higher than DelayAfterSend-lastPulseTimeTimeout
+      delayMicroseconds(100);  //must be the same or higher than DelayAfterSend-(lastPulseTimeTimeout/2)
       uint8_t ID3 = GetSlotID();
 
       pinMode(LED_BUILTIN, OUTPUT);  //HIGH = OFF
@@ -301,7 +301,7 @@ void CheckAndGetSlotID() {
           }
         }
       }
-      digitalWrite(LED_BUILTIN, HIGH);                //HIGH = OFF
+      digitalWrite(LED_BUILTIN, HIGH);  //HIGH = OFF
 
       if (ID1 > 0 && (ID1 == ID2) or (ID1 == ID3)) {  //Two measurements need to agree
         deviceID = ID1;
@@ -333,11 +333,11 @@ void CheckAndGetSlotID() {
 }
 uint8_t GetSlotID() {
   uint8_t pulseCount = 0;  //Amount of pulses counted from SLOT
-  bool OLD_PIN_state = 0;
+  bool OLD_PIN_state = 1;
   const static uint16_t lastPulseTimeTimeout = 40;
   pinMode(PDI_SLOT_TXRX, OUTPUT);
   digitalWrite(PDI_SLOT_TXRX, LOW);
-  delayMicroseconds(10);
+  delayMicroseconds(10);  //Give the SLOT time to notice us
   pinMode(PDI_SLOT_TXRX, INPUT);
   unsigned long lastPulseTime;
   lastPulseTime = micros();
