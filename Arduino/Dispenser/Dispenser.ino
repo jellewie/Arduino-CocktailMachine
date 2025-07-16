@@ -334,10 +334,10 @@ void CheckAndGetSlotID() {
 uint8_t GetSlotID() {
   uint8_t pulseCount = 0;  //Amount of pulses counted from SLOT
   bool OLD_PIN_state = 1;
-  const static uint16_t lastPulseTimeTimeout = 40;
+  const static uint16_t lastPulseTimeTimeout = 75;
   pinMode(PDI_SLOT_TXRX, OUTPUT);
   digitalWrite(PDI_SLOT_TXRX, LOW);
-  delayMicroseconds(10);  //Give the SLOT time to notice us
+  delayMicroseconds(5);  //Give the SLOT time to notice us
   pinMode(PDI_SLOT_TXRX, INPUT);
   unsigned long lastPulseTime;
   lastPulseTime = micros();
