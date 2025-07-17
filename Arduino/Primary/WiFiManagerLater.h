@@ -167,7 +167,7 @@ String WiFiManagerUser_Get_Value(uint8_t ValueID, bool Safe, bool Convert) {
     case 12: return String(MaxGlassSize); break;
     case 13: return String(MaxBrightness); break;
     case 14: return String(DispenserHeartbeat); break;
-    case 15: return String(DispenserDripTime);; break;
+    case 15: return String(DispenserDripTime); break;
     case 16: return ""; break;
     default:
       {
