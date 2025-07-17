@@ -146,7 +146,7 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
         uint8_t BusSend[] = { DISPENSERSTATUS, dispenserSettings.IngredientID, dispenserSettings.TimeMSML, dispenserSettings.DelayAir };  //Reply back we have completed
         uint16_t result = bus.reply(&BusSend, sizeof(BusSend));                                                                           //Send success to Primary
 #ifdef SerialDebug
-        if (result == PJON_FAIL)
+        if (result != PJON_ACK)
           Serial.print("bus.reply wrong =" + String(result));
 #endif
         break;
@@ -321,7 +321,8 @@ void CheckAndGetSlotID() {
       uint16_t result = bus.send(PrimaryID, &BusSend, sizeof(BusSend));
 #ifdef SerialDebug
       Serial.println("SlotID recieved, I am " + String(bus.device_id()));
-      if (result == PJON_FAIL) Serial.print("bus request fail =" + String(result));
+      if (result != PJON_ACK)
+        Serial.print("bus request fail =" + String(result));
 #endif
     }
 #ifdef SerialDebug
