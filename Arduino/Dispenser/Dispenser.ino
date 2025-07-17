@@ -44,7 +44,7 @@ Settings dispenserSettings;  //Create a variable of type Settings
 enum COMMANDS { DONTREPLY,
                 ADOPT,
                 DISPENSE,
-                CALIBRATETimeMSML,
+                CALIBRATEMSPERML,
                 CHANGEFLUID,
                 CHANGEDELAY,
                 CHANGECOLOR,
@@ -130,7 +130,7 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
   /*
     1=ADOPT, IGNORED
     2=DISPENSE, ml to dispense
-    3=CALIBRATETimeMSML, TimeMSML
+    3=CALIBRATEMSPERML, TimeMSML
     4=CHANGEFLUID, New_Fluid_ID
     5=CHANGEDELAY, Time_in_ms*5 between air and fluid
     6=CHANGECOLOR, RRGGBBMM MM=00 = Auto
@@ -157,6 +157,9 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
       DispenseStop();
       break;
     case CALIBRATETimeMSML:
+      {
+      }
+    case CALIBRATEMSPERML:
       dispenserSettings.TimeMSML = payload[1];
       SaveSettings();
       break;
