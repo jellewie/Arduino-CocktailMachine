@@ -225,12 +225,6 @@ bool AddDispenser(Dispenser Dis) {
   }
   return false;
 }
-bool SetFluidInDispenser(uint8_t DispenserID, uint8_t IngredientID) {
-  if (DispenserID >= Dispensers_Amount)
-    return false;
-  Dispensers[DispenserID].IngredientID = IngredientID;
-  return true;
-}
 bool TickEveryXms(unsigned long *_LastTime, unsigned long _Delay) {
   //With overflow, can be adjusted, no overshoot correction, true when (Now < _LastTime + _Delay)
   /* Example:   static unsigned long LastTime;

@@ -314,14 +314,6 @@ void handle_Set() {
   if (DisID != -1 or LocationX != -1 or LocationY != -1 or Dis.TimeMSML != 0 or DelayAir != -1 or Dis.IngredientID != 0) {
     if (DisID >= 0) {
       bool DisError = false;
-
-
-
-      Serial.println("LocationX=" + String(LocationX));
-      Serial.println("LocationY=" + String(LocationY));
-
-
-
       if (LocationX != -1)
         Dis.LocationX = LocationX;
       else
