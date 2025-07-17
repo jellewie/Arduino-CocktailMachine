@@ -114,7 +114,9 @@ bool WiFiManagerUser_Set_Value(uint8_t ValueID, String Value) {
       break;
     case 15:
       {
-        //reserved
+        if (!StringIsDigit(Value)) return false;
+        uint16_t Temp = Value.toInt();
+        DispenserDripTime = Temp;
       }
       break;
     case 16:
@@ -165,7 +167,7 @@ String WiFiManagerUser_Get_Value(uint8_t ValueID, bool Safe, bool Convert) {
     case 12: return String(MaxGlassSize); break;
     case 13: return String(MaxBrightness); break;
     case 14: return String(DispenserHeartbeat); break;
-    case 15: return ""; break;
+    case 15: return String(DispenserDripTime);; break;
     case 16: return ""; break;
     default:
       {

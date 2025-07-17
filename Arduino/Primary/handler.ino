@@ -15,6 +15,7 @@
 #define PreFixMaxBrightness "maxbrightness"
 #define PreFixHome "homed"
 #define PreFixDispenserHeartbeat "dispenserheartbeat"
+#define PreFixDispenserDripTime "DispenserDripTime"
 //Dispenser Settings
 #define PreFixSetDispenserID "di"
 #define PreFixSetDispenserIngredientID "dn"
@@ -146,6 +147,12 @@ void handle_Set() {
     } else if (ArguName == PreFixDispenserHeartbeat) {
       if (!WiFiManagerUser_Set_Value(14, ArgValue)) {
         ERRORMSG = "DispenserHeartbeat Not set";
+      } else {
+        SaveEEPROMinSeconds = 30;
+      }
+    } else if (ArguName == PreFixDispenserDripTime) {
+      if (!WiFiManagerUser_Set_Value(15, ArgValue)) {
+        ERRORMSG = "PreFixDispenserDripTime Not set";
       } else {
         SaveEEPROMinSeconds = 30;
       }
@@ -403,6 +410,7 @@ void handle_Get() {
   Json += ",\"MaxGlassSize\":" + String(MaxGlassSize);
   Json += ",\"MaxBrightness\":" + String(MaxBrightness);
   Json += ",\"DispenserHeartbeat\":" + String(DispenserHeartbeat);
+  Json += ",\"DispenserDripTime\":" + String(DispenserDripTime);
   Json += "}";
   Json += "}";
   server.send(200, "text/html", Json);

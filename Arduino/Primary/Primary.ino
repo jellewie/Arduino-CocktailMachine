@@ -22,12 +22,13 @@ const uint8_t PDO_X_Dir = 23;
 const uint8_t PDO_Y_Dir = 17;
 const uint8_t PDO_X_Step = 4;
 const uint8_t PDO_Y_Step = 12;
-const uint8_t PDI_X_Ref = 5;       //LOW = TRIGGERED
-const uint8_t PDI_Y_Ref = 27;      //LOW = TRIGGERED
-const uint8_t PDI_S = 39;          //LOW = TRIGGERED
-const uint8_t PDIO_buspin = 25;    //must be 12 or 25 for PJONSoftwareBitBang
-const uint16_t TotalLEDs = 100;    //The total amounts of LEDs in the strip
-uint16_t DispenserHeartbeat = 30;  //time in s to check if all dispensers are still there
+const uint8_t PDI_X_Ref = 5;        //LOW = TRIGGERED
+const uint8_t PDI_Y_Ref = 27;       //LOW = TRIGGERED
+const uint8_t PDI_S = 39;           //LOW = TRIGGERED
+const uint8_t PDIO_buspin = 25;     //must be 12 or 25 for PJONSoftwareBitBang
+const uint16_t TotalLEDs = 100;     //The total amounts of LEDs in the strip
+uint16_t DispenserDripTime = 1000;  //Time to wait after a dispenser is done to catch any drips
+uint16_t DispenserHeartbeat = 30;   //time in s to check if all dispensers are still there
 CRGB ColorBoot = CRGB(255, 128, 0);
 CRGB ColorHoming = CRGB(0, 0, 255);
 CRGB ColorHomeFail = CRGB(255, 0, 0);
@@ -181,7 +182,9 @@ void GetIngredient(Ingredient IN) {
       uint32_t ExitAt = millis() + (IN.ml * Dispensers[DispenserID].TimeMSML + Dispensers[DispenserID].DelayAir) * 2;
       while (!DispenserDone && (millis() < ExitAt))
         MyDelay(1);  //Wait for the dispenser report to be done (or timeout)
-      if (!DispenserDone)
+      if (DispenserDone)
+        MyDelay(DispenserDripTime);
+      else
         WaitForUser("Disper failed", "to finisch");
     } else
       WaitForUser("Failed to get", IngredientIDtoString(IN.ID));
