@@ -38,6 +38,7 @@ CRGB ColorMoveActive = CRGB(0, 255, 0);
 //==============================================================
 uint8_t HomeMAXSpeed = 200;  //Only used for last homing reference step
 bool Running = false;
+bool DispenserDone = false;
 uint16_t MotorMAXSpeed = 5500;
 uint16_t MotorMAXAccel = 3000;
 uint16_t BedSize_X = 23950;
@@ -173,12 +174,17 @@ void GetIngredient(Ingredient IN) {
   }
   uint8_t DispenserID = GetDispenserID(IN.ID);
   if (DispenserID != 255) {
-    LightSection(Dispensers[DispenserID].LocationX);                                         //Turn on the main LED so show where we are going
-    MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);            //Move to the dispenser
-    if (BusSendBlocking(DispenserID, DISPENSE, IN.ml))                                       //Give the dispence command
-      MyDelay(IN.ml * Dispensers[DispenserID].TimeMSML + Dispensers[DispenserID].DelayAir);  //Wait for the dispenser to be done
-    else
-      LcdPrint("Failed to get", IngredientIDtoString(IN.ID));
+    DispenserDone = false;
+    LightSection(Dispensers[DispenserID].LocationX);                               //Turn on the main LED so show where we are going
+    MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);  //Move to the dispenser
+    if (BusSendBlocking(DispenserID, DISPENSE, IN.ml)) {                           //Give the dispence command
+      uint32_t ExitAt = millis() + (IN.ml * Dispensers[DispenserID].TimeMSML + Dispensers[DispenserID].DelayAir) * 2;
+      while (!DispenserDone && (millis() < ExitAt))
+        MyDelay(1);  //Wait for the dispenser report to be done (or timeout)
+      if (!DispenserDone)
+        WaitForUser("Disper failed", "to finisch");
+    } else
+      WaitForUser("Failed to get", IngredientIDtoString(IN.ID));
   }
 }
 void LightSection(long LocationX) {

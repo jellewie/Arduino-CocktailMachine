@@ -51,6 +51,7 @@ enum COMMANDS { DONTREPLY,
                 CHANGECOLOR,
                 DISPENSERSTATUS,
                 CHANGEFLUIDLEVEL,
+                DONE
 };
 PJONSoftwareBitBang bus;  //DeviceID = PJON_NOT_ASSIGNED
 void setup() {
@@ -155,12 +156,19 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
         break;
       }
     case DISPENSE:
-      DispenseStart();
-      delay(payload[1] * dispenserSettings.TimeMSML);
-      DispenseStop();
-      break;
-    case CALIBRATETimeMSML:
       {
+        DispenseStart();
+        uint16_t DelayCompensated = (400 - (dispenserSettings.FluidLevel * 0.0727 + 142.9)) / 200 * payload[1];
+        Serial.println("Dispensing " + String(payload[1]) + "ml, raw delay=" + String(payload[1] * dispenserSettings.TimeMSML) + " compensated delay=" + String(DelayCompensated));
+        delay(DelayCompensated);
+        DispenseStop();
+        uint8_t BusSend[] = { DONE };  //Tell primary we have completed it's command
+        uint16_t result = bus.send(PrimaryID, &BusSend, sizeof(BusSend));
+#ifdef SerialDebug
+        if (result != PJON_ACK)
+          Serial.print("bus.send wrong =" + String(result));
+#endif
+        break;
       }
     case CALIBRATEMSPERML:
       dispenserSettings.TimeMSML = payload[1];
