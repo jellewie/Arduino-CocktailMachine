@@ -29,4 +29,5 @@ enum COMMANDS { DONTREPLY,
                 CHANGEDELAY,
                 CHANGECOLOR,
                 DISPENSERSTATUS,
+                CHANGEFLUIDLEVEL,
 };

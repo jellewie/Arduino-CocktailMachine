@@ -22,6 +22,7 @@
 #define PreFixSetDispenserY "dy"
 #define PreFixSetDispenserDelayAir "do"
 #define PreFixSetDispenserTimeMSML "dl"
+#define PreFixSetDispenserFluidLevel "df"
 //Create a mix (max 8 ingredient)
 #define PreFix_Mix_Name "m"  //this one MUST be set (=!"") to start creating a mix
 #define PreFix_0_Ingredient "i0"
@@ -67,7 +68,7 @@ void handle_Set() {
     Mix.Ingredients[i].ml = 0;
   }
   Dispenser Dis = { 0, 0, 0, 0, 0 };
-  int16_t DisID = -1, DelayAir = -1;
+  int16_t DisID = -1, DelayAir = -1, FluidLevel = -1;
   int32_t LocationX = -1, LocationY = -1;
   for (uint16_t i = 0; i < server.args(); i++) {
     String ArguName = server.argName(i);
@@ -268,6 +269,14 @@ void handle_Set() {
       } else if (Dispensers[DisID].TimeMSML != ArgValue.toInt()) {
         Dis.TimeMSML = ArgValue.toInt();
       }
+    } else if (ArguName == PreFixSetDispenserFluidLevel) {
+      if (!StringIsDigit(ArgValue)) {
+        ERRORMSG = "PreFixSetDispenserFluidLevel not a value";
+      } else if (ArgValue.toInt() < 0 or ArgValue.toInt() > 5000) {
+        ERRORMSG = "PreFixSetDispenserFluidLevel out of valid range";
+      } else if (Dispensers[DisID].FluidLevel != ArgValue.toInt()) {
+        FluidLevel = ArgValue.toInt();
+      }
     } else if (ArguName == PreFixSetDispenserDelayAir) {
       if (!StringIsDigit(ArgValue)) {
         ERRORMSG = "SetDispenserDelayAir not a value";
@@ -338,6 +347,12 @@ void handle_Set() {
           DisError = true;
       } else {
         Dis.IngredientID = Dispensers[DisID].IngredientID;  //not given, so keep what we have
+      }
+      if (FluidLevel != -1) {
+        if (!BusSendBlocking(DisID, CHANGEFLUIDLEVEL, FluidLevel))
+          DisError = true;
+      } else {
+        Dis.FluidLevel = Dispensers[DisID].FluidLevel;  //not given, so keep what we have
       }
       if (!DisError)
         SetDispenser(Dis, DisID);

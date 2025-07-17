@@ -14,6 +14,7 @@ struct Dispenser {
   uint8_t TimeMSML;      //Timer per ms for each mL
   uint8_t DelayAir;      //Delay in MS to wait after
   uint8_t IngredientID;  //The fluid in this dispenser
+  uint16_t FluidLevel;   //mm of fluid in the bottle
 };
 
 uint8_t Ingredient_Amount = sizeof(IngredientS) / sizeof(IngredientS[0]);  //Why filling this in if we can automate that? :)

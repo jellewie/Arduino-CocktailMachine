@@ -36,9 +36,10 @@ CRGB ColorDispencing = CRGB(0, 255, 0);             //While dispensing
 bool ImAdopted = false;                             //If the primary has seen this dispenser yet
 bool LEDrainbow = false;                            //use to enable rainbow led mode
 struct Settings {
-  uint8_t IngredientID = 1;  //Default Store the fluid of this dispenser
-  uint8_t TimeMSML = 40;     //ms to let 1 ml go, for example it takes 12s to do 300ml, thats about 40 milliseconds per milliliter
-  uint8_t DelayAir;          //ms to let the air valve open before the fluid valve, to get rid of pressure buildup in the bottle
+  uint8_t IngredientID = 1;    //Default Store the fluid of this dispenser
+  uint8_t TimeMSML = 40;       //ms to let 1 ml go, for example it takes 12s to do 300ml, thats about 40 milliseconds per milliliter
+  uint8_t DelayAir = 0;        //ms to let the air valve open before the fluid valve, to get rid of pressure buildup in the bottle
+  uint16_t FluidLevel = 1000;  //mm of fluid in the bottle
 };
 Settings dispenserSettings;  //Create a variable of type Settings
 enum COMMANDS { DONTREPLY,
@@ -49,6 +50,7 @@ enum COMMANDS { DONTREPLY,
                 CHANGEDELAY,
                 CHANGECOLOR,
                 DISPENSERSTATUS,
+                CHANGEFLUIDLEVEL,
 };
 PJONSoftwareBitBang bus;  //DeviceID = PJON_NOT_ASSIGNED
 void setup() {
@@ -137,14 +139,15 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
                             MM=01 = RGB mode,
                             MM=10 = rainbow mode
                             MM=11 = reserved for other modes
+    7=CHANGEFLUIDLEVEL, estimated ml left in the bottle. used to compensate for head pressure
   */
   switch (payload[0]) {
     case ADOPT:
       {
         ImAdopted = true;
         LEDloop(true);
-        uint8_t BusSend[] = { DISPENSERSTATUS, dispenserSettings.IngredientID, dispenserSettings.TimeMSML, dispenserSettings.DelayAir };  //Reply back we have completed
-        uint16_t result = bus.reply(&BusSend, sizeof(BusSend));                                                                           //Send success to Primary
+        uint8_t BusSend[] = { DISPENSERSTATUS, dispenserSettings.IngredientID, dispenserSettings.TimeMSML, dispenserSettings.DelayAir, dispenserSettings.FluidLevel };  //Reply back we have completed
+        uint16_t result = bus.reply(&BusSend, sizeof(BusSend));                                                                                                         //Send success to Primary
 #ifdef SerialDebug
         if (result != PJON_ACK)
           Serial.print("bus.reply wrong =" + String(result));
@@ -199,6 +202,11 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
 #ifdef SerialDebug
         Serial.println("r=" + String(r) + " g=" + String(g) + " b=" + String(b) + " m=" + String(m));
 #endif
+        break;
+      }
+    case CHANGEFLUIDLEVEL:
+      {
+        dispenserSettings.FluidLevel = payload[1];
         break;
       }
   }
