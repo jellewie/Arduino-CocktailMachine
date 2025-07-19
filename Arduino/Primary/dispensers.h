@@ -82,7 +82,7 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
       Dispensers[packet_info.tx.id].IngredientID = payload[1];
       Dispensers[packet_info.tx.id].TimeMSML = payload[2];
       Dispensers[packet_info.tx.id].DelayAir = payload[3];
-      Dispensers[packet_info.tx.id].FluidLevel = payload[4];
+      Dispensers[packet_info.tx.id].FluidLevel = payload[4] * 10;
       //Serial.println("Dispenser " + String(packet_info.tx.id) + " has fluid " + String(payload[1]) + "=" + IngredientIDtoString(payload[1]));
       break;
     case ADOPT:
