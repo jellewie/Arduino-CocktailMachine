@@ -3,7 +3,6 @@
   Board: https://dl.espressif.com/dl/package_esp32_index.json ESP32C3
   DISPENSER
 */
-//#define SerialDebug  //Enable for ESP32-DOIT board for serial debugging, dont forget to enable CDC on boot while uploading
 #ifndef ESP32
 #error "Please select ESP32 as a board."
 #endif
@@ -58,9 +57,7 @@ void setup() {
   FastLED.addLeds<WS2812B, PAO_LED, GRB>(LEDs, TotalLEDs);
   fill_solid(&(LEDs[0]), TotalLEDs, ColorBoot);
   FastLED.show();
-#ifdef SerialDebug
   Serial.begin(115200);
-#endif
   pinMode(PDI_Button, INPUT_PULLUP);
   pinMode(PDO_ValveFluid, OUTPUT);
   pinMode(PDO_ValveAir, OUTPUT);
@@ -100,10 +97,8 @@ void LoadSettings() {
   dispenserSettings.IngredientID = EEPROM.read(0);
   dispenserSettings.DelayAir = EEPROM.read(1);
   dispenserSettings.TimeMSML = EEPROM.read(2);
-#ifdef SerialDebug
   for (uint8_t i = 0; i < 3; i++)
     Serial.println("LoadedSetting " + String(i) + "=" + EEPROM.read(i));
-#endif
 }
 void SaveSettings() {
   EEPROM.write(0, dispenserSettings.IngredientID);
@@ -114,22 +109,18 @@ void SaveSettings() {
 void error_handler(uint8_t code, uint16_t data, void *custom_pointer) {
   if (code == PJON_CONNECTION_LOST)
     ImAdopted = false;
-#ifdef SerialDebug
   if (code == PJON_CONNECTION_LOST)
     Serial.println("Connection with device ID " + String(bus.packets[data].content[0]) + " is lost.");
   if (code == PJON_PACKETS_BUFFER_FULL)
     Serial.println("Packet buffer is full, has now a length of " + String(data) + " Possible wrong bus configuration!");
   if (code == PJON_CONTENT_TOO_LONG)
     Serial.println("Content is too long, length: " + String(data));
-#endif
 }
 void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info &packet_info) {
-#ifdef SerialDebug
   Serial.print("Received: ");
   for (uint16_t i = 0; i < length; i++)
     Serial.print(payload[i] + String(" "));
   Serial.println();
-#endif
   /*
     1=ADOPT, IGNORED
     2=DISPENSE, ml to dispense
@@ -149,10 +140,8 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
         LEDloop(true);
         uint8_t BusSend[] = { DISPENSERSTATUS, dispenserSettings.IngredientID, dispenserSettings.TimeMSML, dispenserSettings.DelayAir, dispenserSettings.FluidLevel };  //Reply back we have completed
         uint16_t result = bus.reply(&BusSend, sizeof(BusSend));                                                                                                         //Send success to Primary
-#ifdef SerialDebug
         if (result != PJON_ACK)
           Serial.print("bus.reply wrong =" + String(result));
-#endif
         break;
       }
     case DISPENSE:
@@ -204,9 +193,7 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
             LEDrainbow = true;                            //Set rainbow mode
             LEDloop(true);
           }
-#ifdef SerialDebug
         Serial.println("r=" + String(r) + " g=" + String(g) + " b=" + String(b) + " m=" + String(m));
-#endif
         break;
       }
     case CHANGEFLUIDLEVEL:
@@ -323,10 +310,8 @@ void CheckAndGetSlotID() {
         deviceID = ID1;
       } else if (ID2 > 0 && ID2 == ID3)
         deviceID = ID2;
-#ifdef SerialDebug
       else
         Serial.println("Error in SlotID recieved, ID1=" + String(ID1) + " ID2=" + String(ID2) + " ID3=" + String(ID3));
-#endif
     }
     bus.set_id(deviceID);
     if (LEDs[0] != ColorDispencing)  //Do not overwrite ColorDispencing
@@ -335,15 +320,11 @@ void CheckAndGetSlotID() {
     if (bus.device_id() != 0) {
       uint8_t BusSend[] = { ADOPT, bus.device_id() };  //Ask Primary for us to be adopted
       bus.send(PrimaryID, &BusSend, sizeof(BusSend));
-#ifdef SerialDebug
       Serial.println("SlotID recieved, I am " + String(bus.device_id()));
-#endif
     }
-#ifdef SerialDebug
     else {
       Serial.println("Could not recieve Slot ID");
     }
-#endif
   }
 }
 uint8_t GetSlotID() {
