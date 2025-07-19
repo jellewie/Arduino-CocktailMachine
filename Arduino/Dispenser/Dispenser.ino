@@ -144,10 +144,11 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
     case DISPENSE:
       {
         DispenseStart();
-        uint16_t DelayCompensated = (400 - (dispenserSettings.FluidLevel * 0.0727 + 142.9)) / 200 * payload[1]* dispenserSettings.TimeMSML;
-        Serial.println("Dispensing " + String(payload[1]) + "ml, raw delay=" + String(payload[1] * dispenserSettings.TimeMSML) + " compensated delay=" + String(DelayCompensated));
+        uint16_t DelayCompensated = (400 - (dispenserSettings.FluidLevel * 0.0727 + 142.9)) / 200 * payload[1] * dispenserSettings.TimeMSML;
+        Serial.println("Dispensing " + String(payload[1]) + "ml, raw delay=" + String(payload[1] * dispenserSettings.TimeMSML) + " compensated delay=" + String(DelayCompensated) + " Fluid left in bottle=" + String(dispenserSettings.FluidLevel));
         delay(DelayCompensated);
         DispenseStop();
+        dispenserSettings.FluidLevel -= payload[1];  //Remove the dispense liquid from the bottle amount
         Serial.println("Done, sending feedback to Primary");
         uint8_t BusSend[] = { DONE };  //Tell primary we have completed it's command
         bus.send(PrimaryID, &BusSend, sizeof(BusSend));
@@ -318,8 +319,7 @@ void CheckAndGetSlotID() {
       uint8_t BusSend[] = { ADOPT, bus.device_id() };  //Ask Primary for us to be adopted
       bus.send(PrimaryID, &BusSend, sizeof(BusSend));
       Serial.println("SlotID recieved, I am " + String(bus.device_id()));
-    }
-    else {
+    } else {
       Serial.println("Could not recieve Slot ID");
     }
   }

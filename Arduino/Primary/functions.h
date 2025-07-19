@@ -452,7 +452,7 @@ void MyDelay(uint16_t DelayMS) {  //Just a non-blocking delay
 }
 void MoveTo(int16_t LocationX = -1, int16_t LocationY = -1);
 void MoveTo(int16_t LocationX, int16_t LocationY) {
-  Serial.println("MoveTo " + String(LocationX) + " , " + String(LocationY));
+  Serial.println("MoveTo " + String(LocationX) + ", " + String(LocationY));
   if (!Homed) {
     if (!Home(true, true)) {
       return;
