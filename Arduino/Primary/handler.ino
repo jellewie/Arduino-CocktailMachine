@@ -279,7 +279,7 @@ void handle_Set() {
     } else if (ArguName == PreFixSetDispenserFluidLevel) {
       if (!StringIsDigit(ArgValue)) {
         ERRORMSG = "PreFixSetDispenserFluidLevel not a value";
-      } else if (ArgValue.toInt() < 0 or ArgValue.toInt() > 5000) {
+      } else if (ArgValue.toInt() < 0 or ArgValue.toInt() > 2560) {
         ERRORMSG = "PreFixSetDispenserFluidLevel out of valid range";
       } else if (Dispensers[DisID].FluidLevel != ArgValue.toInt()) {
         FluidLevel = ArgValue.toInt();
@@ -348,7 +348,7 @@ void handle_Set() {
         Dis.IngredientID = Dispensers[DisID].IngredientID;  //not given, so keep what we have
       }
       if (FluidLevel != -1) {
-        if (!BusSendBlocking(DisID, CHANGEFLUIDLEVEL, FluidLevel))
+        if (!BusSendBlocking(DisID, CHANGEFLUIDLEVEL, FluidLevel / 10))
           DisError = true;
       } else {
         Dis.FluidLevel = Dispensers[DisID].FluidLevel;  //not given, so keep what we have

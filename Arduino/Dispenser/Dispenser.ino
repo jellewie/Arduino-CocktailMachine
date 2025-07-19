@@ -196,7 +196,7 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
       }
     case CHANGEFLUIDLEVEL:
       {
-        dispenserSettings.FluidLevel = payload[1];
+        dispenserSettings.FluidLevel = payload[1] * 10;
         break;
       }
   }
