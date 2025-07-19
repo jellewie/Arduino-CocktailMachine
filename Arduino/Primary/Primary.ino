@@ -153,10 +153,11 @@ void MakeCocktail(Drink Mix) {
   for (uint8_t i = 0; i < 8; i++) {  //For each Ingredient
     MyYield();
     if (Mix.Ingredients[i].ID != 0 or Mix.Ingredients[i].Action != 0) {
-      if (Mix.Ingredients[i].ID != 0)
+      if (GetDispenserID(Mix.Ingredients[i].ID) == 255) {                                                                   //If we can not find the dispenser for this fluid
+        if (Mix.Ingredients[i].Action == "")                                                                                //If no action has yet been set
+          Mix.Ingredients[i].Action = String(Mix.Ingredients[i].ml) + "ml " + IngredientIDtoString(Mix.Ingredients[i].ID);  //Set the action to the fluid we could not find
+      } else
         LcdPrint("Getting", IngredientIDtoString(Mix.Ingredients[i].ID));
-      else
-        LcdPrint("Please add", Mix.Ingredients[i].Action);
       GetIngredient(Mix.Ingredients[i]);
     }
   }
@@ -184,7 +185,7 @@ void GetIngredient(Ingredient IN) {
         MyDelay(1);                                 //Wait for the dispenser report to be done (or timeout)
       Dispensers[DispenserID].FluidLevel -= IN.ml;  //Remove the dispense liquid from the bottle amount (We could also ask the dispenser again, but this is faster)
       if (DispenserDone) {
-        Serial.println("waiting a bit for dripping" + String(DispenserDripTime) + "ms");
+        Serial.println("waiting a bit for dripping " + String(DispenserDripTime) + "ms");
         MyDelay(DispenserDripTime);
       } else
         WaitForUser("Dispensing fail", "no conformation");
