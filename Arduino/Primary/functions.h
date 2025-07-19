@@ -12,7 +12,7 @@ struct Dispenser {
   uint16_t LocationX;    //X location of the dispenser
   uint16_t LocationY;    //Y location of the dispenser
   uint8_t TimeMSML;      //Timer per ms for each mL
-  uint8_t DelayAir;      //Delay in MS to wait after
+  uint8_t DelayAir;      //Delay in 10MS to wait after
   uint8_t IngredientID;  //The fluid in this dispenser
   uint16_t FluidLevel;   //mm of fluid in the bottle
 };

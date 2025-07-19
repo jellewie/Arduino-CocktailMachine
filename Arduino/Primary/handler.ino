@@ -287,10 +287,10 @@ void handle_Set() {
     } else if (ArguName == PreFixSetDispenserDelayAir) {
       if (!StringIsDigit(ArgValue)) {
         ERRORMSG = "SetDispenserDelayAir not a value";
-      } else if (ArgValue.toInt() < 0 or ArgValue.toInt() / 5 > 255) {
+      } else if (ArgValue.toInt() < 0 or ArgValue.toInt() > 2560) {
         ERRORMSG = "SetDispenserDelayAir out of valid range";
-      } else if (Dispensers[DisID].DelayAir != ArgValue.toInt() / 5) {
-        DelayAir = ArgValue.toInt() / 5;
+      } else if (Dispensers[DisID].DelayAir != ArgValue.toInt() / 10) {
+        DelayAir = ArgValue.toInt() / 10;
       }
     } else if (ArguName == PreFixSetDispenserIngredientID) {
       if (!StringIsDigit(ArgValue)) {

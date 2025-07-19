@@ -209,7 +209,7 @@ void DispenseStart() {
   fill_solid(&(LEDs[0]), TotalLEDs, ColorDispencing);
   FastLED.show();
   digitalWrite(PDO_ValveAir, HIGH);
-  delay(dispenserSettings.DelayAir * 5);
+  delay(dispenserSettings.DelayAir * 10);
   digitalWrite(PDO_ValveFluid, HIGH);
 }
 void DispenseStop() {

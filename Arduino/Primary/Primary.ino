@@ -177,10 +177,10 @@ void GetIngredient(Ingredient IN) {
   uint8_t DispenserID = GetDispenserID(IN.ID);
   if (DispenserID != 255) {
     DispenserDone = false;
-    LightSection(Dispensers[DispenserID].LocationX);                                                                            //Turn on the main LED so show where we are going
-    MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);                                               //Move to the dispenser
-    if (BusSendBlocking(DispenserID, DISPENSE, IN.ml)) {                                                                        //Give the dispence command
-      uint32_t ExitAt = millis() + (IN.ml * Dispensers[DispenserID].TimeMSML + Dispensers[DispenserID].DelayAir) * 1.1 + 4000;  //Allow 110% and wait for the 4s blocking timeout
+    LightSection(Dispensers[DispenserID].LocationX);                                                                                     //Turn on the main LED so show where we are going
+    MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);                                                        //Move to the dispenser
+    if (BusSendBlocking(DispenserID, DISPENSE, IN.ml)) {                                                                                 //Give the dispence command
+      uint32_t ExitAt = millis() + (IN.ml * Dispensers[DispenserID].TimeMSML + ((Dispensers[DispenserID].DelayAir) * 10)) * 1.1 + 4000;  //Allow 110% and wait for the 4s blocking timeout
       Serial.println("waiting for dispenser " + String(ExitAt - millis()) + "ms");
       LcdPrint("Dispensing", "");
       while (!DispenserDone && (millis() < ExitAt))
