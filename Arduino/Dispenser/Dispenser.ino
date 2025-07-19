@@ -116,11 +116,11 @@ void error_handler(uint8_t code, uint16_t data, void *custom_pointer) {
     ImAdopted = false;
 #ifdef SerialDebug
   if (code == PJON_CONNECTION_LOST)
-    Serial.print("Connection with device ID " + String(bus.packets[data].content[0]) + " is lost.");
+    Serial.println("Connection with device ID " + String(bus.packets[data].content[0]) + " is lost.");
   if (code == PJON_PACKETS_BUFFER_FULL)
-    Serial.print("Packet buffer is full, has now a length of " + String(data) + " Possible wrong bus configuration!");
+    Serial.println("Packet buffer is full, has now a length of " + String(data) + " Possible wrong bus configuration!");
   if (code == PJON_CONTENT_TOO_LONG)
-    Serial.print("Content is too long, length: " + String(data));
+    Serial.println("Content is too long, length: " + String(data));
 #endif
 }
 void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info &packet_info) {
@@ -162,6 +162,7 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
         Serial.println("Dispensing " + String(payload[1]) + "ml, raw delay=" + String(payload[1] * dispenserSettings.TimeMSML) + " compensated delay=" + String(DelayCompensated));
         delay(DelayCompensated);
         DispenseStop();
+        Serial.println("Done, sending feedback to Primary");
         uint8_t BusSend[] = { DONE };  //Tell primary we have completed it's command
         uint16_t result = bus.send(PrimaryID, &BusSend, sizeof(BusSend));
 #ifdef SerialDebug
