@@ -490,6 +490,7 @@ bool WaitForUser(String msg, String msg2) {
   while (true) {
     if (digitalRead(PDI_S) == LOW) {
       LcdPrint(msg, "User confirmed");
+      MyDelay(1000);
       return true;
     }
     static unsigned long LastTime;
