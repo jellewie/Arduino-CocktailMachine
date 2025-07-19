@@ -421,21 +421,24 @@ bool Home(bool X, bool Y) {
   return false;
 }
 void MyYield() {
-  WiFiManager.CheckAndReconnectIfNeeded(true);
-  CheckEEPROMSave();
-  CheckDisableSteppers();
-  if (!Running) {
-    static bool LastButtonState = HIGH;
-    bool ButtonState = digitalRead(PDI_S);
-    if (LastButtonState and !ButtonState) {
-      if (!Homed) {
-        Home(true, true);
-      } else {
-        DisableSteppers();
+  static unsigned long LastTime;
+  if (TickEveryXms(&LastTime, 100000)) {  //Only run every 0.1 S
+    WiFiManager.CheckAndReconnectIfNeeded(true);
+    CheckEEPROMSave();
+    CheckDisableSteppers();
+    if (!Running) {
+      static bool LastButtonState = HIGH;
+      bool ButtonState = digitalRead(PDI_S);
+      if (LastButtonState and !ButtonState) {
+        if (!Homed) {
+          Home(true, true);
+        } else {
+          DisableSteppers();
+        }
+        LcdPrint("Mixer ready!", IpAddress2String(WiFi.localIP()));
       }
-      LcdPrint("Mixer ready!", IpAddress2String(WiFi.localIP()));
+      LastButtonState = ButtonState;
     }
-    LastButtonState = ButtonState;
   }
   //FastLED.delay(1);
   unsigned long _EndTime = micros() + 10000;
