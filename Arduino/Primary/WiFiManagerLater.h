@@ -117,6 +117,7 @@ bool WiFiManagerUser_Set_Value(uint8_t ValueID, String Value) {
         if (!StringIsDigit(Value)) return false;
         uint16_t Temp = Value.toInt();
         DispenserDripTime = Temp;
+        return true;
       }
       break;
     case 16:

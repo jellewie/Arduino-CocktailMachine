@@ -180,12 +180,14 @@ void GetIngredient(Ingredient IN) {
     MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);  //Move to the dispenser
     if (BusSendBlocking(DispenserID, DISPENSE, IN.ml)) {                           //Give the dispence command
       uint32_t ExitAt = millis() + (IN.ml * Dispensers[DispenserID].TimeMSML + Dispensers[DispenserID].DelayAir) * 2;
+      Serial.println("waiting for dispenser " +  String(ExitAt - millis()) + "ms");
       while (!DispenserDone && (millis() < ExitAt))
         MyDelay(1);                                 //Wait for the dispenser report to be done (or timeout)
       Dispensers[DispenserID].FluidLevel -= IN.ml;  //Remove the dispense liquid from the bottle amount (We could also ask the dispenser again, but this is faster)
-      if (DispenserDone)
+      if (DispenserDone) {
+        Serial.println("waiting a bit for dripping" +  String(DispenserDripTime) + "ms");
         MyDelay(DispenserDripTime);
-      else
+      } else
         WaitForUser("Dispensing fail", "no conformation");
     } else
       WaitForUser("Failed to get", IngredientIDtoString(IN.ID));
