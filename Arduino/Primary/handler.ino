@@ -310,12 +310,12 @@ void handle_Set() {
   Drink MixEmthy;
   if (makeMix) {
     if (Mix.Name == "") {
-      ERRORMSG += "No mix name given/n";
+      ERRORMSG += "No mix name given\n";
     } else if (Running) {
-      ERRORMSG += "Mixer already running a job/n";
+      ERRORMSG += "Mixer already running a job\n";
     }
   } else if (Mix.Name != "") {
-    ERRORMSG += "No mix ingredients given/n";
+    ERRORMSG += "No mix ingredients given\n";
   }
   //Process the dispenser update
   if (DisID != -1 or LocationX != -1 or LocationY != -1 or Dis.TimeMSML != 0 or DelayAir != -1 or Dis.IngredientID != 0) {

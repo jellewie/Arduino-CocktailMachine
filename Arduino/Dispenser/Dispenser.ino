@@ -158,7 +158,7 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
     case DISPENSE:
       {
         DispenseStart();
-        uint16_t DelayCompensated = (400 - (dispenserSettings.FluidLevel * 0.0727 + 142.9)) / 200 * payload[1];
+        uint16_t DelayCompensated = (400 - (dispenserSettings.FluidLevel * 0.0727 + 142.9)) / 200 * payload[1]* dispenserSettings.TimeMSML;
         Serial.println("Dispensing " + String(payload[1]) + "ml, raw delay=" + String(payload[1] * dispenserSettings.TimeMSML) + " compensated delay=" + String(DelayCompensated));
         delay(DelayCompensated);
         DispenseStop();
