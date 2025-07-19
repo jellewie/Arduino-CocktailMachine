@@ -430,6 +430,8 @@ void MyYield() {
     if (LastButtonState and !ButtonState) {
       if (!Homed) {
         Home(true, true);
+      } else {
+        DisableSteppers();
       }
       LcdPrint("Mixer ready!", IpAddress2String(WiFi.localIP()));
     }
