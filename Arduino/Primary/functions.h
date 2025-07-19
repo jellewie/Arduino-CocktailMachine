@@ -441,6 +441,7 @@ void MyYield() {
   if (result != PJON_ACK and result != PJON_FAIL) {
     LcdPrint("Bus error!", PJONresultToString(result));
   }
+  bus.update();  //Handle bus updates
   yield();
 }
 void MyDelay(uint16_t DelayMS) {  //Just a non-blocking delay
