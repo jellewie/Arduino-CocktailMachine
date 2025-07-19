@@ -430,8 +430,7 @@ void MyYield() {
     bool ButtonState = digitalRead(PDI_S);
     if (LastButtonState and !ButtonState) {
       if (!Homed) {
-        if (!Home(true, true))
-          FastLED.delay(500);
+        Home(true, true);
       }
       LcdPrint("Mixer ready!", IpAddress2String(WiFi.localIP()));
     }
