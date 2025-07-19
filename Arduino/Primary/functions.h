@@ -443,8 +443,8 @@ void MyYield() {
   //FastLED.delay(1);
   unsigned long _EndTime = micros() + 10000;
   while (micros() < _EndTime) {
-    WiFiManager.RunServer();             //Do WIFI server stuff if needed
-    uint16_t result = bus.receive(100);  //Stop and receive commands for x microseconds (1000 micro = 1ms)
+    WiFiManager.RunServer();              //Do WIFI server stuff if needed
+    uint16_t result = bus.receive(1000);  //Stop and receive commands for x microseconds (1000 micro = 1ms)
     if (result != PJON_ACK and result != PJON_FAIL) {
       LcdPrint("Bus error!", PJONresultToString(result));
     }

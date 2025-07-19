@@ -152,7 +152,9 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
         dispenserSettings.FluidLevel -= payload[1];  //Remove the dispense liquid from the bottle amount
         Serial.println("Done, sending feedback to Primary");
         uint8_t BusSend[] = { DONE };  //Tell primary we have completed it's command
-        bus.send(PrimaryID, &BusSend, sizeof(BusSend));
+        uint16_t result = bus.send_packet_blocking(PrimaryID, BusSend, sizeof(BusSend));
+        if (result != PJON_ACK)
+          Serial.println("BUS error:" + String(result));
         break;
       }
     case CALIBRATEMSPERML:
