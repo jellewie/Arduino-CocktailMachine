@@ -184,10 +184,9 @@ void GetIngredient(Ingredient IN) {
       while (!DispenserDone && (millis() < ExitAt))
         MyDelay(1);                                 //Wait for the dispenser report to be done (or timeout)
       Dispensers[DispenserID].FluidLevel -= IN.ml;  //Remove the dispense liquid from the bottle amount (We could also ask the dispenser again, but this is faster)
-      if (DispenserDone) {
-        Serial.println("waiting a bit for dripping " + String(DispenserDripTime) + "ms");
-        MyDelay(DispenserDripTime);
-      } else
+      Serial.println("waiting a bit for dripping " + String(DispenserDripTime) + "ms");
+      MyDelay(DispenserDripTime);
+      if (!DispenserDone)
         WaitForUser("Dispensing fail", "no conformation");
     } else
       WaitForUser("Failed to get", IngredientIDtoString(IN.ID));
