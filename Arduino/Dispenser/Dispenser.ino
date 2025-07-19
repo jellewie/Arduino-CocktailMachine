@@ -164,11 +164,7 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
         DispenseStop();
         Serial.println("Done, sending feedback to Primary");
         uint8_t BusSend[] = { DONE };  //Tell primary we have completed it's command
-        uint16_t result = bus.send(PrimaryID, &BusSend, sizeof(BusSend));
-#ifdef SerialDebug
-        if (result != PJON_ACK)
-          Serial.print("bus.send wrong =" + String(result));
-#endif
+        bus.send(PrimaryID, &BusSend, sizeof(BusSend));
         break;
       }
     case CALIBRATEMSPERML:
@@ -338,11 +334,9 @@ void CheckAndGetSlotID() {
 
     if (bus.device_id() != 0) {
       uint8_t BusSend[] = { ADOPT, bus.device_id() };  //Ask Primary for us to be adopted
-      uint16_t result = bus.send(PrimaryID, &BusSend, sizeof(BusSend));
+      bus.send(PrimaryID, &BusSend, sizeof(BusSend));
 #ifdef SerialDebug
       Serial.println("SlotID recieved, I am " + String(bus.device_id()));
-      if (result != PJON_ACK)
-        Serial.print("bus request fail =" + String(result));
 #endif
     }
 #ifdef SerialDebug
