@@ -185,7 +185,7 @@ void GetIngredient(Ingredient IN) {
       if (DispenserDone)
         MyDelay(DispenserDripTime);
       else
-        WaitForUser("Disper failed", "to finisch");
+        WaitForUser("Dispensing fail", "no conformation");
     } else
       WaitForUser("Failed to get", IngredientIDtoString(IN.ID));
   }
