@@ -181,7 +181,8 @@ void GetIngredient(Ingredient IN) {
     if (BusSendBlocking(DispenserID, DISPENSE, IN.ml)) {                           //Give the dispence command
       uint32_t ExitAt = millis() + (IN.ml * Dispensers[DispenserID].TimeMSML + Dispensers[DispenserID].DelayAir) * 2;
       while (!DispenserDone && (millis() < ExitAt))
-        MyDelay(1);  //Wait for the dispenser report to be done (or timeout)
+        MyDelay(1);                                 //Wait for the dispenser report to be done (or timeout)
+      Dispensers[DispenserID].FluidLevel -= IN.ml;  //Remove the dispense liquid from the bottle amount (We could also ask the dispenser again, but this is faster)
       if (DispenserDone)
         MyDelay(DispenserDripTime);
       else
