@@ -139,8 +139,8 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
         ImAdopted = true;
         LEDloop(true);
         uint8_t BusSend[] = { DISPENSERSTATUS, dispenserSettings.IngredientID, dispenserSettings.TimeMSML, dispenserSettings.DelayAir, dispenserSettings.FluidLevel / 10 };  //Reply back we have completed
-        uint16_t result = bus.reply(&BusSend, sizeof(BusSend));   
-        break;                                                                                                           //Send success to Primary
+        uint16_t result = bus.reply(&BusSend, sizeof(BusSend));
+        break;  //Send success to Primary
       }
     case DISPENSE:
       {
