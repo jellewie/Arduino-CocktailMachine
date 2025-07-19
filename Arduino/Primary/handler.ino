@@ -379,6 +379,7 @@ void handle_Set() {
   //If we need to somewhere
   if (GoTo[0] != -1 or GoTo[1] != -1) {
     LcdPrint("Moving to", String(GoTo[0]) + "," + String(GoTo[1]));
+    LightSection(GoTo[0]);
     MoveTo(GoTo[0], GoTo[1]);
   }
   //If we need to mix

@@ -82,7 +82,7 @@ void setup() {
   FastLED.addLeds<WS2812B, PAO_LED, GRB>(LEDs, TotalLEDs);
   FastLED.setBrightness(MaxBrightness);  //Set brightness
   LED_Fill(0, TotalLEDs, ColorBoot);
-  FastLED.show();  //Update
+  UpdateLED(true);  //Force update LEDs
   //===========================================================================
   pinMode(PDO_Step_enable, OUTPUT);
   DisableSteppers();
@@ -193,10 +193,15 @@ void GetIngredient(Ingredient IN) {
   }
 }
 void LightSection(long LocationX) {
-  uint8_t Len = 13;
-  float LEDPos = (LocationX * TotalLEDs) / (BedSize_X);
-  LEDPos = LEDPos - Len < 0 ? 0 : LEDPos - Len;
-  LEDPos = LEDPos + Len > TotalLEDs ? LEDPos - Len : LEDPos;
+  uint8_t Len = 10;
+  int32_t LEDPos = (LocationX * TotalLEDs) / (BedSize_X);  //Howfar are we in LED numbers
+  Serial.print("LightSection raw=" + String(LEDPos));
+  LEDPos = LEDPos - Len / 2;     //Center around out target
+  if (LEDPos < 0)                //If we would overflow below
+    LEDPos = 0;                  //bound to start at 0
+  if (LEDPos + Len > TotalLEDs)  //If we would overflow above
+    TotalLEDs - Len;             //bound to end at max
+  Serial.println(" X=" + String(LocationX) + " LEDPos=" + String(LEDPos));
   LED_Fill(0, TotalLEDs, ColorMoveBase);  //Set base color
   LED_Fill(LEDPos, Len, ColorMoveActive);
   UpdateLED(true);
