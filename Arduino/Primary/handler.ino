@@ -15,7 +15,7 @@
 #define PreFixMaxBrightness "maxbrightness"
 #define PreFixHome "homed"
 #define PreFixDispenserHeartbeat "dispenserheartbeat"
-#define PreFixDispenserDripTime "DispenserDripTime"
+#define PreFixDispenserDripTime "dispenserdriptime"
 //Dispenser Settings
 #define PreFixSetDispenserID "di"
 #define PreFixSetDispenserIngredientID "dn"
