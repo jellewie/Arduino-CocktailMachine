@@ -175,9 +175,9 @@ String WiFiManagerUser_Get_Value(uint8_t ValueID, bool Safe, bool Convert) {
         if (i < Dispensers_Amount) {
           String Output = "";
           if (Convert) {
-            Output = "X=" + String(Dispensers[i].LocationX) + ",Y=" + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "MSML," + String(Dispensers[i].DelayAir) + "MSoff," + IngredientIDtoString(Dispensers[i].IngredientID);
+            Output = "X=" + String(Dispensers[i].LocationX) + ",Y=" + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "MSML," + String(Dispensers[i].DelayAir) + "MSdelayed," + IngredientIDtoString(Dispensers[i].IngredientID)+ "," + String(Dispensers[i].FluidLevel) + "MLFluidLeft";
           } else {
-            Output = String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].DelayAir) + "," + String(Dispensers[i].IngredientID);
+            Output = String(Dispensers[i].LocationX) + "," + String(Dispensers[i].LocationY) + "," + String(Dispensers[i].TimeMSML) + "," + String(Dispensers[i].DelayAir) + "," + String(Dispensers[i].IngredientID) + "," + String(Dispensers[i].FluidLevel);
           }
           return String(Output);
         }
