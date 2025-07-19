@@ -161,6 +161,7 @@ void MakeCocktail(Drink Mix) {
       GetIngredient(Mix.Ingredients[i]);
     }
   }
+  LcdPrint("Finishing up", Mix.Name);
   MoveTo(Manual_X, Manual_Y);
   LcdPrint("Mixed cocktail", Mix.Name);
   FastLED.clear();
@@ -181,10 +182,12 @@ void GetIngredient(Ingredient IN) {
     if (BusSendBlocking(DispenserID, DISPENSE, IN.ml)) {                                                                        //Give the dispence command
       uint32_t ExitAt = millis() + (IN.ml * Dispensers[DispenserID].TimeMSML + Dispensers[DispenserID].DelayAir) * 1.1 + 4000;  //Allow 110% and wait for the 4s blocking timeout
       Serial.println("waiting for dispenser " + String(ExitAt - millis()) + "ms");
+      LcdPrint("Dispensing", "");
       while (!DispenserDone && (millis() < ExitAt))
         MyDelay(1);                                 //Wait for the dispenser report to be done (or timeout)
       Dispensers[DispenserID].FluidLevel -= IN.ml;  //Remove the dispense liquid from the bottle amount (We could also ask the dispenser again, but this is faster)
       Serial.println("waiting a bit for dripping " + String(DispenserDripTime) + "ms");
+      LcdPrint("Waiting on drips", "");
       MyDelay(DispenserDripTime);
       if (!DispenserDone)
         WaitForUser("Dispensing fail", "no conformation");
