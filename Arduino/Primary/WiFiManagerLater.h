@@ -133,14 +133,17 @@ bool WiFiManagerUser_Set_Value(uint8_t ValueID, String Value) {
           _Output[0].replace("X=", "");
           _Output[1].replace("Y=", "");
           _Output[2].replace("MSML", "");
-          _Output[3].replace("MSoff", "");
+          _Output[3].replace("MSdelayed", "");
+          //_Output[4].replace("", ""); //IngredientID has no pre of suffix
+          _Output[5].replace("MLFluidLeft", "");
           if (!StringIsDigit(_Output[0]) or !StringIsDigit(_Output[1]) or !StringIsDigit(_Output[2]) or !StringIsDigit(_Output[3])) return false;
           Dispenser Dis;
           Dis.LocationX = _Output[0].toInt();
           Dis.LocationY = _Output[1].toInt();
-          Dis.TimeMSML = _Output[2].toInt();
-          Dis.DelayAir = _Output[3].toInt();
-          Dis.IngredientID = 0;  //We do not do _Output[4] since thats stored in the dispenser
+          Dis.TimeMSML = 0;      //We do not do this one since thats stored in the dispenser
+          Dis.DelayAir = 0;      //^
+          Dis.IngredientID = 0;  //^
+          Dis.FluidLevel = 0;    //^
           SetDispenser(Dis, i);
           return true;
         }
