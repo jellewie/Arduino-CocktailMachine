@@ -66,6 +66,9 @@ void pingOnline() {  //We can call this code periodicaly this will check if all 
       uint16_t result = bus.send_packet_blocking(i, BusSend, sizeof(BusSend));  //Check if they are all still online, to make sure also retry if we fail the first time
       if (result != PJON_ACK) {
         Dispensers[i].IngredientID = 0;  //Disconnect the dispenser by setting the fluid to 0 (UNK)
+        Dispensers[i].TimeMSML = 0;      //^
+        Dispensers[i].DelayAir = 0;      //^
+        Dispensers[i].FluidLevel = 0;    //^
         LcdPrint("Disp " + String(i), "removed");
         Serial.println("BUS error:" + String(i) + "=" + PJONresultToString(result) + " Dispenser" + String(i) + " went offline");
       }
