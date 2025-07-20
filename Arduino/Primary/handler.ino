@@ -2,18 +2,18 @@
 //"/set" commands
 //===========================================================================
 //Settings
+#define PreFixHome "homed"
 #define PreFixMotorMAXSpeed "motormaxspeed"
 #define PreFixMotorMAXAccel "motormaxaccel"
 #define PreFixBedSize_X "bedsizex"
 #define PreFixBedSize_Y "bedsizey"
 #define PreFixManual_X "manualx"
 #define PreFixManual_Y "manualy"
-#define PreFixShotDispenserML "shotdispenserml"
 #define PreFixHomeMAXSpeed "homemaxspeed"
-#define PreFixMaxHomeBounce "MaxHomeBounce"
+#define PreFixMaxHomeBounce "maxhomebounce"
 #define PreFixDisableSteppersAfterIdleS "disablesteppersafteridles"
+#define PreFixMaxGlassSize "maxglasssize"
 #define PreFixMaxBrightness "maxbrightness"
-#define PreFixHome "homed"
 #define PreFixDispenserHeartbeat "dispenserheartbeats"
 #define PreFixDispenserDripTime "dispenserdriptimems"
 //Dispenser Settings
@@ -113,12 +113,6 @@ void handle_Set() {
       } else {
         SaveEEPROMinSeconds = 30;
       }
-    } else if (ArguName == PreFixShotDispenserML) {
-      if (!WiFiManagerUser_Set_Value(8, ArgValue)) {
-        ERRORMSG = "ShotDispenserML Not set";
-      } else {
-        SaveEEPROMinSeconds = 30;
-      }
     } else if (ArguName == PreFixHomeMAXSpeed) {
       if (!WiFiManagerUser_Set_Value(9, ArgValue)) {
         ERRORMSG = "HomeMAXSpeed Not set";
@@ -134,6 +128,12 @@ void handle_Set() {
     } else if (ArguName == PreFixDisableSteppersAfterIdleS) {
       if (!WiFiManagerUser_Set_Value(11, ArgValue)) {
         ERRORMSG = "DisableSteppersAfterIdleS Not set";
+      } else {
+        SaveEEPROMinSeconds = 30;
+      }
+    } else if (ArguName == PreFixMaxGlassSize) {
+      if (!WiFiManagerUser_Set_Value(12, ArgValue)) {
+        ERRORMSG = "MaxGlassSize Not set";
       } else {
         SaveEEPROMinSeconds = 30;
       }
@@ -399,15 +399,15 @@ void handle_Get() {
   }
   Json += "],\"settings\":{";
   Json += "\"Homed\":" + IsTrueToString(Homed);
-  Json += ",\"DisableSteppersAfterIdleS\":" + String(DisableSteppersAfterIdleS);
+  Json += ",\"MotorMaxSpeed\":" + String(MotorMAXSpeed);
+  Json += ",\"MotorMaxAccel\":" + String(MotorMAXAccel);
   Json += ",\"BedSizeX\":" + String(BedSize_X);
   Json += ",\"BedSizeY\":" + String(BedSize_Y);
   Json += ",\"ManualX\":" + String(Manual_X);
   Json += ",\"ManualY\":" + String(Manual_Y);
-  Json += ",\"MotorMaxSpeed\":" + String(MotorMAXSpeed);
-  Json += ",\"MotorMaxAccel\":" + String(MotorMAXAccel);
   Json += ",\"HomeMaxSpeed\":" + String(HomeMAXSpeed);
   Json += ",\"MaxHomeBounce\":" + String(MaxHomeBounce);
+  Json += ",\"DisableSteppersAfterIdleS\":" + String(DisableSteppersAfterIdleS);
   Json += ",\"MaxGlassSizeML\":" + String(MaxGlassSize);
   Json += ",\"MaxBrightness\":" + String(MaxBrightness);
   Json += ",\"DispenserHeartbeatS\":" + String(DispenserHeartbeat);
