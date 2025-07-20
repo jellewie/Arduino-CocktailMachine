@@ -422,7 +422,7 @@ bool Home(bool X, bool Y) {
 }
 void MyYield() {
   static unsigned long LastTime;
-  if (TickEveryXms(&LastTime, 100000)) {  //Only run every 0.1 S
+  if (TickEveryXms(&LastTime, 100)) {  //Only run every 0.1 S
     WiFiManager.CheckAndReconnectIfNeeded(true);
     CheckEEPROMSave();
     CheckDisableSteppers();
