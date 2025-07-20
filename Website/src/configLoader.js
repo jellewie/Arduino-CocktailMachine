@@ -21,7 +21,7 @@ import { showToastMessage } from "./toastMessages/showToastMessage.js";
  */
 
 /**
- * @typedef {[x: number, y: number, timeMsMl: number, delayAir: number, ingredientId: number]} DispenserConfigArr
+ * @typedef {[x: number, y: number, timeMsMl: number, delayAir: number, ingredientId: number, fluidLevel: number]} DispenserConfigArr
  */
 
 /**
@@ -31,6 +31,7 @@ import { showToastMessage } from "./toastMessages/showToastMessage.js";
  * @property {number} timeMsMl
  * @property {number} delayAir
  * @property {import("./drinksConfig.js").Ingredients} ingredient
+ * @property {number} fluidLevel
  */
 
 /**
@@ -84,7 +85,8 @@ async function refreshConfigFn() {
 				y: dispenser[1],
 				timeMsMl: dispenser[2],
 				delayAir: dispenser[3],
-				ingredient: data.ingredients[dispenser[4]]
+				ingredient: data.ingredients[dispenser[4]],
+				fluidLevel: dispenser[5],
 			});
 		}
 		currentConfigData = {

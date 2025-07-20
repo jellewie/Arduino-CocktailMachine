@@ -55,7 +55,8 @@ for (let i = 0; i < 11; i++) {
 	const timeMsMl = Math.floor(Math.random() * 500);
 	const delayAir = Math.floor(Math.random() * 500);
 	const ingredientId = Math.floor(Math.random() * 18);
-	dispensers.push([locationX, locationY, timeMsMl, delayAir, ingredientId]);
+	const fluidLevel = Math.floor(Math.random() * 2560);
+	dispensers.push([locationX, locationY, timeMsMl, delayAir, ingredientId, fluidLevel]);
 }
 
 // TODO: use the ingredients list from drinksConfig.js somehow
@@ -116,6 +117,8 @@ const server = new Server({
 						dispenser[3] = Number(url.searchParams.get("do"));
 					} else if (url.searchParams.has("dn")) {
 						dispenser[4] = Number(url.searchParams.get("dn"));
+					} else if (url.searchParams.has("df")) {
+						dispenser[5] = Number(url.searchParams.get("df"));
 					}
 				}
 			}
