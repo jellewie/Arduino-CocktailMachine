@@ -5,9 +5,8 @@
 }
 
 .drink-display > .drink-icon-container {
-	width: 150px;
-	height: 200px;
-	margin: 20px 20px;
+	width: 190px;
+	height: 240px;
 	position: relative;
 	filter: url(#svgNeon);
 }
