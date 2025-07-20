@@ -78,6 +78,11 @@ onConfigUpdated(() => {
 	updateAddIngredientSelect();
 });
 
+function updateAddIngredientSelectVisibility() {
+	const visible = currentCustomizableIngredients.length < 8;
+	addIngredientContainerEl.style.display = visible ? "" : "none";
+}
+
 addIngredientSelect.addEventListener("change", () => {
 	const castValueAction = /** @type {import("../drinksConfig.js").Actions} */ (addIngredientSelect.value);
 	const castValueIngredient = /** @type {import("../drinksConfig.js").Ingredients} */ (addIngredientSelect.value);
@@ -120,9 +125,11 @@ function addIngredient(action) {
 		const index = currentCustomizableIngredients.indexOf(customizableIngredient);
 		if (index >= 0) {
 			currentCustomizableIngredients.splice(index, 1);
+			updateAddIngredientSelectVisibility();
 		}
 	});
 	currentCustomizableIngredients.push(customizableIngredient);
+	updateAddIngredientSelectVisibility();
 
 	customizableIngredient.onDragStart(() => {
 		if (currentlyDraggingIngredient) return false;
@@ -238,6 +245,7 @@ export function showModal({
 		drinkCustomizationActionsList.removeChild(drinkCustomizationActionsList.firstChild);
 	}
 	currentCustomizableIngredients = [];
+	updateAddIngredientSelectVisibility();
 
 	for (const action of actions) {
 		addIngredient(action);
