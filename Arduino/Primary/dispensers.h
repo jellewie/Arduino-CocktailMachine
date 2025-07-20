@@ -59,7 +59,7 @@ void pingAll(bool Print) {
 }
 void pingOnline() {  //We can call this code periodicaly this will check if all dispensers are still attached
   Serial.println("pingOnline " + String(Dispensers_Amount));
-  static uint8_t BusSend[] = { DONTREPLY, 0 };
+  static uint8_t BusSend[] = { DONTREPLY };
   for (uint8_t i = 1; i < Dispensers_Amount; i++) {
     if (Dispensers[i].IngredientID != 0) {  //Only checks slots that should be connected and respond
       Serial.println("Checking in on dispenser " + String(i));
