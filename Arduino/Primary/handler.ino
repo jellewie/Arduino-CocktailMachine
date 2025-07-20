@@ -14,8 +14,8 @@
 #define PreFixDisableSteppersAfterIdleS "disablesteppersafteridles"
 #define PreFixMaxBrightness "maxbrightness"
 #define PreFixHome "homed"
-#define PreFixDispenserHeartbeat "dispenserheartbeat"
-#define PreFixDispenserDripTime "dispenserdriptime"
+#define PreFixDispenserHeartbeat "dispenserheartbeats"
+#define PreFixDispenserDripTime "dispenserdriptimems"
 //Dispenser Settings
 #define PreFixSetDispenserID "di"
 #define PreFixSetDispenserIngredientID "dn"
@@ -408,10 +408,10 @@ void handle_Get() {
   Json += ",\"MotorMaxAccel\":" + String(MotorMAXAccel);
   Json += ",\"HomeMaxSpeed\":" + String(HomeMAXSpeed);
   Json += ",\"MaxHomeBounce\":" + String(MaxHomeBounce);
-  Json += ",\"MaxGlassSize\":" + String(MaxGlassSize);
+  Json += ",\"MaxGlassSizeML\":" + String(MaxGlassSize);
   Json += ",\"MaxBrightness\":" + String(MaxBrightness);
-  Json += ",\"DispenserHeartbeat\":" + String(DispenserHeartbeat);
-  Json += ",\"DispenserDripTime\":" + String(DispenserDripTime);
+  Json += ",\"DispenserHeartbeatS\":" + String(DispenserHeartbeat);
+  Json += ",\"DispenserDripTimeMS\":" + String(DispenserDripTime);
   Json += "}";
   Json += "}";
   server.send(200, "text/html", Json);
