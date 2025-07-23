@@ -13,7 +13,6 @@ export async function handleRequestWithToast(url, {
 	toastOptions,
 }) {
 	const response = await fetch(url.href);
-	console.log(response.ok);
 	if (response.ok) {
 		showToastMessage(successMessage, toastOptions);
 	} else {

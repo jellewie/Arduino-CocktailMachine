@@ -2,7 +2,7 @@ import { ingredientNames } from "../drinksConfig.js";
 import { dispensersDialog } from "../globalElements.js";
 import { handleRequestWithToast } from "../handleRequestWithToast.js";
 
-/** @typedef {"x" | "y" | "timeMsMl" | "delayAir" | "ingredient"} DispenserSettingType */
+/** @typedef {"x" | "y" | "timeMsMl" | "delayAir" | "ingredient" | "fluidLevel"} DispenserSettingType */
 
 /** @typedef {(config: import("../configLoader.js").DispenserConfig, changedSetting: DispenserSettingType) => void} OnDispenserChangeCallback */
 
@@ -167,6 +167,16 @@ export class DispenserSettingsItem {
 		/** @private */
 		this.getDelayAirSetting = delayAirSetting.getValue;
 
+		const fluidLevelSetting = createNumberSetting({
+			label: "fluid level",
+			initialValue: dispenserConfig.fluidLevel,
+			settingType: "fluidLevel",
+			onChange: boundFireDispenserChangeCbs,
+		});
+		this.el.appendChild(fluidLevelSetting.el);
+		/** @private */
+		this.getFluidLevelSetting = fluidLevelSetting.getValue;
+
 		const goToButton = document.createElement("button");
 		goToButton.textContent = "Go to";
 		goToButton.classList.add("text-button");
@@ -205,6 +215,7 @@ export class DispenserSettingsItem {
 			y: this.getYSetting(),
 			timeMsMl: this.getTimeMsMlSetting(),
 			delayAir: this.getDelayAirSetting(),
+			fluidLevel: this.getFluidLevelSetting(),
 		}
 
 		this.onDispenserChangeCbs.forEach(cb => cb(config, changedSetting));

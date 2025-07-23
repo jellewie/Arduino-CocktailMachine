@@ -31,6 +31,11 @@
 #drinkCustomizationActionsList.rearranging > li:not(.grabbing) {
 	pointer-events: none;
 }
+#drinkCustomizationActionsList > li.grabbing {
+	position: relative;
+	backdrop-filter: blur(10px);
+	z-index: 10;
+}
 
 #drinkCustomizationActionsList > li > .grab-handle {
 	min-width: 12px;

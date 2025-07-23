@@ -36,6 +36,8 @@ async function updateDispensersList() {
 				let ingredientId = config.ingredients.indexOf(dispenserConfig.ingredient);
 				if (ingredientId < 0) ingredientId = 0;
 				url.searchParams.set("dn", String(ingredientId));
+			} else if (changedSettingType == "fluidLevel") {
+				url.searchParams.set("df", String(dispenserConfig.fluidLevel));
 			}
 			await handleRequestWithToast(url, {
 				successMessage: "Dispenser updated.",

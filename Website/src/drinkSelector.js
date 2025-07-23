@@ -7,7 +7,7 @@ import { randFromArray } from "./util.js";
 /**
  * @typedef DrinkData
  * @property {import("./drinksConfig.js").DrinkConfig} config
- * @property {boolean} allIngredientsAvailable
+ * @property {number} missingIngredientCount
  * @property {DrinkDisplay} drinkDisplay
  * @property {boolean} isCustomDrink
  */
@@ -53,8 +53,8 @@ function addDrink(drinkConfig, isCustomDrink = false) {
 	drinkSelectorEl.appendChild(drinkDisplay.el);
 	createdDrinks.set(drinkDisplay.el, {
 		config: drinkConfig,
-		allIngredientsAvailable: false,
-		drinkDisplay: drinkDisplay,
+		missingIngredientCount: 0,
+		drinkDisplay,
 		isCustomDrink,
 	});
 	intersectionObserver.observe(drinkDisplay.el);
@@ -89,7 +89,7 @@ async function updateDrinkIngredients() {
 	const availableIngredients = await getAvailableIngredients();
 	for (const [el, drinkData] of createdDrinks) {
 		const ingredients = [];
-		let allIngredientsAvailable = true;
+		let missingIngredientCount = 0;
 		for (const action of drinkData.config.actions) {
 			if ("ingredient" in action) {
 				const available = availableIngredients.has(action.ingredient);
@@ -98,11 +98,11 @@ async function updateDrinkIngredients() {
 					name,
 					available,
 				});
-				if (!available) allIngredientsAvailable = false;
+				if (!available) missingIngredientCount++;
 			}
 		}
-		drinkData.allIngredientsAvailable = allIngredientsAvailable;
-		drinkData.drinkDisplay.available = allIngredientsAvailable;
+		drinkData.missingIngredientCount = missingIngredientCount;
+		drinkData.drinkDisplay.available = missingIngredientCount <= 0;
 		drinkData.drinkDisplay.setIngredients(ingredients)
 	}
 
@@ -117,8 +117,9 @@ function sortDrinkElements() {
 	sortedDrinks.sort((a, b) => {
 		if (a.isCustomDrink && !b.isCustomDrink) return -1;
 		if (!a.isCustomDrink && b.isCustomDrink) return 1;
-		if (a.allIngredientsAvailable && !b.allIngredientsAvailable) return -1;
-		if (!a.allIngredientsAvailable && b.allIngredientsAvailable) return 1;
+		if (a.missingIngredientCount != b.missingIngredientCount) {
+			return a.missingIngredientCount - b.missingIngredientCount;
+		}
 		const aIndex = recentDrinks.indexOf(a.config.name);
 		const bIndex = recentDrinks.indexOf(b.config.name);
 		if (aIndex >= 0 && bIndex >= 0) {
@@ -192,7 +193,7 @@ export function markRecentDrink(drinkName) {
 }
 
 export function scrollToRandomAvailableDrink() {
-	const availableDrinks = Array.from(createdDrinks.values()).filter(drink => drink.allIngredientsAvailable && !drink.isCustomDrink);
+	const availableDrinks = Array.from(createdDrinks.values()).filter(drink => drink.missingIngredientCount <= 0 && !drink.isCustomDrink);
 	const drink = randFromArray(availableDrinks);
 	if (drink) {
 		drink.drinkDisplay.el.scrollIntoView({

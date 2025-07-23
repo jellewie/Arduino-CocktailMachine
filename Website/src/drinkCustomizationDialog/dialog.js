@@ -1,3 +1,4 @@
+import { getAvailableIngredients, onConfigUpdated } from "../configLoader.js";
 import { actionNames, ingredientNames } from "../drinksConfig.js";
 import { sendMixRequest } from "../sendMixRequest.js";
 import { CustomizableIngredient } from "./CustomizableIngredient.js";
@@ -14,33 +15,73 @@ const addIngredientSelect = document.createElement("select");
 addIngredientSelect.classList.add("add-ingredient");
 addIngredientContainerEl.appendChild(addIngredientSelect);
 
-const addIngredientTextOption = document.createElement("option");
-addIngredientTextOption.textContent = "Add an ingredient";
-addIngredientTextOption.value = "placeholder";
-addIngredientTextOption.disabled = true;
-addIngredientTextOption.selected = true;
-addIngredientTextOption.style.display = "none";
-addIngredientSelect.appendChild(addIngredientTextOption);
+async function updateAddIngredientSelect() {
+	while (addIngredientSelect.lastChild) {
+		addIngredientSelect.lastChild.remove();
+	}
 
-const ingredientsGroup = document.createElement("optgroup");
-ingredientsGroup.label = "Ingredients";
-for (const [id, name] of ingredientNames) {
-	const option = document.createElement("option");
-	option.value = id;
-	option.text = name;
-	ingredientsGroup.appendChild(option);
-}
-addIngredientSelect.appendChild(ingredientsGroup);
+	const addIngredientTextOption = document.createElement("option");
+	addIngredientTextOption.textContent = "Add an ingredient";
+	addIngredientTextOption.value = "placeholder";
+	addIngredientTextOption.disabled = true;
+	addIngredientTextOption.selected = true;
+	addIngredientTextOption.style.display = "none";
+	addIngredientSelect.appendChild(addIngredientTextOption);
 
-const actionsGroup = document.createElement("optgroup");
-actionsGroup.label = "Actions";
-for (const action of actionNames) {
-	const option = document.createElement("option");
-	option.value = action;
-	option.text = action;
-	actionsGroup.appendChild(option);
+	const availableIngredientIds = await getAvailableIngredients();
+	const unavailableIngredientIds = new Set(ingredientNames.keys());
+	for (const ingredientId of availableIngredientIds) {
+		unavailableIngredientIds.delete(ingredientId);
+	}
+
+	/**
+	 * @param {string} label
+	 * @param {() => Generator<[string, string, boolean]>} options
+	 */
+	function createOptGroup(label, options) {
+		const groupEl = document.createElement("optgroup");
+		groupEl.label = label;
+		for (const [value, text, enabled] of options()) {
+			const option = document.createElement("option");
+			option.value = value;
+			option.text = text;
+			option.disabled = !enabled;
+			groupEl.appendChild(option);
+		}
+		addIngredientSelect.appendChild(groupEl);
+	}
+
+	createOptGroup("Available ingredients", function*() {
+		for (const id of availableIngredientIds) {
+			const name = ingredientNames.get(id);
+			if (!name) continue;
+			yield [id, name, true];
+		}
+	});
+
+	createOptGroup("Actions", function*() {
+		for (const action of actionNames) {
+			yield [action, action, true];
+		}
+	});
+
+	createOptGroup("Unavailable ingredients", function*() {
+		for (const id of unavailableIngredientIds) {
+			const name = ingredientNames.get(id);
+			if (!name) continue;
+			yield [id, name, false];
+		}
+	});
 }
-addIngredientSelect.appendChild(actionsGroup);
+updateAddIngredientSelect();
+onConfigUpdated(() => {
+	updateAddIngredientSelect();
+});
+
+function updateAddIngredientSelectVisibility() {
+	const visible = currentCustomizableIngredients.length < 8;
+	addIngredientContainerEl.style.display = visible ? "" : "none";
+}
 
 addIngredientSelect.addEventListener("change", () => {
 	const castValueAction = /** @type {import("../drinksConfig.js").Actions} */ (addIngredientSelect.value);
@@ -84,9 +125,11 @@ function addIngredient(action) {
 		const index = currentCustomizableIngredients.indexOf(customizableIngredient);
 		if (index >= 0) {
 			currentCustomizableIngredients.splice(index, 1);
+			updateAddIngredientSelectVisibility();
 		}
 	});
 	currentCustomizableIngredients.push(customizableIngredient);
+	updateAddIngredientSelectVisibility();
 
 	customizableIngredient.onDragStart(() => {
 		if (currentlyDraggingIngredient) return false;
@@ -202,6 +245,7 @@ export function showModal({
 		drinkCustomizationActionsList.removeChild(drinkCustomizationActionsList.firstChild);
 	}
 	currentCustomizableIngredients = [];
+	updateAddIngredientSelectVisibility();
 
 	for (const action of actions) {
 		addIngredient(action);
