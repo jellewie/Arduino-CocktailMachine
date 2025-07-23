@@ -440,7 +440,6 @@ void MyYield() {
       LastButtonState = ButtonState;
     }
   }
-  //FastLED.delay(1);
   unsigned long _EndTime = micros() + 10000;
   while (micros() < _EndTime) {
     WiFiManager.RunServer();              //Do WIFI server stuff if needed
@@ -448,8 +447,8 @@ void MyYield() {
     if (result != PJON_ACK and result != PJON_FAIL) {
       LcdPrint("Bus error!", PJONresultToString(result));
     }
+    bus.update();  //Handle bus updates
   }
-  bus.update();  //Handle bus updates
   yield();
 }
 void MyDelay(uint16_t DelayMS) {  //Just a non-blocking delay
