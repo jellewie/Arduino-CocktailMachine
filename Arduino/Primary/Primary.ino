@@ -2,7 +2,7 @@
   Program written by JelleWho https://github.com/jellewie
   Board: https://dl.espressif.com/dl/package_esp32_index.json
 */
-#if !defined(ESP32)
+#ifndef ARDUINO_ESP32_DEV
 #error "Please check if the 'DOIT ESP32 DEVKIT V1' board is selected, which can be downloaded at https://dl.espressif.com/dl/package_esp32_index.json"
 #endif
 #include <WiFi.h>                     //Arduino IDe 2.3.4 requires this here for some reason
