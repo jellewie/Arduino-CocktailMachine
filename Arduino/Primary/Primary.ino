@@ -203,7 +203,7 @@ void LightSection(long LocationX) {
   if (LEDPos < 0)                //If we would overflow below
     LEDPos = 0;                  //bound to start at 0
   if (LEDPos + Len > TotalLEDs)  //If we would overflow above
-    TotalLEDs - Len;             //bound to end at max
+    LEDPos = TotalLEDs - Len;             //bound to end at max
   Serial.println(" X=" + String(LocationX) + " LEDPos=" + String(LEDPos));
   LED_Fill(0, TotalLEDs, ColorMoveBase);  //Set base color
   LED_Fill(LEDPos, Len, ColorMoveActive);
