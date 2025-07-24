@@ -189,19 +189,31 @@ String WiFiManagerUser_Get_Value(uint8_t ValueID, bool Safe, bool Convert) {
   }
   return "";
 }
-void WiFiManagerUser_Status_Start() {  //Called before start of WiFi
+void WiFiManagerUser_Status_Start() {                       //Called before start of WiFi
+  LED_Fill(0, TotalLEDs, CRGB(255, 0, 255));                //Turn all LEDs purple 2222
+  LED_Fill(0, TotalLEDs / 4, CRGB(0, 0, 255));              //Turn 1th quater blue 1222
+  LED_Fill(TotalLEDs / 2, TotalLEDs / 4, CRGB(0, 0, 255));  //Turn 2rd quater blue 1212
+  FastLED.show();                                           //Update leds to show wifi is starting
   pinMode(Pin_LED, OUTPUT);
   digitalWrite(Pin_LED, HIGH);
   LcdPrint("", "WiFi connecting");
   ApStarted = false;
 }
-void WiFiManagerUser_Status_Done() {  //Called after succesfull connection to WiFi
+void WiFiManagerUser_Status_Done() {        //Called after succesfull connection to WiFi
+  LED_Fill(0, TotalLEDs, CRGB(0, 255, 0));  //Turn all Clock LEDs green
+  FastLED.show();                           //Update leds to show wifi is done
   digitalWrite(Pin_LED, LOW);
   LcdPrint("", "WiFi connected");
   ApStarted = false;
 }
 void WiFiManagerUser_Status_Blink() {  //Used when trying to connect/not connected
   digitalWrite(Pin_LED, !digitalRead(Pin_LED));
+}
+void WiFiManagerUser_Status_StartAP() {                     //Called before start of APmode
+  LED_Fill(0, TotalLEDs, CRGB(255, 0, 255));                //Turn all LEDs purple 2222
+  LED_Fill(0, TotalLEDs / 4, CRGB(255, 0, 0));              //Turn 1th quater red  1222
+  LED_Fill(TotalLEDs / 2, TotalLEDs / 4, CRGB(255, 0, 0));  //Turn 2rd quater red  1212
+  FastLED.show();                                           //Update leds to show we are entering APmode
 }
 bool WiFiManagerUser_HandleAP() {  //Called when in the While loop in APMode, this so you can exit it
   if (ApStarted == false) {

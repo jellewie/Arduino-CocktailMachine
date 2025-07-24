@@ -26,13 +26,13 @@
 //===========================================================================
 //#define WiFiManager_SerialEnabled                               //Define to send Serial debug feedback
 
-#define WiFiManagerUser_Set_Value_Defined     //Define we want to hook into WiFiManager
-#define WiFiManagerUser_Get_Value_Defined     //^
-#define WiFiManagerUser_Status_Start_Defined  //^
-#define WiFiManagerUser_Status_Done_Defined   //^
-#define WiFiManagerUser_Status_Blink_Defined  //^
-//#define WiFiManagerUser_Status_StartAP_Defined                  //^
-#define WiFiManagerUser_HandleAP_Defined  //^
+#define WiFiManagerUser_Set_Value_Defined       //Define we want to hook into WiFiManager
+#define WiFiManagerUser_Get_Value_Defined       //^
+#define WiFiManagerUser_Status_Start_Defined    //^
+#define WiFiManagerUser_Status_Done_Defined     //^
+#define WiFiManagerUser_Status_Blink_Defined    //^
+#define WiFiManagerUser_Status_StartAP_Defined  //^
+#define WiFiManagerUser_HandleAP_Defined        //^
 
 #define WiFiManager_DoRequest  //Adds a simple way to do stable URL request (with optional json)
 #define WiFiManager_Restart    //Adds a simple handle "/restart" to restart the ESP
