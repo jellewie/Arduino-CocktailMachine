@@ -36,9 +36,9 @@ bool ImAdopted = false;                             //If the primary has seen th
 bool LEDrainbow = false;                            //use to enable rainbow led mode
 struct Settings {
   uint8_t IngredientID = 1;    //Default Store the fluid of this dispenser
-  uint8_t TimeMSML = 40;       //ms to let 1 ml go, for example it takes 12s to do 300ml, thats about 40 milliseconds per milliliter
+  uint8_t TimeMSML = 36;       //ms to let 1 ml go, for example it takes 12s to do 300ml, thats about 40 milliseconds per milliliter
   uint8_t DelayAir = 0;        //ms to let the air valve open before the fluid valve, to get rid of pressure buildup in the bottle
-  uint16_t FluidLevel = 1000;  //mm of fluid in the bottle
+  uint16_t FluidLevel = 700;  //mm of fluid in the bottle
 };
 Settings dispenserSettings;  //Create a variable of type Settings
 enum COMMANDS { DONTREPLY,
@@ -145,7 +145,7 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
     case DISPENSE:
       {
         DispenseStart();
-        uint16_t DelayCompensated = (400 - (dispenserSettings.FluidLevel * 0.0727 + 142.9)) / 200 * payload[1] * dispenserSettings.TimeMSML;
+        uint16_t DelayCompensated = (400 - (dispenserSettings.FluidLevel * 0.124 + 125)) / 200 * payload[1] * dispenserSettings.TimeMSML;
         Serial.println("Dispensing " + String(payload[1]) + "ml, raw delay=" + String(payload[1] * dispenserSettings.TimeMSML) + " compensated delay=" + String(DelayCompensated) + " Fluid left in bottle=" + String(dispenserSettings.FluidLevel));
         delay(DelayCompensated);
         DispenseStop();
