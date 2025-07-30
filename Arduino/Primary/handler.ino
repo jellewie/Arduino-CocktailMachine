@@ -365,6 +365,13 @@ void handle_Set() {
         ERRORMSG += "No more space for a new dispenser";
     }
   }
+  uint16_t Totalml = 0;
+  for (uint8_t i = 0; i <= 7; i++)  //Calculate the total amount of fluid requested
+    Totalml += Mix.Ingredients[i].ml;
+  if (Totalml > MaxGlassSize) {
+    ERRORMSG += "Requested fluid more than glass " + String(Totalml) + "ml > " + String(MaxGlassSize) + "ml";
+    Mix.Name = "";  //Cancel making of this drink
+  }
   if (ERRORMSG == "") {
     server.send(200, "text/plain", "OK");
   } else {
