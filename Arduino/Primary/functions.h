@@ -1,7 +1,7 @@
 struct Ingredient {
   uint8_t ID;     //ID of the fluid
   String Action;  //If given, prompt the message and wait for user confirmation first
-  uint8_t ml;     //ml of the fluid
+  uint16_t ml;     //ml of the fluid
 };
 struct Drink {
   String Name;
