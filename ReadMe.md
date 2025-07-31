@@ -119,11 +119,16 @@ Note that [SoftSettings](#soft-settings) are preserved.
 ### Full reset
 If a full reset is desired it can be achieved by going to 'mixer.local/reset'. But note that accessing the page will directly wipe all [SoftSettings](#soft-settings) from existence and there will be no way to restore them back. If the wipe was successful it will be reported back and will execute a restart.
 
-# Specifications 
-## Input voltage
-The power supply is 12V. 
-the current draw and power consumption are as time of writing still unknown.
-
+## Compensation DOUBLENOZZLE guide
+1. Set CompensationFluidLevel* = 1 and flash it, this is so the dispenser does not compensate (*see Dispenser.ino).
+2. Set "ms/ml" of dispenser at 40
+3. Fill bottle with 300ml
+4. Do an command to dispense 200ml, for example <IP Adress>/set?m=calibrate&i0=VODKA&m0=200 or use the interface
+5. Now set the new "ms/ml" = dispensed_ml / 40 * 200, for example with 178ml you end up with 45
+6. Fill bottle with 700ml
+7. Do an command to dispense 200ml, for example we get 250 ml now
+8. Set CompensationFluidLevel =-(((250.0/200.0)-1.0)/(700.0-300.0))*( FluidLevel -300)+1
+        
 # Appendix
 * Firmware
 [This is included in this repository](Arduino)

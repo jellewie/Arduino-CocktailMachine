@@ -2,6 +2,7 @@
   Program written by JelleWho https://github.com/jellewie
   Board: https://dl.espressif.com/dl/package_esp32_index.json ESP32C3
   DISPENSER
+  Enable "USB CDC on boot" to enable serial 
 */
 #ifndef ESP32
 #error "Please select ESP32 as a board."
@@ -35,9 +36,9 @@ CRGB ColorDispencing = CRGB(0, 255, 0);             //While dispensing
 bool ImAdopted = false;                             //If the primary has seen this dispenser yet
 bool LEDrainbow = false;                            //use to enable rainbow led mode
 struct Settings {
-  uint8_t IngredientID = 1;    //Default Store the fluid of this dispenser
-  uint8_t TimeMSML = 36;       //ms to let 1 ml go, for example it takes 12s to do 300ml, thats about 40 milliseconds per milliliter
-  uint8_t DelayAir = 0;        //ms to let the air valve open before the fluid valve, to get rid of pressure buildup in the bottle
+  uint8_t IngredientID = 1;   //Default Store the fluid of this dispenser
+  uint8_t TimeMSML = 42;      //ms to let 1 ml go, for example it takes 12s to do 300ml, thats about 40 milliseconds per milliliter
+  uint8_t DelayAir = 0;       //ms to let the air valve open before the fluid valve, to get rid of pressure buildup in the bottle
   uint16_t FluidLevel = 700;  //mm of fluid in the bottle
 };
 Settings dispenserSettings;  //Create a variable of type Settings
@@ -145,7 +146,8 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
     case DISPENSE:
       {
         DispenseStart();
-        uint16_t DelayCompensated = (400 - (dispenserSettings.FluidLevel * 0.124 + 125)) / 200 * payload[1] * dispenserSettings.TimeMSML;
+        float CompensationFluidLevel = -(((250.0 / 200.0) - 1.0) / (700.0 - 300.0)) * (dispenserSettings.FluidLevel - 300.0) + 1;
+        uint16_t DelayCompensated = CompensationFluidLevel * payload[1] * dispenserSettings.TimeMSML;
         Serial.println("Dispensing " + String(payload[1]) + "ml, raw delay=" + String(payload[1] * dispenserSettings.TimeMSML) + " compensated delay=" + String(DelayCompensated) + " Fluid left in bottle=" + String(dispenserSettings.FluidLevel));
         delay(DelayCompensated);
         DispenseStop();
