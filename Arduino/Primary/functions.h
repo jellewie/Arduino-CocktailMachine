@@ -281,9 +281,12 @@ uint8_t GetDispenserID(uint8_t IngredientID) {
   }
   return 255;
 }
+extern void BusSend(uint8_t cmd1, uint8_t cmd2);  //This is defined in "dispensers.h" after this file
 void DisableSteppers() {
+  Serial.println("DisableSteppers");
   FastLED.setBrightness(MaxBrightness / 4);  //Set brightness to be 25%
   Homed = false;
+  BusSend(CHANGECOLOR, 0b00000000);  //Reset dispenser LED color command
   Stepper_X.moveTo(Stepper_X.currentPosition());
   Stepper_Y.moveTo(Stepper_Y.currentPosition());
   digitalWrite(PDO_Step_enable, HIGH);  //Disable all stepper drivers

@@ -122,12 +122,12 @@ void setup() {
 }
 void loop() {
   MyYield();
-  static bool HomedLast = Homed;
-  if (Homed != HomedLast) {
-    HomedLast = Homed;
-    BusSend(CHANGECOLOR, 0b00000010);  //Send dispenser LED Rainbow command
-  }
   if (Homed) {
+    static bool HomedLast = false;
+    if (Homed != HomedLast) {  //If we just homed
+      HomedLast = Homed;
+      BusSend(CHANGECOLOR, 0b0000010);  //Send dispenser LED Rainbow command
+    }
     EVERY_N_MILLISECONDS(40) {
       LED_Rainbow(0, TotalLEDs, 255 / TotalLEDs);  //Show a rainbow to sinal we are done and IDLE
       UpdateLED(true);
