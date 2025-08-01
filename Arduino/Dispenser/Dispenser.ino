@@ -79,8 +79,9 @@ void loop() {
   if (button_state != OLD_button_state) {       //Only update if button state changes
     OLD_button_state = button_state;            //remember the new state as the old one
     if (button_state == LOW) {                  //Button just pressed
-      pressStartTime = millis();                //Remember when we started with dispensing
+      Serial.println("Manual dispensing");
       DispenseStart();
+      pressStartTime = millis();                //Remember when we started with dispensing
     } else {  //Button just released
       uint32_t pressedDuration = millis() - pressStartTime;
       uint32_t MinimumDuration = ManualDispenceML * dispenserSettings.TimeMSML;
