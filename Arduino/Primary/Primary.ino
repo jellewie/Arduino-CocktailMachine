@@ -122,6 +122,12 @@ void setup() {
 }
 void loop() {
   MyYield();
+  static bool HomedLast = Homed;
+  if (Homed != HomedLast) {              //If home status just changed
+    HomedLast = Homed;                   //Remember the enw status
+    if (Homed && !Running)               //If we just homed, and are not running
+      BusSend(CHANGECOLOR, 0b00000010);  //Send dispenser LED Rainbow command
+  }
   if (Homed) {
     EVERY_N_MILLISECONDS(40) {
       LED_Rainbow(0, TotalLEDs, 255 / TotalLEDs);  //Show a rainbow to sinal we are done and IDLE

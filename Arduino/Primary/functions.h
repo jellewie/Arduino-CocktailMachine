@@ -285,7 +285,7 @@ extern void BusSend(uint8_t cmd1, uint8_t cmd2);  //This is defined in "dispense
 void DisableSteppers() {
   Serial.println("DisableSteppers");
   FastLED.setBrightness(MaxBrightness / 4);  //Set brightness to be 25%
-  BusSend(CHANGECOLOR, 0b0000011);           //Send dispenser LED Rainbow 25% command
+  BusSend(CHANGECOLOR, 0b00000000);          //Reset dispenser LED color command
   Homed = false;
   Stepper_X.moveTo(Stepper_X.currentPosition());
   Stepper_Y.moveTo(Stepper_Y.currentPosition());
@@ -417,7 +417,6 @@ bool Home(bool X, bool Y) {
     LcdPrint("Homed", "X" + String(Homed_X) + " Y" + String(Homed_Y));
   if (X == Homed_X and Y == Homed_Y) {
     Homed = true;
-    BusSend(CHANGECOLOR, 0b0000010);                       //Send dispenser LED Rainbow command
     DisableSteppersinSeconds = DisableSteppersAfterIdleS;  //Schedule to disable the steppers
     return true;
   }
