@@ -192,7 +192,7 @@ void GetIngredient(Ingredient IN) {
       if (!DispenserDone)
         WaitForUser("Dispensing fail", "no conformation");
     } else
-      WaitForUser("Failed to get", IngredientIDtoString(IN.ID));
+      WaitForUser("Failed to get", String(IN.ml) + "ml " + IngredientIDtoString(IN.ID));
   }
 }
 void LightSection(long LocationX) {
