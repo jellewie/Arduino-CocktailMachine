@@ -159,6 +159,7 @@ void handle_Set() {
     } else if (ArguName == PreFixHome) {
       DoHoming = IsTrue(ArgValue);
     } else if (ArguName == PreFix_Mix_Name) {
+      ArgValue[0] = toupper(ArgValue[0]);
       Mix.Name = ArgValue;
     } else if (ArguName == PreFix_0_Ingredient) {
       Mix.Ingredients[0].ID = IngredientStringToID(ArgValue);
