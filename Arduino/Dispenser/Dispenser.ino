@@ -131,7 +131,7 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
     6=CHANGECOLOR, RRGGBBMM MM=00 = Auto
                             MM=01 = RGB mode,
                             MM=10 = rainbow mode
-                            MM=11 = reserved for other modes
+                            MM=11 = rainbow mode 25% Brightness
     7=CHANGEFLUIDLEVEL, estimated ml left in the bottle. used to compensate for head pressure
   */
   switch (payload[0]) {
@@ -175,6 +175,7 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
       break;
     case CHANGECOLOR:
       {
+        FastLED.setBrightness(255);  //Set brightness
         uint8_t r, g, b, m;
         r = (payload[1] >> 6) & 0b11;  //Extract bits 7-6 (RR)
         g = (payload[1] >> 4) & 0b11;  //Extract bits 5-4 (GG)
@@ -191,7 +192,9 @@ void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info
           fill_solid(&(LEDs[0]), TotalLEDs, CRGB(r, g, b));
           FastLED.show();
         }
-        if (m == 2)
+        if (m == 3)
+          FastLED.setBrightness(255 / 4);  //Set brightness to be 25%
+        if (m == 2 or m == 3)
           if (LEDs[0] == ColorIdle or LEDrainbow == 1) {  //Do not overwrite other modes OR if we want to sync the rainbow
             LEDrainbow = true;                            //Set rainbow mode
             LEDloop(true);
