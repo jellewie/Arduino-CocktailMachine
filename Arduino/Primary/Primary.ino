@@ -165,13 +165,11 @@ void MakeCocktail(Drink Mix) {
 void GetIngredient(Ingredient IN) {
   Serial.println("GetIngredient: ID=" + String(IN.ID) + " Action=" + IN.Action + " ml=" + String(IN.ml) + " from dispenser=" + String(GetDispenserID(IN.ID)));
   if (IN.Action != "") {
-    LightSection(Manual_X);
     if (WaitForUser("Waiting on user", String(IN.Action))) return;
   }
   uint8_t DispenserID = GetDispenserID(IN.ID);
   if (DispenserID != 255) {
     DispenserDone = false;
-    LightSection(Dispensers[DispenserID].LocationX);                                                                                     //Turn on the main LED so show where we are going
     MoveTo(Dispensers[DispenserID].LocationX, Dispensers[DispenserID].LocationY);                                                        //Move to the dispenser
     if (BusSendBlocking(DispenserID, DISPENSE, IN.ml)) {                                                                                 //Give the dispence command
       uint32_t ExitAt = millis() + (IN.ml * Dispensers[DispenserID].TimeMSML + ((Dispensers[DispenserID].DelayAir) * 10)) * 1.1 + 4000;  //Allow 110% and wait for the 4s blocking timeout
