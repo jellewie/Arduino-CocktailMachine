@@ -195,17 +195,3 @@ void GetIngredient(Ingredient IN) {
       WaitForUser("Failed to get", String(IN.ml) + "ml " + IngredientIDtoString(IN.ID));
   }
 }
-void LightSection(long LocationX) {
-  uint8_t Len = 10;
-  int32_t LEDPos = (LocationX * TotalLEDs) / (BedSize_X);  //Howfar are we in LED numbers
-  Serial.print("LightSection raw=" + String(LEDPos));
-  LEDPos = LEDPos - Len / 2;     //Center around out target
-  if (LEDPos < 0)                //If we would overflow below
-    LEDPos = 0;                  //bound to start at 0
-  if (LEDPos + Len > TotalLEDs)  //If we would overflow above
-    LEDPos = TotalLEDs - Len;             //bound to end at max
-  Serial.println(" X=" + String(LocationX) + " LEDPos=" + String(LEDPos));
-  LED_Fill(0, TotalLEDs, ColorMoveBase);  //Set base color
-  LED_Fill(LEDPos, Len, ColorMoveActive);
-  UpdateLED(true);
-}

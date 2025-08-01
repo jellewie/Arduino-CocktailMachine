@@ -485,9 +485,24 @@ void MoveTo(int16_t LocationX, int16_t LocationY) {
   }
   DisableSteppersinSeconds = DisableSteppersAfterIdleS;  //Schedule to disable the steppers
 }
+void LightSection(long LocationX) {
+  uint8_t Len = 10;
+  int32_t LEDPos = (LocationX * TotalLEDs) / (BedSize_X);  //Howfar are we in LED numbers
+  Serial.print("LightSection raw=" + String(LEDPos));
+  LEDPos = LEDPos - Len / 2;     //Center around out target
+  if (LEDPos < 0)                //If we would overflow below
+    LEDPos = 0;                  //bound to start at 0
+  if (LEDPos + Len > TotalLEDs)  //If we would overflow above
+    LEDPos = TotalLEDs - Len;    //bound to end at max
+  Serial.println(" X=" + String(LocationX) + " LEDPos=" + String(LEDPos));
+  LED_Fill(0, TotalLEDs, ColorMoveBase);  //Set base color
+  LED_Fill(LEDPos, Len, ColorMoveActive);
+  UpdateLED(true);
+}
 #define TimeoutWaitingOnUserMs 10 * 60 * 1000
 bool WaitForUser(String msg, String msg2) {
   LcdPrint(msg, msg2);
+  LightSection(Manual_X);
   MoveTo(Manual_X, Manual_Y);
   while (true) {
     if (digitalRead(PDI_S) == LOW) {
