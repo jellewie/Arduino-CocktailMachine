@@ -417,8 +417,10 @@ bool Home(bool X, bool Y) {
     LcdPrint("Homed", "X" + String(Homed_X) + " Y" + String(Homed_Y));
   if (X == Homed_X and Y == Homed_Y) {
     Homed = true;
+    DisableSteppersinSeconds = DisableSteppersAfterIdleS;  //Schedule to disable the steppers
     return true;
   }
+  DisableSteppers();
   LED_Fill(0, TotalLEDs, ColorHomeFail);
   UpdateLED(true);
   return false;
