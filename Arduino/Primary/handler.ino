@@ -435,7 +435,7 @@ void handle_Info() {
                    + IsTrueToString(digitalRead(PDI_X_Ref) == LOW) + " " + (digitalRead(PDI_X_Ref) ? "HIGH" : "LOW") + "\n"
                                                                                                                        "Y_Ref = "
                    + IsTrueToString(digitalRead(PDI_Y_Ref) == LOW) + " " + (digitalRead(PDI_Y_Ref) ? "HIGH" : "LOW") + "\n"
-                                                                                                                       "Switch = "
+                                                                                                                       "Button = "
                    + IsTrueToString(digitalRead(PDI_S) == LOW) + " " + (digitalRead(PDI_S) ? "HIGH" : "LOW") + "\n"
                                                                                                                "Running = "
                    + IsTrueToString(Running) + "\n"
