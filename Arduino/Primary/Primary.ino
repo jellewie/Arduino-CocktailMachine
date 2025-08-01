@@ -22,13 +22,11 @@ const uint8_t PDO_X_Dir = 23;
 const uint8_t PDO_Y_Dir = 17;
 const uint8_t PDO_X_Step = 4;
 const uint8_t PDO_Y_Step = 12;
-const uint8_t PDI_X_Ref = 5;        //LOW = TRIGGERED
-const uint8_t PDI_Y_Ref = 27;       //LOW = TRIGGERED
-const uint8_t PDI_S = 39;           //LOW = TRIGGERED
-const uint8_t PDIO_buspin = 25;     //must be 12 or 25 for PJONSoftwareBitBang
-const uint16_t TotalLEDs = 100;     //The total amounts of LEDs in the strip
-uint16_t DispenserDripTime = 1000;  //Time to wait after a dispenser is done to catch any drips
-uint16_t DispenserHeartbeat = 30;   //time in s to check if all dispensers are still there
+const uint8_t PDI_X_Ref = 5;     //LOW = TRIGGERED
+const uint8_t PDI_Y_Ref = 27;    //LOW = TRIGGERED
+const uint8_t PDI_S = 39;        //LOW = TRIGGERED
+const uint8_t PDIO_buspin = 25;  //must be 12 or 25 for PJONSoftwareBitBang
+const uint16_t TotalLEDs = 100;  //The total amounts of LEDs in the strip
 CRGB ColorBoot = CRGB(255, 128, 0);
 CRGB ColorHoming = CRGB(0, 0, 255);
 CRGB ColorHomeFail = CRGB(255, 0, 0);
@@ -37,38 +35,39 @@ CRGB ColorMoveActive = CRGB(0, 255, 0);
 //==============================================================
 //Soft settings (can be changed with the interface)
 //==============================================================
-uint8_t HomeMAXSpeed = 200;  //Only used for last homing reference step
-bool Running = false;
-bool DispenserDone = false;
-uint16_t MotorMAXSpeed = 5500;
-uint16_t MotorMAXAccel = 3000;
-uint16_t BedSize_X = 23950;
-uint16_t BedSize_Y = 7100;
-uint16_t Manual_X = BedSize_X;
-uint16_t Manual_Y = BedSize_Y;
-uint16_t MaxHomeBounce = 200;
-uint16_t MaxGlassSize = 300;
-uint16_t DisableSteppersAfterIdleS = 60;
-uint8_t MaxBrightness = 128;
-int16_t SaveEEPROMinSeconds = -1;
-int16_t DisableSteppersinSeconds = -1;
-bool Homed = false;
+bool Homed = false;                       //If the device is currently homed
+uint8_t HomeMAXSpeed = 200;               //Only used for last homing reference step
+uint16_t MotorMAXSpeed = 5500;            //max speed set to the stepper libary
+uint16_t MotorMAXAccel = 3000;            //^
+uint16_t BedSize_X = 23950;               //Limit of bed size and movements, in motor steps
+uint16_t BedSize_Y = 7100;                //^
+uint16_t Manual_X = BedSize_X;            //Where to park when the user needs to do something
+uint16_t Manual_Y = BedSize_Y;            //^
+uint16_t MaxHomeBounce = 200;             //Amount of steps to try and bounce wihtin to detect the Red
+uint16_t DisableSteppersAfterIdleS = 30;  //Release and the motors after this amount of seconds
+uint16_t MaxGlassSize = 300;              //Limit for the drinks in ml
+uint8_t MaxBrightness = 255;              //Brightness of main LED strip
+uint16_t DispenserHeartbeat = 30;         //time in s to check if all dispensers are still there
+uint16_t DispenserDripTime = 4000;        //Time to wait after a dispenser is done to catch any drips
 //==============================================================
 //End of settings
 //==============================================================
 bool UpdateLEDs = false;
+bool Running = false;
+bool DispenserDone = false;
+const uint8_t PrimaryID = 254;
 const uint8_t Dispensers_Amount = 20 + 1;  //Only 20 are saved in the WiFiManager!! 00 is reserved/invalid_ID so add 1 here
+int16_t SaveEEPROMinSeconds = -1;
+int16_t DisableSteppersinSeconds = -1;
 AccelStepper Stepper_X(AccelStepper::DRIVER, PDO_X_Step, PDO_X_Dir);
 AccelStepper Stepper_Y(AccelStepper::DRIVER, PDO_Y_Step, PDO_Y_Dir);
 LiquidCrystal_I2C lcd(0x27, 20, 4);  //Set the LCD address to 0x27 for a 20 chars and 2 line display
-const uint8_t PrimaryID = 254;
 PJONSoftwareBitBang bus(PrimaryID);  //Master Device ID
 CRGB LEDs[TotalLEDs];
 #include "data.h"
 #include "functions.h"
 #include "dispensers.h"
 #include "WiFiManagerLater.h"  //Define options of WiFiManager (can also be done before), but WiFiManager can also be called here (example for DoRequest included here)
-
 void setup() {
   Serial.begin(115200);
   lcd.init();
