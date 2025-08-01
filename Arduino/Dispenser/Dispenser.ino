@@ -81,8 +81,8 @@ void loop() {
     if (button_state == LOW) {                  //Button just pressed
       Serial.println("Manual dispensing");
       DispenseStart();
-      pressStartTime = millis();                //Remember when we started with dispensing
-    } else {  //Button just released
+      pressStartTime = millis();  //Remember when we started with dispensing
+    } else {                      //Button just released
       uint32_t pressedDuration = millis() - pressStartTime;
       uint32_t MinimumDuration = ManualDispenceML * dispenserSettings.TimeMSML;
       if (pressedDuration < MinimumDuration)       //If we pressed shorter than ManualDispenceML
