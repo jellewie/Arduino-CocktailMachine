@@ -509,7 +509,7 @@ void MoveTo(int16_t LocationX, int16_t LocationY) {
 bool WaitForUser(String msg, String msg2) {
   LcdPrint(msg, msg2);
   MoveTo(Manual_X, Manual_Y);
-  long LastTime;
+  unsigned long LastTime;
   while (true) {
     if (digitalRead(PDI_S) == LOW) {
       LcdPrint(msg, "User confirmed");
