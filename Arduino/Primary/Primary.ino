@@ -121,6 +121,12 @@ void setup() {
   digitalWrite(LED_BUILTIN, LOW);
 }
 void loop() {
+  MainLoop();
+  static unsigned long LastTime;
+  if (TickEveryXms(&LastTime, DispenserHeartbeat * 1000))
+    pingOnline();  //Heartbeat to all dispensers to check if they are still there
+}
+void MainLoop() {
   MyYield();
   static bool HomedLast = Homed;
   if (Homed != HomedLast) {              //If home status just changed
@@ -134,9 +140,6 @@ void loop() {
       UpdateLED(true);
     }
   }
-  static unsigned long LastTime;
-  if (TickEveryXms(&LastTime, DispenserHeartbeat * 1000))
-    pingOnline();  //Heartbeat to all dispensers to check if they are still there
 }
 void MakeCocktail(Drink Mix) {
   if (Running) return;

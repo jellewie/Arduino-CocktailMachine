@@ -220,6 +220,7 @@ bool WiFiManagerUser_HandleAP() {  //Called when in the While loop in APMode, th
     ApStarted = true;
     LcdPrint("", "ApMode");
   }
+  MainLoop();
   //Return true to leave APmode
 #define TimeOutApMode 15 * 60 * 1000;  //Example for a timeout, (time in ms)
   unsigned long StopApAt = millis() + TimeOutApMode;
