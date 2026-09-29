@@ -1,19 +1,12 @@
 # **Cocktail Mixer Machine**  
 _A machine that can mix drinks_
 
-> **Note**: This project is still in development!
-
 ![Cocktail Mixer Machine CAD](Images/CAD%20overview.png)
 
 Part of this project is sponsored by [PCBWay](https://www.pcbway.com/). Read more about that [here](Sponsorship.md).
 
 ## **Firmware**
-
-The firmware needs to be flashed to enable OTA BIN file uploads. You can do this either using the Arduino IDE and compiling it, or by using a BIN uploader of your choice.
-There 3 PCB's with firmware
-- Each DISPENSER (ESP32)
-- Each SLOT (ATTINY85, required compiling for each ID)
-- PRIMARY (ESP32) the main PCB
+> **Note**: This project is still in development!
 
 ### Compile
 - [Arduino sketch](Arduino) The whole sketch is the 'Arduino' folder.
@@ -50,19 +43,7 @@ This is also where the dispensers are configured
 <img src="Images/Webpage dispensers.png" alt="Settings.png" width=30%>
 
 ## LED status
-The LED on the ESP (LED_BUILDIN) reflects these errors:
-- **ON** WIFI starts, goes OFF when WIFI setup is successfully completed.
-- **blink 100ms** WIFI setup failed, APmode has started.
-- **blink 500ms** It is connecting to the given WIFI.
 
-The LED strip shows different statuses depending on the operational status.
-The LED strip will show the following effects when said action is being performed:
-- Show lighting effect when just booted (ColorBoot)
-- Show lighting effect when Homing (ColorHoming)
-- Show lighting effect when Homing Failed (ColorHomeFail)
-- Shows rainbow effect when finished/idle
-- Shows lighting effect on set dispenser when in use (ColorMoveBase + ColorMoveActive)
-- LEDs will be at 25% brightness after being idle for DisableSteppersAfterIdleS
 
 ## WIFI page
 The 2 most important pages are the [Setup](#setup) page, where the user can set up the mixer. And the [main landing page](#control) where the fancy UI is.
@@ -94,21 +75,6 @@ The control page is the default landing page the user will land on. Here you sel
 - **Saved settings** just redirects you to [mixer.local/ip](http://mixer.local/ip) to show you the values saved in the EEPROM.
 
 ### Soft settings
-There are multiple soft settings, these are settings that can be changed after the sketch has been uploaded, but are still saved so they can be restored after a reboot.
-The most up-to-date values can be found in the top of the [WiFiManagerBefore.h](Arduino/WiFiManagerBefore.h) source file, and can only be set in [mixer.local/ip](http://mixer.local/ip).
-These settings are auto saved 30000ms after the last change of SoftSettings, or directly after APmode and in the [mixer.local/ip](http://mixer.local/ip) page.
-Note that the character " and TAB (EEPROM_Seperator) cannot be used, these will be replaced with ' and SPACE respectively. Leave black to skip updating these, use spaces ' ' to clear the values
-- **MotorMAXSpeed** The max speed the motors can go
-- **MotorMAXAccel** The max acceleration the motors can do
-- **BedSize_X** **BedSize_Y** **BedSize_Z** The max size in steps the X motor can go
-- **Manual_X** **Manual_Y** The X position to go to when done, and for the manual steps
-- **ShotDispenserML** The amount of ML in a shot dispenser 
-- **HomeMAXSpeed** The max speed of the second soft home
-- **HomedistanceBounce** The amount to bounce back when the switch is triggered
-- **DisableSteppersAfterDone** When set to true, will free and disable the steppers, although this saves heat and power, will require to home again.
-- **MaxGlassSize** The max amount of mL that can fit in a glass
-- **Reserved** Reserved spots for future things
-- **D#** 20 Dispensers with their setup data, saved in the format 'Type,LocationX,LocationY,LocationZ,TimeMSML,TimeMSoff,IngredientID'
 
 ### OTA (Over The Air update)
 This page can be accessed on [mixer.local/ota](http://mixer.local/ota) (or 'IP/ota') and enables you to update firmware over WiFi.
@@ -119,16 +85,7 @@ Note that [SoftSettings](#soft-settings) are preserved.
 ### Full reset
 If a full reset is desired it can be achieved by going to 'mixer.local/reset'. But note that accessing the page will directly wipe all [SoftSettings](#soft-settings) from existence and there will be no way to restore them back. If the wipe was successful it will be reported back and will execute a restart.
 
-## Compensation DOUBLENOZZLE guide
-1. Set CompensationFluidLevel* = 1 and flash it, this is so the dispenser does not compensate (*see Dispenser.ino).
-2. Set "ms/ml" of dispenser at 40
-3. Fill bottle with 300ml
-4. Do an command to dispense 200ml, for example <IP Adress>/set?m=calibrate&i0=VODKA&m0=200 or use the interface
-5. Now set the new "ms/ml" = dispensed_ml / 40 * 200, for example with 178ml you end up with 45
-6. Fill bottle with 700ml
-7. Do an command to dispense 200ml, for example we get 250 ml now
-8. Set CompensationFluidLevel =-(((250.0/200.0)-1.0)/(700.0-300.0))*( FluidLevel -300)+1
-        
+      
 # Appendix
 * Firmware
 [This is included in this repository](Arduino)
