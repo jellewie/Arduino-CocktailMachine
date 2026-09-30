@@ -154,7 +154,7 @@ void UpdatePumps() {
         uint8_t dispenceAmountRotations = 20;
         uint8_t TubePrimeRotations = 4;
         static bool HasDispenced = false;
-        if (ModeUpdated) {                                                       //If the mode just changed to OFF
+        if (ModeUpdated) {                                                       //If the mode just changed
           MovePumpRevolutions(i, TubePrimeRotations + dispenceAmountRotations);  //Prime + dispence the tube to the glass
           HasDispenced = false;
         }
