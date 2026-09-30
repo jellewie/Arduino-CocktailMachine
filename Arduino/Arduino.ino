@@ -153,14 +153,16 @@ void UpdatePumps() {
       case DISPENSE:
         uint8_t dispenceAmountRotations = 20;
         uint8_t TubePrimeRotations = 4;
-        if (ModeUpdated)                                                         //If the mode just changed to OFF
-          MovePumpRevolutions(i, TubePrimeRotations + dispenceAmountRotations);  //Prime + dispence the tube to the glass
         static bool HasDispenced = false;
+        if (ModeUpdated) {                                                       //If the mode just changed to OFF
+          MovePumpRevolutions(i, TubePrimeRotations + dispenceAmountRotations);  //Prime + dispence the tube to the glass
+          HasDispenced = false;
+        }
         if (Stepper.isRunning() == false)  //If we reached our destination
           if (HasDispenced) {
             pump.Mode = OFF;  //we are done
           } else {
-            MovePumpRevolutions(i, TubePrimeRotations);  //Emthy the tube backwards
+            MovePumpRevolutions(i, -TubePrimeRotations);  //Emthy the tube backwards
             HasDispenced = true;
           }
         break;
