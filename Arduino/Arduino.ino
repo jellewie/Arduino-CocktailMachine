@@ -135,9 +135,10 @@ void UpdatePumps() {
           Serial.println("ERROR, timeout Priming on pump " + String(i));
           pump.Mode = OFF;  //Cancel mode, we timed out
         } else if (pump.FluidUpdateFlag) {
-          if (pump.FluidDetected and millis() - pump.ModeStartTime > 500)  //If fluid detected and running for a bit to avoid startup jerk
-            MovePumpRevolutions(i, -1);                                    //Move 1 rotation backwards
-          else
+          if (pump.FluidDetected and millis() - pump.ModeStartTime > 100) {  //If fluid detected and running for a bit to avoid startup jerk
+            Stepper.stop();                                                  //Stop death here in tracks, dont ramp downt
+            MovePumpRevolutions(i, -1);                                      //Move 1 rotation backwards
+          } else
             MovePumpRevolutions(i, 100);  //Move forwards
           pump.FluidUpdateFlag = false;
         } else if (Stepper.isRunning() == false)  //If we reached our destination
