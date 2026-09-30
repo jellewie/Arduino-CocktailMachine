@@ -16,6 +16,8 @@ enum PumpMode { OFF,
 const uint8_t SampleSize = 16;
 const uint8_t PDO_Step = 12;  //Pin Digital Output, Motor step pin
 const uint8_t PDO_Dir = 13;   //Motor Direction pin
+const uint16_t StepperSpeedMax = 7000;
+const uint16_t StepperSpeedMaxPrime = 2000;
 
 struct PumpConfig {
   const uint8_t PDO_Step_enable;
@@ -131,6 +133,8 @@ void UpdatePumps() {
         }
         break;
       case PRIME:
+        if (ModeUpdated)  //If the mode just changed
+          Stepper.setMaxSpeed(StepperSpeedMaxPrime);
         if (millis() - pump.ModeStartTime > 30000) {  //If there is no fluid detected after running, avoid flooding the whole place and stop
           Serial.println("ERROR, timeout Priming on pump " + String(i));
           pump.Mode = OFF;  //Cancel mode, we timed out
@@ -145,8 +149,10 @@ void UpdatePumps() {
           pump.Mode = OFF;                        //we are done
         break;
       case UNLOAD:
-        if (ModeUpdated)                   //If the mode just changed to OFF
-          MovePumpRevolutions(i, -100);    //Emthy the tube backwards
+        if (ModeUpdated) {               //If the mode just changed to OFF
+          MovePumpRevolutions(i, -100);  //Emthy the tube backwards
+          Stepper.setMaxSpeed(StepperSpeedMax);
+        }
         if (Stepper.isRunning() == false)  //If we reached our destination
           pump.Mode = OFF;                 //we are done
         break;
@@ -157,6 +163,7 @@ void UpdatePumps() {
         if (ModeUpdated) {                                                       //If the mode just changed
           MovePumpRevolutions(i, TubePrimeRotations + dispenceAmountRotations);  //Prime + dispence the tube to the glass
           HasDispenced = false;
+          Stepper.setMaxSpeed(StepperSpeedMax);
         }
         if (Stepper.isRunning() == false)  //If we reached our destination
           if (HasDispenced) {
