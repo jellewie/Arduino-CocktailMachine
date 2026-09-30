@@ -53,6 +53,7 @@ void setup() {
     pinMode(Pumps[i].PDO_Step_enable, OUTPUT);
     pinMode(Pumps[i].PDI_Light_Sensor, INPUT);
   }
+  DisableAllSteppers();
   Serial.println("booted");
 }
 void loop() {
