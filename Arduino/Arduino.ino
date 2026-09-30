@@ -116,12 +116,17 @@ void ReadSensors() {  //Read the sensors and save the average
 void UpdatePumps() {
   for (uint8_t i = 0; i < PumpAmount; i++) {
     PumpConfig& pump = Pumps[i];
-    if (pump.LastMode != pump.Mode)
+    bool ModeUpdated = false;
+    if (pump.LastMode != pump.Mode) {
+      pump.LastMode = pump.Mode;
+      ModeUpdated = true;
       Serial.println("UpdatePumps pump=" + String(i) + " mode=" + String(pump.Mode));
+    }
     switch (pump.Mode) {
       case OFF:
-        if (pump.LastMode != pump.Mode)  //If the mode just changed to OFF
+        if (ModeUpdated) {  //If the mode just changed to OFF
           Stepper.stop();
+        }
         break;
       case PRIME:
         if (millis() - pump.ModeStartTime > 30000) {  //If there is no fluid detected after running, avoid flooding the whole place and stop
@@ -137,15 +142,15 @@ void UpdatePumps() {
           pump.Mode = OFF;                        //we are done
         break;
       case UNLOAD:
-        if (pump.LastMode != pump.Mode)    //If the mode just changed to OFF
-          MovePumpRevolutions(i, -100);     //Emthy the tube backwards
+        if (ModeUpdated)                   //If the mode just changed to OFF
+          MovePumpRevolutions(i, -100);    //Emthy the tube backwards
         if (Stepper.isRunning() == false)  //If we reached our destination
           pump.Mode = OFF;                 //we are done
         break;  //digitalWrite(PDO_Dir, HIGH);  //Set direction counter clockwise
       case DISPENSE:
         uint8_t dispenceAmountRotations = 20;
         uint8_t TubePrimeRotations = 4;
-        if (pump.LastMode != pump.Mode)                                          //If the mode just changed to OFF
+        if (ModeUpdated)                                                         //If the mode just changed to OFF
           MovePumpRevolutions(i, TubePrimeRotations + dispenceAmountRotations);  //Prime + dispence the tube to the glass
         static bool HasDispenced = false;
         if (Stepper.isRunning() == false)  //If we reached our destination
@@ -157,16 +162,18 @@ void UpdatePumps() {
           }
         break;
     }
-    pump.LastMode = pump.Mode;
   }
 }
 void MovePumpRevolutions(uint8_t PumpId, float Revolutions) {
-  for (uint8_t i = 0; i < PumpAmount; i++)
-    digitalWrite(Pumps[i].PDO_Step_enable, HIGH);    //Disable all steppers
+  DisableAllSteppers();
   digitalWrite(Pumps[PumpId].PDO_Step_enable, LOW);  //Enable this stepper
   const int StepsPerRev = 1600;                      //We have 1600 steps per full resolution
   long Steps = Revolutions * StepsPerRev;
   Stepper.move(Steps);
+}
+void DisableAllSteppers() {
+  for (uint8_t i = 0; i < PumpAmount; i++)
+    digitalWrite(Pumps[i].PDO_Step_enable, HIGH);  //Disable all steppers
 }
 
 //Functions:
