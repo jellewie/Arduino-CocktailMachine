@@ -127,6 +127,7 @@ void UpdatePumps() {
       case OFF:
         if (ModeUpdated) {  //If the mode just changed to OFF
           Stepper.stop();
+          DisableAllSteppers();
         }
         break;
       case PRIME:
