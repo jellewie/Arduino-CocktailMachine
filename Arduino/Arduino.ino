@@ -3,7 +3,7 @@
   Board: https://dl.espressif.com/dl/package_esp32_index.json
 */
 
-#include <AccelStepper.h>  //Make sure to install AccelStepper V1.61.0(+) manually //https://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html#a68942c66e78fb7f7b5f0cdade6eb7f06
+#include <AccelStepper.h>  //Make sure to install AccelStepper V1.64(+) manually //https://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html#a68942c66e78fb7f7b5f0cdade6eb7f06
 
 enum PumpMode { OFF,
                 PRIME,
