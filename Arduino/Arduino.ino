@@ -149,7 +149,7 @@ void UpdatePumps() {
           MovePumpRevolutions(i, -100);    //Emthy the tube backwards
         if (Stepper.isRunning() == false)  //If we reached our destination
           pump.Mode = OFF;                 //we are done
-        break;  //digitalWrite(PDO_Dir, HIGH);  //Set direction counter clockwise
+        break;
       case DISPENSE:
         uint8_t dispenceAmountRotations = 20;
         uint8_t TubePrimeRotations = 4;
