@@ -49,7 +49,7 @@ void setup() {
   Serial.begin(115200);
   pinMode(PDO_Step, OUTPUT);
   pinMode(PDO_Dir, OUTPUT);
-  Stepper.setMaxSpeed(7000);
+  Stepper.setMaxSpeed(StepperSpeedMax);
   Stepper.setAcceleration(10000);
   for (uint8_t i = 0; i < PumpAmount; i++) {
     pinMode(Pumps[i].PDO_Step_enable, OUTPUT);
